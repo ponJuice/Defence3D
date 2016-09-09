@@ -22,6 +22,7 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
+import jp.ac.dendai.c.jtp.defence3d.R;
 
 /**
  * 2次元用画像描画クラス（なんで抽象クラスにしたのか本気で悩んでるwww）

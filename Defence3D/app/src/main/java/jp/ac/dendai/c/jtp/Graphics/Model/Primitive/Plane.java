@@ -23,7 +23,7 @@ public class Plane extends Mesh {
     };
     protected static int vertexBufferObject = -1;
     protected static int indexBufferObject = -1;
-    protected static Face[] face = new Face[1];
+    protected Face[] face = new Face[1];
 
     public Plane(){
         face[0] = new Face(new Matelial(),0,6);

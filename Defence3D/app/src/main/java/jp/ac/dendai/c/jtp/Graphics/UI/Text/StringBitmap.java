@@ -8,11 +8,13 @@ import android.graphics.Paint;
  */
 public class StringBitmap {
     Bitmap bitmap;
+    float width;
     Paint.FontMetrics fm;
 
-    public StringBitmap(Bitmap b, Paint.FontMetrics f){
+    public StringBitmap(Bitmap b, Paint.FontMetrics f,float width){
         bitmap = b;
         fm = f;
+        this.width = width;
     }
 
     public Bitmap getBitmap(){

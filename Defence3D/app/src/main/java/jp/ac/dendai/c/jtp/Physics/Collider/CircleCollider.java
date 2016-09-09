@@ -4,6 +4,7 @@ import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model.ModelObject;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Math.Vector;
+import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by Goto on 2016/08/31.
@@ -32,6 +33,6 @@ public class CircleCollider extends ACollider{
                 ,radius
                 ,radius
                 ,0,0,0
-                ,0.5f);
+                ,0.5f, GLES20COMPOSITIONMODE.ALPHA);
     }
 }

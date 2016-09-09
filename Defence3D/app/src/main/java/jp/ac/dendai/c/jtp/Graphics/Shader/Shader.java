@@ -11,6 +11,7 @@ import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model.Model;
 import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
+import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by テツヤ on 2016/08/29.
@@ -195,10 +196,10 @@ public abstract class Shader {
     }
     public abstract void draw(Model model, float x, float y, float z,
                        float scaleX, float scaleY, float scaleZ,
-                       float degreeX, float degreeY, float degreeZ);
+                       float degreeX, float degreeY, float degreeZ,GLES20COMPOSITIONMODE mode);
     public abstract void draw(Mesh mesh, float x, float y, float z,
                               float scaleX, float scaleY, float scaleZ,
-                              float degreeX, float degreeY, float degreeZ,float alpha);
+                              float degreeX, float degreeY, float degreeZ,float alpha,GLES20COMPOSITIONMODE mode);
     public abstract void draw(Texture tex, float x, float y, float z,
                               float scaleX, float scaleY, float scaleZ,
                               float degreeX, float degreeY, float degreeZ,float alpha);

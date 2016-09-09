@@ -47,6 +47,8 @@ public class Text implements UI {
 
     @Override
     public void draw(UiShader shader) {
-        shader.draw(image,x,y,image.getTexture().getWidth()/image.getTexture().getHeight()*sx,sy,dx,alpha);
+        float bottom = sb.fm.bottom / (float)sb.bitmap.getHeight();
+        shader.draw(image,x,y-(bottom*sy),image.getTexture().getWidth()/image.getTexture().getHeight()*sx,sy,dx,alpha);
+        //shader.draw(image,0,0,image.getTexture().getWidth()/image.getTexture().getHeight()*sx,1,0,alpha);
     }
 }

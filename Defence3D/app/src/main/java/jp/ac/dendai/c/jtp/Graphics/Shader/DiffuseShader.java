@@ -9,6 +9,7 @@ import jp.ac.dendai.c.jtp.Graphics.Model.Model.Model;
 import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
+import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by テツヤ on 2016/08/29.
@@ -30,7 +31,7 @@ public class DiffuseShader extends Shader{
     }
 
     @Override
-    public void draw(Model model, float x, float y, float z, float scaleX, float scaleY, float scaleZ, float degreeX, float degreeY, float degreeZ) {
+    public void draw(Model model, float x, float y, float z, float scaleX, float scaleY, float scaleZ, float degreeX, float degreeY, float degreeZ,GLES20COMPOSITIONMODE mode) {
         Matrix.setIdentityM(modelMatrix, 0);
 
         Matrix.translateM(modelMatrix, 0, x, y, z);
@@ -43,6 +44,7 @@ public class DiffuseShader extends Shader{
         if(degreeX != 0)
             Matrix.rotateM(modelMatrix, 0, degreeX, 1, 0, 0);
 
+        mode.setBlendMode();
         setShaderModelMatrix(modelMatrix);
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, model.vertexBufferObject[0]);
@@ -63,7 +65,7 @@ public class DiffuseShader extends Shader{
     }
 
     @Override
-    public void draw(Mesh mesh, float x, float y, float z, float scaleX, float scaleY, float scaleZ, float degreeX, float degreeY, float degreeZ,float alpha) {
+    public void draw(Mesh mesh, float x, float y, float z, float scaleX, float scaleY, float scaleZ, float degreeX, float degreeY, float degreeZ,float alpha,GLES20COMPOSITIONMODE mode) {
         Matrix.setIdentityM(modelMatrix, 0);
 
         Matrix.translateM(modelMatrix, 0, x, y, z);
@@ -76,6 +78,7 @@ public class DiffuseShader extends Shader{
         if(degreeX != 0)
             Matrix.rotateM(modelMatrix, 0, degreeX, 1, 0, 0);
 
+        mode.setBlendMode();
         setShaderModelMatrix(modelMatrix);
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mesh.getVBO());

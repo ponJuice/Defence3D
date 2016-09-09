@@ -18,6 +18,7 @@ public abstract class Mesh {
     protected IntBuffer index;
     public abstract int getVBO();
     public abstract int getIBO();
+
     public FloatBuffer getVertexBuffer(){return vertex;}
     public IntBuffer getIndexBuffer(){return index;}
     protected void setVertexBufferObject(){

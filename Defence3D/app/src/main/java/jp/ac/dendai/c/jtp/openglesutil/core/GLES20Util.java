@@ -78,9 +78,10 @@ public class GLES20Util extends abstractGLES20Util {
 
 		//キャンバスからビットマップを取得
 		canvas = new Canvas(bitmap);
+		//canvas.drawColor(Color.BLUE);
 		canvas.drawText(text, 0, Math.abs(fm.top), paint);
 
-		return new StringBitmap(bitmap,paint.getFontMetrics());
+		return new StringBitmap(bitmap,paint.getFontMetrics(),textWidth);
 	}
 
 	public static void DrawString(String string,int size,int r,int g,int b,float alpha,float x,float y,GLES20COMPOSITIONMODE mode){

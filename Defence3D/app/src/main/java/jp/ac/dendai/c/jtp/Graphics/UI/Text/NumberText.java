@@ -19,7 +19,8 @@ public class NumberText implements UI {
     protected StringBitmap[] number;
     protected int num;
     protected Texture tex;
-    protected int x = 0,y = 0,z = 0;
+    public float x = 0,y = 0,z = 0;
+    public float lx = 1,ly = 1,lz = 1;
     protected int align_h = UI_CENTOR,align_v = UI_CENTOR;
     public NumberText(String fontName){
         if(numberFont == null)
@@ -59,10 +60,14 @@ public class NumberText implements UI {
     public void draw(UiShader shader) {
         int line = (int)Math.log10(num) + 1;
         float x_offset = getHolizon(line,number[0].getBitmap().getHeight(),number[0].getBitmap().getWidth());
+        int m = 0;
         for(int n = line;n > 0;n--){
-            tex.setTexture(number[getDigit(num,n)].getBitmap());
+            int digit = getDigit(num,n);
+            tex.setTexture(number[digit].getBitmap());
+            float bottom = number[digit].fm.bottom / (float)number[digit].bitmap.getHeight();
             float scaleX = (float)tex.getTexture().getWidth() / (float)tex.getTexture().getHeight();
-            shader.draw(tex,scaleX * (float)(line - n) + x,y,scaleX,1,0,1);
+            shader.draw(tex,scaleX*lx * (float)m + x,y-(bottom*ly),scaleX*lx,ly,0,1);
+            m++;
         }
     }
 
