@@ -62,14 +62,17 @@ public class Renderer {
     public void removeItem(GameObject object){
         if(object.getRenderMediator().renderer == null || object.getRenderMediator().renderer != this)
             return;
+        if(ite != object.getRenderMediator().item) {
+            object.getRenderMediator().item.prev.next = object.getRenderMediator().item.next;
+            object.getRenderMediator().item.next.prev = object.getRenderMediator().item.prev;
 
-        object.getRenderMediator().item.prev.next = object.getRenderMediator().item.next;
-        object.getRenderMediator().item.next.prev = object.getRenderMediator().item.prev;
-
-        object.getRenderMediator().item.prev = ite;
-        object.getRenderMediator().item.next = ite.next;
-        ite.next.prev = object.getRenderMediator().item;
-        ite.next = object.getRenderMediator().item;
+            object.getRenderMediator().item.prev = ite;
+            object.getRenderMediator().item.next = ite.next;
+            ite.next.prev = object.getRenderMediator().item;
+            ite.next = object.getRenderMediator().item;
+        }else{
+            ite = ite.prev;
+        }
         object.getRenderMediator().renderer = null;
         object.getRenderMediator().item = null;
         registItemNum--;

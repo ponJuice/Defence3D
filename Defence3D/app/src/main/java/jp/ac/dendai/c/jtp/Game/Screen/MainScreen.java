@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.view.MotionEvent;
 
+import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Game.Player;
 import jp.ac.dendai.c.jtp.Graphics.Bitmap.AnimationBitmap;
@@ -24,7 +25,9 @@ import jp.ac.dendai.c.jtp.Graphics.UI.Text.Text;
 import jp.ac.dendai.c.jtp.Math.Vector;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
+import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.CircleCollider;
+import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
 import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsInfo;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
@@ -52,7 +55,8 @@ public class MainScreen implements Screenable {
     private Camera uiCamera;
     private Camera testCamera;
     private GameObject[] gameObjects;
-    private Button button;
+    private GameObject[] playerBullet;
+    private Button button,button2;
     private Player player;
     private Physics3D physics;
     private Shader shader;
@@ -100,6 +104,18 @@ public class MainScreen implements Screenable {
         tex = new Texture(ImageReader.readImageToAssets("Block.png"), GLES20COMPOSITIONMODE.ALPHA);
         //バッファオブジェクトを使用する
         tex.setBufferObject();
+
+        //プレイヤーの玉
+        playerBullet = new GameObject[5];
+        for(int n = 0;n < 5;n++){
+            playerBullet[n] = new GameObject();
+            playerBullet[n].setCollider(new CircleCollider(0.125f));
+            playerBullet[n].getRenderMediator().isDraw = false;
+            playerBullet[n].getRenderMediator().mesh = box;
+            playerBullet[n].getScl().setX(0.05f);
+            playerBullet[n].getScl().setY(0.05f);
+            playerBullet[n].getScl().setZ(0.05f);
+        }
 
         //ゲームオブジェクトを作成
         gameObjects = new GameObject[5];
@@ -149,8 +165,8 @@ public class MainScreen implements Screenable {
         Input.getTouchArray()[0].addTouchListener(new TouchListener() {
             @Override
             public void execute(Touch t) {
-                rotateX += t.getDelta(Touch.Pos_Flag.Y) * 0.05f;
-                rotateY += t.getDelta(Touch.Pos_Flag.X) * 0.05f;
+                rotateX += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
+                rotateY += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
 
                 if(rotateX <= -90f)
                     rotateX = -89f;
@@ -169,13 +185,18 @@ public class MainScreen implements Screenable {
             }
         });
 
+        TestCollisionListener tcl = new TestCollisionListener();
+
         //物理計算用クラス作成
         PhysicsInfo info = new PhysicsInfo();
         info.enabled = true;
         info.gravity = new Vector3(0,-0.98f,0);
-        info.maxObject = 3;
+        info.maxObject = 10;
         physics = new Physics3D(info);
         PhysicsObject po = new PhysicsObject(gameObjects[0]);
+        po.mask = Constant.COLLISION_PLAYERBULLET;
+        po.tag = Constant.COLLISION_ENEMY;
+        gameObjects[0].setCollisionListener(tcl);
         po.gameObject.getScl().setX(0.25f);
         po.gameObject.getScl().setY(0.25f);
         po.gameObject.getScl().setZ(0.25f);
@@ -185,12 +206,19 @@ public class MainScreen implements Screenable {
         po.freeze = false;
         physics.addObject(po);
         PhysicsObject po2 = new PhysicsObject(gameObjects[3]);
+        po2.mask = Constant.COLLISION_PLAYERBULLET;
+        po2.tag = Constant.COLLISION_ENEMY;
+        gameObjects[3].setCollisionListener(tcl);
         po2.useGravity = false;
         physics.addObject(po2);
-        //po = new PhysicsObject(gameObjects[1]);
-        //po.useGravity = false;
-        //po.freeze = false;
-        //physics.addObject(po);
+        for(int n = 0;n < playerBullet.length;n++){
+            po2 = new PhysicsObject(playerBullet[n]);
+            po2.tag = Constant.COLLISION_PLAYERBULLET;
+            po2.mask = Constant.COLLISION_ENEMY;
+            po2.useGravity = true;
+            po2.freeze = true;
+            physics.addObject(po2);
+        }
 
         //レンダラを作成
         renderer = new Renderer();
@@ -208,6 +236,9 @@ public class MainScreen implements Screenable {
         testRenderer.addItem(gameObjects[2]);
         testRenderer.addItem(gameObjects[3]);
         testRenderer.addItem(player);
+        for(int n = 0;n < playerBullet.length;n++){
+            testRenderer.addItem(playerBullet[n]);
+        }
 
         alphaRenderer = new Renderer();
         alphaRenderer.setShader(testShader);
@@ -235,7 +266,12 @@ public class MainScreen implements Screenable {
         button = new Button(0,0.125f,0.125f, 0);
         button.setCamera(uiCamera);
         button.setBackground(tex);
-        button.setButtonListener(new TestButtonListener(player,po));
+        button.setButtonListener(new TestButtonListener(player, playerBullet));
+
+        button2 = new Button(GLES20Util.getWidth_gl()-0.125f,0.125f,GLES20Util.getWidth_gl(),0);
+        button2.setCamera(uiCamera);
+        button2.setBackground(tex);
+        button2.setButtonListener(new TestButtonListener2(player,gameObjects[0]));
 
         //ナンバーテキスト
         nt = new NumberText("メイリオ");
@@ -258,9 +294,11 @@ public class MainScreen implements Screenable {
         player.proc();
         for(int n = 0;n < Input.getMaxTouch();n++) {
             button.touch(Input.getTouchArray()[n]);
+            button2.touch(Input.getTouchArray()[n]);
         }
         nt.setNumber(MainActivity.fpsController.getFps());
         button.proc();
+        button2.proc();
         physics.simulate();
         if(n % 5 == 0)
             anim.next();
@@ -288,6 +326,7 @@ public class MainScreen implements Screenable {
         tx.draw(uiShader);
 
         button.draw(uiShader);
+        button2.draw(uiShader);
     }
 
     @Override
@@ -313,8 +352,8 @@ public class MainScreen implements Screenable {
     private void tempTouchProcess(Touch t){
         if(t.getTouchID() == -1)
             return;
-        rotateX += t.getDelta(Touch.Pos_Flag.X) * 0.1f;
-        rotateY += t.getDelta(Touch.Pos_Flag.Y) * 0.1f;
+        rotateX += t.getDelta(Touch.Pos_Flag.X) * 0.5f;
+        rotateY += t.getDelta(Touch.Pos_Flag.Y) * 0.5f;
 
         if(rotateX <= -90f)
             rotateX = -89f;
@@ -331,9 +370,45 @@ public class MainScreen implements Screenable {
     }
 
     class TestButtonListener implements ButtonListener {
-        PhysicsObject target;
+        int n = 0;
+        GameObject[] bullet;
         Player player;
-        public TestButtonListener(Player player,PhysicsObject target){
+        public TestButtonListener(Player player,GameObject[] bullet){
+            this.bullet = bullet;
+            this.player = player;
+        }
+
+        @Override
+        public void touchDown(Button button) {
+
+        }
+
+        @Override
+        public void touchHover(Button button) {
+
+        }
+
+        @Override
+        public void touchUp(Button button) {
+            bullet[n].getPos().copy(player.getPos());
+            bullet[n].getRot().copy(player.getRot());
+            bullet[n].getPhysicsObject().velocity.zeroReset();
+            bullet[n].getPhysicsObject().velocity.setZ(-1);
+            Vector.rotateX(Math.toRadians(player.getRot().getX()), bullet[n].getPhysicsObject().velocity, bullet[n].getPhysicsObject().velocity);
+            Vector.rotateY(Math.toRadians(player.getRot().getY()), bullet[n].getPhysicsObject().velocity, bullet[n].getPhysicsObject().velocity);
+            bullet[n].getPhysicsObject().velocity.scalarMult(25f);
+            bullet[n].getRenderMediator().isDraw = true;
+            bullet[n].getPhysicsObject().freeze = false;
+            n++;
+            if(n >= bullet.length)
+                n = 0;
+        }
+    }
+
+    class TestButtonListener2 implements ButtonListener {
+        GameObject target;
+        Player player;
+        public TestButtonListener2(Player player,GameObject target){
             this.target = target;
             this.player = player;
         }
@@ -350,13 +425,33 @@ public class MainScreen implements Screenable {
 
         @Override
         public void touchUp(Button button) {
-            target.gameObject.getPos().copy(player.getPos());
-            target.gameObject.getRot().copy(player.getRot());
-            target.velocity.zeroReset();
-            target.velocity.setZ(-1);
-            Vector.rotateX(Math.toRadians(player.getRot().getX()), target.velocity, target.velocity);
-            Vector.rotateY(Math.toRadians(player.getRot().getY()), target.velocity, target.velocity);
-            target.velocity.scalarMult(25f);
+            target.getPos().setY(10f);
+            target.getPos().setZ(-5f);
+            target.getPhysicsObject().velocity.zeroReset();
+            target.getRenderMediator().isDraw = true;
+            target.getPhysicsObject().freeze = false;
+            if(!target.getPhysicsObject().isRegist()) {
+                testRenderer.addItem(target);
+                physics.addObject(target.getPhysicsObject());
+            }
+        }
+    }
+
+    class TestCollisionListener implements CollisionListener{
+        @Override
+        public void collEnter(GameObject owner,ACollider col) {
+            owner.getRenderMediator().renderer.removeItem(owner);
+            physics.removeObject(owner.getPhysicsObject());
+        }
+
+        @Override
+        public void collExit(GameObject owner) {
+
+        }
+
+        @Override
+        public void collStay(GameObject owner) {
+
         }
     }
 }

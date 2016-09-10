@@ -14,6 +14,8 @@ public class PhysicsObject {
         NON
     }
     COLLISION collisionMode = COLLISION.NON;
+    public int mask;
+    public int tag;
     public String name;
     public float mass;
     public GameObject gameObject;
@@ -29,6 +31,7 @@ public class PhysicsObject {
 
     public PhysicsObject(GameObject gameObject){
         this.gameObject = gameObject;
+        this.gameObject.setPhysicsObject(this);
         name = "";
         velocity = new Vector3();
         impulseVelocity = new Vector3();
@@ -38,6 +41,10 @@ public class PhysicsObject {
         bufferScl = new Vector3();
         useGravity = true;
         freeze = false;
+    }
+
+    public boolean isRegist(){
+        return regist != null;
     }
 
     public Vector getBufferVelocity(){

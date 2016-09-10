@@ -8,6 +8,7 @@ import jp.ac.dendai.c.jtp.Math.Vector;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.CircleCollider;
+import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 
 /**
@@ -18,6 +19,7 @@ public class GameObject{
     protected CircleCollider collider;
     protected PhysicsObject po;
     protected RenderMediator rm;
+    protected CollisionListener cl;
     public GameObject(){
         pos = new Vector3();
         rot = new Vector3();
@@ -34,6 +36,12 @@ public class GameObject{
         rm.gameObject = this;
         rm.alpha = 1.0f;
     }
+    public void setPhysicsObject(PhysicsObject object){
+        this.po = object;
+    }
+    public PhysicsObject getPhysicsObject(){
+        return po;
+    }
     public RenderMediator getRenderMediator(){
         return rm;
     }
@@ -47,6 +55,9 @@ public class GameObject{
         collider = col;
         collider.setGameObject(this);
     }
+    public void setCollisionListener(CollisionListener cl){
+        this.cl = cl;
+    }
     public Vector getRot(){
         return rot;
     }
@@ -54,12 +65,18 @@ public class GameObject{
         return scl;
     }
     public void collEnter(ACollider col){
-        rm.alpha = 0.5f;
+        if(cl == null)
+            return;
+        cl.collEnter(this,col);
     };
     public void collExit(){
-        rm.alpha = 1.0f;
+        if(cl == null)
+            return;
+        cl.collExit(this);
     };
     public void collStay(){
-        rm.alpha = 0.5f;
+        if(cl == null)
+            return;
+        cl.collStay(this);
     };
 }

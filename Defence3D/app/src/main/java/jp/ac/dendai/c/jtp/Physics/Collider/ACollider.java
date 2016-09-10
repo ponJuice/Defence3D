@@ -26,10 +26,10 @@ public abstract class ACollider {
     public abstract Vector[] getDirect();
     public abstract void debugDraw(Shader shader,GameObject pos);
 
-    public static boolean isCollision(CircleCollider A,CircleCollider B){
-        if(A.radius + B.radius <= Vector.distanceAtoB(A.gameObject.getPos(),B.gameObject.getPos())){
+    public static boolean isCollision(CircleCollider A,CircleCollider B) {
+        if (A.radius + B.radius <= Vector.distanceAtoB(A.gameObject.getPos(), B.gameObject.getPos())) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
