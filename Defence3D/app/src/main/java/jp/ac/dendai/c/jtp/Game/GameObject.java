@@ -14,7 +14,7 @@ import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 /**
  * Created by Goto on 2016/08/31.
  */
-public class GameObject{
+public class GameObject implements FrameListener{
     protected Vector pos,rot,scl;
     protected CircleCollider collider;
     protected PhysicsObject po;
@@ -79,4 +79,9 @@ public class GameObject{
             return;
         cl.collStay(this);
     };
+
+    @Override
+    public void update() {
+
+    }
 }

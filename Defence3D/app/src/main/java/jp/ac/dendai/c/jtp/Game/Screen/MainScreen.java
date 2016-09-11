@@ -5,6 +5,7 @@ import android.opengl.GLES20;
 import android.view.MotionEvent;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
+import jp.ac.dendai.c.jtp.Game.Enemy.Enemy;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Game.Player;
 import jp.ac.dendai.c.jtp.Graphics.Bitmap.AnimationBitmap;
@@ -64,7 +65,8 @@ public class MainScreen implements Screenable {
     private DiffuseShader testShader;
     private Texture tex;
     private ModelObject box,gird,sphear;
-    private NumberText nt;
+    private Enemy enemy;
+    private NumberText nt,timeNt;
     private Text tx;
     private Animator anim;
     public MainScreen(){
@@ -190,7 +192,7 @@ public class MainScreen implements Screenable {
         //物理計算用クラス作成
         PhysicsInfo info = new PhysicsInfo();
         info.enabled = true;
-        info.gravity = new Vector3(0,-0.98f,0);
+        info.gravity = new Vector3(0,-9.8f,0);
         info.maxObject = 10;
         physics = new Physics3D(info);
         PhysicsObject po = new PhysicsObject(gameObjects[0]);
@@ -281,12 +283,26 @@ public class MainScreen implements Screenable {
         nt.ly = 0.25f;
         nt.lz = 0.25f;
 
+        timeNt = new NumberText("メイリオ");
+        timeNt.setNumber(100);
+        timeNt.y = 0.85f;
+        timeNt.lx = 0.25f;
+        timeNt.ly = 0.25f;
+        timeNt.lz = 0.25f;
+
         //テキスト
         tx = new Text("abcefghij");
         tx.sx = 0.25f;
         tx.sy = 0.25f;
 
         uiCamera.setPosition(GLES20Util.getAspect() / 2f, 0.5f, 0);
+
+        enemy = new Enemy(physics,testRenderer,box);
+        enemy.getPos().setZ(-50f);
+        enemy.getPos().setY(-4f);
+        enemy.getRenderMediator().mesh = box;
+        enemy.getRenderMediator().isDraw = true;
+        testRenderer.addItem(enemy);
     }
     int n = 0;
     @Override
@@ -302,6 +318,8 @@ public class MainScreen implements Screenable {
         physics.simulate();
         if(n % 5 == 0)
             anim.next();
+        enemy.update();
+        timeNt.setNumber((int)physics.getCurrentTime());
         /*nt.lx += 0.001f;
         nt.ly = nt.lx;
         nt.lz = nt.lx;
@@ -324,6 +342,7 @@ public class MainScreen implements Screenable {
 
         nt.draw(uiShader);
         tx.draw(uiShader);
+        timeNt.draw(uiShader);
 
         button.draw(uiShader);
         button2.draw(uiShader);
