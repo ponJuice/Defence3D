@@ -6,18 +6,7 @@ import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 /**
  * Created by Goto on 2016/09/01.
  */
-public class Renderer {
-    class RenderItem{
-        public RenderItem next,prev;
-        public RenderMediator rm;
-    }
-    private int registItemNum = 0;
-    private int maxItemNum = 0;
-    private RenderItem ite;
-
-    //private RenderItem item;
-    protected Shader shader;
-    protected boolean enabled;
+public class Renderer extends ARenderer {
     public Renderer(){
         enabled = true;
     }

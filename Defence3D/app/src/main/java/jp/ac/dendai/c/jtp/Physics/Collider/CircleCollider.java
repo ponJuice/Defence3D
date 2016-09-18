@@ -18,10 +18,6 @@ public class CircleCollider extends ACollider{
     public void setDebugModel(ModelObject model){
         debug = model;
     }
-    @Override
-    public Vector[] getDirect() {
-        return new Vector[0];
-    }
 
     @Override
     public void debugDraw(Shader shader, GameObject pos) {

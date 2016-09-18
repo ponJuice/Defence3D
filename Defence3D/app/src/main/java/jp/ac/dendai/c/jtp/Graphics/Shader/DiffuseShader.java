@@ -44,6 +44,9 @@ public class DiffuseShader extends Shader{
         if(degreeX != 0)
             Matrix.rotateM(modelMatrix, 0, degreeX, 1, 0, 0);
 
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+
         mode.setBlendMode();
         setShaderModelMatrix(modelMatrix);
 
@@ -78,6 +81,9 @@ public class DiffuseShader extends Shader{
         if(degreeX != 0)
             Matrix.rotateM(modelMatrix, 0, degreeX, 1, 0, 0);
 
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+
         mode.setBlendMode();
         setShaderModelMatrix(modelMatrix);
 
@@ -106,6 +112,9 @@ public class DiffuseShader extends Shader{
         Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, 1.0f);
         Matrix.rotateM(modelMatrix, 0, degreeZ, 0, 0, 1);
         setShaderModelMatrix(modelMatrix);
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
 
         setOnTexture(tex.getTexture(), u_Sampler);
 

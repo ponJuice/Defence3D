@@ -1,9 +1,9 @@
-package jp.ac.dendai.c.jtp.Graphics.UI.Util;
+package jp.ac.dendai.c.jtp.Graphics.UI.Util.Figure;
 
 /**
  * Created by Goto on 2016/09/06.
  */
-public class Rect {
+public class Rect implements Figure{
     protected float cx,cy;
     protected float top,left,bottom,right;
     public Rect(float left,float top,float right,float bottom){
@@ -45,6 +45,10 @@ public class Rect {
         return bottom;
     }
 
+    public float getWidth(){return right - left;}
+
+    public float getHeight(){return top - bottom;}
+
     public void setRect(float left,float top,float right,float bottom){
         this.top = top;
         this.left = left;
@@ -74,9 +78,28 @@ public class Rect {
     }
 
     public void calcCenter(){
-        cx = this.left - this.right;
-        cy = this.top - this.bottom;
+        cx = (this.right - this.left)/2f + this.left;
+        cy = (this.top - this.bottom)/2f + this.bottom;
     }
+
+    public void setCx(float value){
+        float _width = getWidth()/2f;
+        float _left = value - _width;
+        float _right = value + _width;
+        left = _left;
+        right = _right;
+        calcCenter();
+    }
+
+    public void setCy(float value){
+        float _height = getHeight()/2f;
+        float _bottom = value - _height;
+        float _top = value + _height;
+        top = _top;
+        bottom = _bottom;
+        calcCenter();
+    }
+    @Override
     public boolean contains(float x,float y){
         return left <= x && x <= right && bottom <= y && y <= top;
     }

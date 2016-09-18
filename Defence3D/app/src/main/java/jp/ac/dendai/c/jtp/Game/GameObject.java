@@ -4,8 +4,10 @@ import android.util.Log;
 
 import jp.ac.dendai.c.jtp.Graphics.Renderer.RenderMediator;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.Renderer;
+import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Math.Vector;
 import jp.ac.dendai.c.jtp.Math.Vector3;
+import jp.ac.dendai.c.jtp.Physics.Collider.AABBCollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.CircleCollider;
 import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
@@ -16,10 +18,11 @@ import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
  */
 public class GameObject implements FrameListener{
     protected Vector pos,rot,scl;
-    protected CircleCollider collider;
+    protected AABBCollider collider;
     protected PhysicsObject po;
     protected RenderMediator rm;
     protected CollisionListener cl;
+    protected String name;
     public GameObject(){
         pos = new Vector3();
         rot = new Vector3();
@@ -48,10 +51,10 @@ public class GameObject implements FrameListener{
     public Vector getPos(){
         return pos;
     }
-    public CircleCollider getCollider(){
+    public ACollider getCollider(){
         return collider;
     }
-    public void setCollider(CircleCollider col){
+    public void setCollider(AABBCollider col){
         collider = col;
         collider.setGameObject(this);
     }
@@ -64,22 +67,11 @@ public class GameObject implements FrameListener{
     public Vector getScl(){
         return scl;
     }
-    public void collEnter(ACollider col){
-        if(cl == null)
-            return;
-        cl.collEnter(this,col);
-    };
-    public void collExit(){
-        if(cl == null)
-            return;
-        cl.collExit(this);
-    };
-    public void collStay(){
-        if(cl == null)
-            return;
-        cl.collStay(this);
-    };
-
+    public CollisionListener getCollisionListener(){
+        return cl;
+    }
+    public String getName(){return name;}
+    public void setName(String name){this.name = name;}
     @Override
     public void update() {
 

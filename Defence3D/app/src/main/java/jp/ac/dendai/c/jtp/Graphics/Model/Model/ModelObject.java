@@ -20,17 +20,10 @@ public class ModelObject extends Mesh {
         this.index = v_indices;
         this.face = faces;
     }
-    public ModelObject(Float[] vertex,Integer[] v_indices,Face[] faces){
+    public ModelObject(Float[] vertex,Integer[] v_indices,Face[] faces) {
         this.vertex = Model.makeFloatBuffer(vertex);
         this.index = Model.makeIntBuffer(v_indices);
         this.face = faces;
-    }
-    public void useBufferObject(){
-        int object[] = GLES20Util.createBufferObject(2);
-        vertexBufferObject = object[0];
-        indexBufferObject = object[1];
-        GLES20Util.setVertexBuffer(vertexBufferObject,vertex,GLES20.GL_STATIC_DRAW);
-        GLES20Util.setIndexBuffer(indexBufferObject,index,GLES20.GL_STATIC_DRAW);
     }
 
     @Override
@@ -41,6 +34,16 @@ public class ModelObject extends Mesh {
     @Override
     public int getIBO() {
         return indexBufferObject;
+    }
+
+    @Override
+    protected void setVBO(int o) {
+        vertexBufferObject = o;
+    }
+
+    @Override
+    protected void setIBO(int i) {
+        indexBufferObject = i;
     }
 
     @Override

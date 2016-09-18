@@ -2,11 +2,12 @@ package jp.ac.dendai.c.jtp.Game.Screen;
 
 import android.view.MotionEvent;
 
-public interface Screenable {
-	public void Proc();
-	public void Draw(float offsetX, float offsetY);
-	public void Touch(MotionEvent event);
-	public void death();
-	public void freeze();
-	public void unFreeze();
+public abstract class Screenable {
+	protected boolean freeze = true;
+	public abstract void Proc();
+	public abstract void Draw(float offsetX, float offsetY);
+	public abstract void Touch();
+	public abstract void death();
+	public void freeze(){freeze = true;};
+	public void unFreeze(){freeze = false;};
 }

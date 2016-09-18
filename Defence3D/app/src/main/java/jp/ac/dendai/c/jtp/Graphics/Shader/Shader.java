@@ -20,6 +20,7 @@ public abstract class Shader {
     protected float[] modelMatrix = new float[16];
     protected float[] invertMatrix = new float[16];
     protected float[] normalMatrix = new float[16];
+    protected int[] textures;
     protected static int useProgram = -1;
     /**
      * プログラムオブジェクト
@@ -50,6 +51,8 @@ public abstract class Shader {
 
         program = createShaderProgram(initVertexShader(v),initFragmentShader(f));
 
+        createTexture();
+
         //プログラムの使用開始
         //GLES20.glUseProgram(program);
         Log.d("abstractGLES20Util","use stert Program finished");
@@ -66,6 +69,12 @@ public abstract class Shader {
         //アルファ値
         u_alpha = GLES20Util.getUniformLocation(program,"u_alpha");
         loadShaderVariable();
+    }
+
+    protected void createTexture(){
+        textures = new int[2];
+        // テクスチャオブジェクトを作成する
+        GLES20.glGenTextures(2, textures, 0);
     }
 
     /**
@@ -203,11 +212,11 @@ public abstract class Shader {
     public abstract void draw(Texture tex, float x, float y, float z,
                               float scaleX, float scaleY, float scaleZ,
                               float degreeX, float degreeY, float degreeZ,float alpha);
-    protected static void setShaderModelMatrix(float[] modelMatrix){
+    protected void setShaderModelMatrix(float[] modelMatrix){
         GLES20.glUniformMatrix4fv(GLES20Util.mu_modelMatrix, 1, false, modelMatrix, 0);
     }
 
-    protected static void setShaderNormalMatrix(float[] normalMatrix){
+    protected void setShaderNormalMatrix(float[] normalMatrix){
         GLES20.glUniformMatrix4fv(GLES20Util.mu_NormalMatrix, 1, false, normalMatrix, 0);
     }
 
@@ -216,7 +225,7 @@ public abstract class Shader {
      * @param 使用する画像のbitmapデータ
      */
     //テクスチャ画像を設定する
-    protected static void setOnTexture(Bitmap image, int u_Sampler){
+    protected void setOnTexture(Bitmap image, int u_Sampler){
         // テクスチャ画像を設定する
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
         GLES20.glUniform1i(u_Sampler, 0);     // サンプラにテクスチャユニットを設定する

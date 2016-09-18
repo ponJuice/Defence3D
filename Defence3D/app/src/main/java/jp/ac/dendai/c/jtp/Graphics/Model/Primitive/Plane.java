@@ -59,4 +59,14 @@ public class Plane extends Mesh {
     public int getIBO() {
         return indexBufferObject;
     }
+
+    @Override
+    protected void setVBO(int o) {
+        vertexBufferObject = o;
+    }
+
+    @Override
+    protected void setIBO(int i) {
+        indexBufferObject = i;
+    }
 }

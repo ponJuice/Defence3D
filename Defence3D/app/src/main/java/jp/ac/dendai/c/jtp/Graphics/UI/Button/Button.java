@@ -1,68 +1,256 @@
 package jp.ac.dendai.c.jtp.Graphics.UI.Button;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
-import org.w3c.dom.Text;
-
-import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
-import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
+import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
+import jp.ac.dendai.c.jtp.Graphics.UI.MaskInfo;
+import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
-import jp.ac.dendai.c.jtp.Graphics.UI.Util.Rect;
+import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
+import jp.ac.dendai.c.jtp.Graphics.UI.Util.Figure.Rect;
+import jp.ac.dendai.c.jtp.Math.Vector2;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
+
+import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
+import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by Goto on 2016/09/06.
  */
-public class Button implements UI {
+public class Button extends UI {
+    public UIAlign.Align getVertical() {
+        return vertical;
+    }
+
+
+    public UIAlign.Align getHolizontal() {
+        return holizontal;
+    }
+
     private enum BUTTON_STATE{
         NON,
         DOWN,
         HOVER,
         UP,
     }
-    protected Camera camera;
+    public enum CRITERIA{
+        NON,
+        WIDTH,
+        HEIGHT
+    }
+    protected CRITERIA criteria = CRITERIA.WIDTH;
     protected BUTTON_STATE state = BUTTON_STATE.NON;
     protected ButtonListener listener;
     protected Touch touch;
+    protected StaticText text;
     protected float hover_alpha = 0.5f;
     protected float non_hover_alpha = 1f;
+    protected float padding = 0;
     protected Rect rect;
-    protected Texture tex;
-    public Button(float left,float top,float right,float bottom){
+    protected Bitmap tex;
+    protected UIAlign.Align holizontal = UIAlign.Align.LEFT,vertical = UIAlign.Align.TOP;
+    public Button(float left,float top,float right,float bottom,String text){
         rect = new Rect(left,top,right,bottom);
+        if(text != null) {
+            this.text = new StaticText(text);
+            this.text.setVertical(UIAlign.Align.CENTOR);
+            this.text.setHolizontal(UIAlign.Align.CENTOR);
+            updateTextPos();
+        }
+        tex = Constant.getBitmap(Constant.BITMAP.white);
     }
     public void setButtonListener(ButtonListener listener){
         this.listener = listener;
     }
     public void setTop(float value){
         rect.setTop(value);
+        updateTextPos();
     }
 
     public void setLeft(float value){
         rect.setLeft(value);
+        updateTextPos();
     }
 
     public void setBottom(float value){
         rect.setBottom(value);
+        updateTextPos();
     }
 
     public void setRight(float value){
         rect.setRight(value);
+        updateTextPos();
     }
-    public void setBackground(Texture tex){
+    private void updateTextPos(){
+        if(text != null){
+            text.setX(rect.getCx());
+            text.setY(rect.getCy());
+            if(criteria == CRITERIA.WIDTH)
+                text.setWidth(rect.getWidth()-padding);
+            else if(criteria == CRITERIA.HEIGHT)
+                text.setHeight(rect.getHeight() - padding);
+        }
+    }
+
+    public void setCriteria(CRITERIA c){
+        this.criteria = c;
+        updateTextPos();
+    }
+
+    public void setPadding(float n){
+        padding = n;
+        updateTextPos();
+    }
+
+    public void setBackground(Bitmap tex){
         this.tex = tex;
     }
-    public void setCamera(Camera camera){
-        this.camera = camera;
+
+    public void setX(float x){
+        rect.setCx(x);
+        if(text != null)
+            text.setX(x);
+    }
+
+    public void setY(float y){
+        rect.setCy(y);
+        if(text != null)
+            text.setY(y);
+    }
+
+    @Override
+    public Bitmap getBitmap() {
+        return null;
+    }
+
+    @Override
+    public float getAlpha() {
+        return 0;
+    }
+
+    @Override
+    public void setAlpha(float a) {
+
+    }
+
+    @Override
+    public Vector2 getTexOffset() {
+        return null;
+    }
+
+    @Override
+    public Vector2 getTexScale() {
+        return null;
+    }
+
+    @Override
+    public int getMaskWrapModeT() {
+        return 0;
+    }
+
+    @Override
+    public int getMaskWrapModeS() {
+        return 0;
+    }
+
+    @Override
+    public int getMaskFilterModeMin() {
+        return 0;
+    }
+
+    @Override
+    public int getMaskFilterModeMag() {
+        return 0;
+    }
+
+    @Override
+    public Bitmap getMaskBitmap() {
+        return null;
+    }
+
+    @Override
+    public void setMaskBitmap(Bitmap bitmap) {
+
+    }
+
+    @Override
+    public float getMaskOffset(MASK flag) {
+        return 0;
+    }
+
+    @Override
+    public float getMaskScale(MASK flag) {
+        return 0;
+    }
+
+    @Override
+    public void setMaskOffset(MASK flag, float n) {
+
+    }
+
+    @Override
+    public void setMaskScale(MASK flag, float n) {
+
+    }
+
+    @Override
+    public float getMaskAlpha() {
+        return 0;
+    }
+
+    @Override
+    public void setMaskAlpha(float a) {
+
+    }
+
+    @Override
+    public int getFilterModeMin() {
+        return 0;
+    }
+
+    @Override
+    public int getFilterModeMag() {
+        return 0;
+    }
+
+    @Override
+    public int getWrapModeT() {
+        return 0;
+    }
+
+    @Override
+    public int getWrapModeS() {
+        return 0;
+    }
+
+    @Override
+    public GLES20COMPOSITIONMODE getBlendMode() {
+        return null;
+    }
+
+    @Override
+    public float getColor(COLOR col) {
+        return 0;
+    }
+
+    @Override
+    public int getVBO() {
+        return 0;
+    }
+
+    @Override
+    public int getIBO() {
+        return 0;
     }
 
     @Override
     public void touch(Touch touch) {
         if(this.touch != null && this.touch != touch)
             return;
-        float x = camera.convertTouchPosToGLPosX(touch.getPosition(Touch.Pos_Flag.X));
-        float y = camera.convertTouchPosToGLPosY(touch.getPosition(Touch.Pos_Flag.Y));
+        float x = Constant.getActiveUiCamera().convertTouchPosToGLPosX(touch.getPosition(Touch.Pos_Flag.X));
+        float y = Constant.getActiveUiCamera().convertTouchPosToGLPosY(touch.getPosition(Touch.Pos_Flag.Y));
         if(touch.getTouchID() == -1){
             //指が離された
             if(state != BUTTON_STATE.NON && rect.contains(x,y)){
@@ -72,7 +260,7 @@ public class Button implements UI {
             }
             return;
         }
-        Log.d("button touch pos","device pos:"+"("+touch.getPosition(Touch.Pos_Flag.X)+","+ touch.getPosition(Touch.Pos_Flag.Y)+")"+"camera pos:("+x+","+y+")");
+        Log.d("button touch pos", "device pos:" + "(" + touch.getPosition(Touch.Pos_Flag.X) + "," + touch.getPosition(Touch.Pos_Flag.Y) + ")" + "camera pos:(" + x + "," + y + ")");
         if(touch.getTouchID() != -1 && rect.contains(x,y)){
             if(state == BUTTON_STATE.NON) {
                 state = BUTTON_STATE.DOWN;
@@ -95,21 +283,27 @@ public class Button implements UI {
     @Override
     public void proc() {
         if(state == BUTTON_STATE.UP){
-            listener.touchUp(this);
+            if(listener != null)
+                listener.touchUp(this);
             state = BUTTON_STATE.NON;
         }else if(state == BUTTON_STATE.DOWN){
-            listener.touchDown(this);
+            if(listener != null)
+                listener.touchDown(this);
             state = BUTTON_STATE.HOVER;
         }else if(state == BUTTON_STATE.HOVER){
-            listener.touchHover(this);
+            if(listener != null)
+                listener.touchHover(this);
         }
     }
 
     @Override
     public void draw(UiShader shader) {
-        if(state == BUTTON_STATE.NON)
-            shader.draw(tex,rect.getLeft(),rect.getBottom(),rect.getRight()-rect.getLeft(),rect.getTop() - rect.getBottom(),0,non_hover_alpha);
-        else
-            shader.draw(tex,rect.getLeft(),rect.getBottom(),rect.getRight()-rect.getLeft(),rect.getTop() - rect.getBottom(),0,hover_alpha);
+        if (state == BUTTON_STATE.NON) {
+            GLES20Util.DrawGraph(rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal), rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical), rect.getWidth(), rect.getHeight(), tex, non_hover_alpha, GLES20COMPOSITIONMODE.ALPHA);
+        } else {
+            GLES20Util.DrawGraph(rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal), rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical), rect.getWidth(), rect.getHeight(), tex, hover_alpha, GLES20COMPOSITIONMODE.ALPHA);
+        }
+        if(text != null)
+            text.draw(shader);
     }
 }

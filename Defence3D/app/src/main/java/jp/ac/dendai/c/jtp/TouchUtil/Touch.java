@@ -96,6 +96,8 @@ public class Touch{
 	}
 	public void removeTouch(){
 		touchID = -1;
+		deltaX = 0;
+		deltaY = 0;
 	}
 	@Override
 	public String toString(){

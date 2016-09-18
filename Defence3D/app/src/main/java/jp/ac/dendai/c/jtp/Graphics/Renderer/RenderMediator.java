@@ -12,8 +12,8 @@ public class RenderMediator {
     public GLES20COMPOSITIONMODE mode = GLES20COMPOSITIONMODE.ALPHA;
     public Mesh mesh;
     public GameObject gameObject;
-    public Renderer renderer;
-    public Renderer.RenderItem item;
+    public ARenderer renderer;
+    public ARenderer.RenderItem item;
     public boolean isDraw = true;
     public void draw(){
         if(mesh == null || renderer == null)

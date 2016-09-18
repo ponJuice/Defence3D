@@ -23,7 +23,7 @@ public class Enemy extends GameObject{
         bullet.getScl().setX(0.5f);
         bullet.getScl().setY(0.5f);
         bullet.getScl().setZ(0.5f);
-        bullet.setCollider(new CircleCollider(0.25f));
+        //bullet.setCollider(new CircleCollider(0.25f));
         bullet.getPhysicsObject().freeze = true;
         bullet.getPhysicsObject().mask = 0;
         bullet.getPhysicsObject().tag = 0;

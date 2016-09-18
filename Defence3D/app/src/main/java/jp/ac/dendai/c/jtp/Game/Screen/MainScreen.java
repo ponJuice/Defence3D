@@ -1,8 +1,6 @@
 package jp.ac.dendai.c.jtp.Game.Screen;
 
-import android.graphics.Bitmap;
 import android.opengl.GLES20;
-import android.view.MotionEvent;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.Enemy.Enemy;
@@ -40,13 +38,12 @@ import jp.ac.dendai.c.jtp.defence3d.R;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.Util.ImageReader;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
-import jp.ac.dendai.c.jtp.openglesutil.graphic.Image;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by テツヤ on 2016/09/09.
  */
-public class MainScreen implements Screenable {
+public class MainScreen extends Screenable {
     private float rotateX = 0 ,rotateY = 0;
     private Line line_x,line_y,line_z;
     private Renderer renderer,alphaRenderer;
@@ -111,7 +108,7 @@ public class MainScreen implements Screenable {
         playerBullet = new GameObject[5];
         for(int n = 0;n < 5;n++){
             playerBullet[n] = new GameObject();
-            playerBullet[n].setCollider(new CircleCollider(0.125f));
+            //playerBullet[n].setCollider(new CircleCollider(0.125f));
             playerBullet[n].getRenderMediator().isDraw = false;
             playerBullet[n].getRenderMediator().mesh = box;
             playerBullet[n].getScl().setX(0.05f);
@@ -137,11 +134,11 @@ public class MainScreen implements Screenable {
         CircleCollider cc = new CircleCollider(0.125f);
         cc.setDebugModel(sphear);
         cc.setDebugDraw(true);
-        gameObjects[0].setCollider(cc);
+        //gameObjects[0].setCollider(cc);
         cc = new CircleCollider(1f);
         cc.setDebugModel(sphear);
         cc.setDebugDraw(true);
-        gameObjects[3].setCollider(cc);
+        //gameObjects[3].setCollider(cc);
         //ゲームオブジェクトの位置を変更
         gameObjects[0].getPos().setX(-2.0f);
         gameObjects[1].getPos().setZ(0.5f);
@@ -265,15 +262,15 @@ public class MainScreen implements Screenable {
         testShader.setCamera(testCamera);
 
         //ボタンを作成
-        button = new Button(0,0.125f,0.125f, 0);
-        button.setCamera(uiCamera);
-        button.setBackground(tex);
-        button.setButtonListener(new TestButtonListener(player, playerBullet));
+        //button = new Button(0,0.125f,0.125f, 0);
+        //button.setCamera(uiCamera);
+        //button.setBackground(tex);
+        //button.setButtonListener(new TestButtonListener(player, playerBullet));
 
-        button2 = new Button(GLES20Util.getWidth_gl()-0.125f,0.125f,GLES20Util.getWidth_gl(),0);
-        button2.setCamera(uiCamera);
-        button2.setBackground(tex);
-        button2.setButtonListener(new TestButtonListener2(player,gameObjects[0]));
+        //button2 = new Button(GLES20Util.getWidth_gl()-0.125f,0.125f,GLES20Util.getWidth_gl(),0);
+        //button2.setCamera(uiCamera);
+        //button2.setBackground(tex);
+        //button2.setButtonListener(new TestButtonListener2(player,gameObjects[0]));
 
         //ナンバーテキスト
         nt = new NumberText("メイリオ");
@@ -291,9 +288,9 @@ public class MainScreen implements Screenable {
         timeNt.lz = 0.25f;
 
         //テキスト
-        tx = new Text("abcefghij");
-        tx.sx = 0.25f;
-        tx.sy = 0.25f;
+        //tx = new Text("abcefghij");
+        //tx.sx = 0.25f;
+        //tx.sy = 0.25f;
 
         uiCamera.setPosition(GLES20Util.getAspect() / 2f, 0.5f, 0);
 
@@ -307,19 +304,21 @@ public class MainScreen implements Screenable {
     int n = 0;
     @Override
     public void Proc() {
+        if(freeze)
+            return;
         player.proc();
-        for(int n = 0;n < Input.getMaxTouch();n++) {
+        /*for(int n = 0;n < Input.getMaxTouch();n++) {
             button.touch(Input.getTouchArray()[n]);
             button2.touch(Input.getTouchArray()[n]);
         }
         nt.setNumber(MainActivity.fpsController.getFps());
         button.proc();
-        button2.proc();
+        button2.proc();*/
         physics.simulate();
         if(n % 5 == 0)
             anim.next();
         enemy.update();
-        timeNt.setNumber((int)physics.getCurrentTime());
+        //timeNt.setNumber((int)physics.getCurrentTime());
         /*nt.lx += 0.001f;
         nt.ly = nt.lx;
         nt.lz = nt.lx;
@@ -337,34 +336,25 @@ public class MainScreen implements Screenable {
         GLES20.glDepthMask(true);
         //
 
-        uiShader.useShader();
-        uiShader.updateCamera();
+        //uiShader.useShader();
+        //uiShader.updateCamera();
 
-        nt.draw(uiShader);
-        tx.draw(uiShader);
-        timeNt.draw(uiShader);
+        //nt.draw(uiShader);
+        //tx.draw(uiShader);
+        //timeNt.draw(uiShader);
 
-        button.draw(uiShader);
-        button2.draw(uiShader);
+        //button.draw(uiShader);
+        //button2.draw(uiShader);
     }
 
     @Override
-    public void Touch(MotionEvent event) {
-
+    public void Touch() {
+        if(freeze)
+            return;
     }
 
     @Override
     public void death() {
-
-    }
-
-    @Override
-    public void freeze() {
-
-    }
-
-    @Override
-    public void unFreeze() {
 
     }
 
@@ -458,18 +448,18 @@ public class MainScreen implements Screenable {
 
     class TestCollisionListener implements CollisionListener{
         @Override
-        public void collEnter(GameObject owner,ACollider col) {
+        public void collEnter(ACollider col,GameObject owner) {
             owner.getRenderMediator().renderer.removeItem(owner);
             physics.removeObject(owner.getPhysicsObject());
         }
 
         @Override
-        public void collExit(GameObject owner) {
+        public void collExit(ACollider col,GameObject owner) {
 
         }
 
         @Override
-        public void collStay(GameObject owner) {
+        public void collStay(ACollider col,GameObject owner) {
 
         }
     }

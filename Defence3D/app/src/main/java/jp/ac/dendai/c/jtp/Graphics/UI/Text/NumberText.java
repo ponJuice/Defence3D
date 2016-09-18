@@ -4,23 +4,26 @@ import android.graphics.Bitmap;
 
 import java.util.HashMap;
 
-import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
+
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
-import jp.ac.dendai.c.jtp.Graphics.UI.UI;
+import jp.ac.dendai.c.jtp.Graphics.UI.MaskInfo;
+import jp.ac.dendai.c.jtp.Graphics.UI.Text.StringBitmap;
+import jp.ac.dendai.c.jtp.Math.Vector2;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
+import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by テツヤ on 2016/09/09.
  */
-public class NumberText implements UI {
+public class NumberText extends UI {
     protected static HashMap<String,StringBitmap[]> numberFont;
     protected StringBitmap[] number;
     protected int num;
-    protected Texture tex;
     public float x = 0,y = 0,z = 0;
     public float lx = 1,ly = 1,lz = 1;
+    public float textSize = 1f;
     protected int align_h = UI_CENTOR,align_v = UI_CENTOR;
     public NumberText(String fontName){
         if(numberFont == null)
@@ -32,11 +35,10 @@ public class NumberText implements UI {
             //まだ登録されていない
             number = new StringBitmap[10];
             for(int n = 0;n < 10;n++){
-                number[n] = GLES20Util.stringToBitmap(String.valueOf(n),1,255,255,255);
+                number[n] = GLES20Util.stringToStringBitmap(String.valueOf(n),fontName,50,255,255,255);
             }
             numberFont.put(fontName,number);
         }
-        tex = new Texture(number[0].getBitmap(), GLES20COMPOSITIONMODE.ALPHA);
     }
 
     public void setNumber(int num){
@@ -44,6 +46,131 @@ public class NumberText implements UI {
     }
     public int getNumber(){
         return num;
+    }
+
+    @Override
+    public Bitmap getBitmap() {
+        return null;
+    }
+
+    @Override
+    public float getAlpha() {
+        return 0;
+    }
+
+    @Override
+    public void setAlpha(float a) {
+
+    }
+
+    @Override
+    public Vector2 getTexOffset() {
+        return null;
+    }
+
+    @Override
+    public Vector2 getTexScale() {
+        return null;
+    }
+
+    @Override
+    public int getMaskWrapModeT() {
+        return 0;
+    }
+
+    @Override
+    public int getMaskWrapModeS() {
+        return 0;
+    }
+
+    @Override
+    public int getMaskFilterModeMin() {
+        return 0;
+    }
+
+    @Override
+    public int getMaskFilterModeMag() {
+        return 0;
+    }
+
+    @Override
+    public Bitmap getMaskBitmap() {
+        return null;
+    }
+
+    @Override
+    public void setMaskBitmap(Bitmap bitmap) {
+
+    }
+
+    @Override
+    public float getMaskOffset(MASK flag) {
+        return 0;
+    }
+
+    @Override
+    public float getMaskScale(MASK flag) {
+        return 0;
+    }
+
+    @Override
+    public void setMaskOffset(MASK flag, float n) {
+
+    }
+
+    @Override
+    public void setMaskScale(MASK flag, float n) {
+
+    }
+
+    @Override
+    public float getMaskAlpha() {
+        return 0;
+    }
+
+    @Override
+    public void setMaskAlpha(float a) {
+
+    }
+
+    @Override
+    public int getFilterModeMin() {
+        return 0;
+    }
+
+    @Override
+    public int getFilterModeMag() {
+        return 0;
+    }
+
+    @Override
+    public int getWrapModeT() {
+        return 0;
+    }
+
+    @Override
+    public int getWrapModeS() {
+        return 0;
+    }
+
+    @Override
+    public GLES20COMPOSITIONMODE getBlendMode() {
+        return null;
+    }
+
+    @Override
+    public float getColor(COLOR col) {
+        return 0;
+    }
+
+    @Override
+    public int getVBO() {
+        return 0;
+    }
+
+    @Override
+    public int getIBO() {
+        return 0;
     }
 
     @Override
@@ -57,16 +184,16 @@ public class NumberText implements UI {
     }
 
     @Override
-    public void draw(UiShader shader) {
+    public void draw(UiShader shadeer) {
+        float _lx = lx * textSize,_ly = ly * textSize;
         int line = (int)Math.log10(num) + 1;
         float x_offset = getHolizon(line,number[0].getBitmap().getHeight(),number[0].getBitmap().getWidth());
         int m = 0;
         for(int n = line;n > 0;n--){
             int digit = getDigit(num,n);
-            tex.setTexture(number[digit].getBitmap());
             float bottom = number[digit].fm.bottom / (float)number[digit].bitmap.getHeight();
-            float scaleX = (float)tex.getTexture().getWidth() / (float)tex.getTexture().getHeight();
-            shader.draw(tex,scaleX*lx * (float)m + x,y-(bottom*ly),scaleX*lx,ly,0,1);
+            float scaleX = (float)number[digit].getBitmap().getWidth() / (float)number[digit].getBitmap().getHeight();
+            GLES20Util.DrawGraph(scaleX*_lx * (float)m + x,y-(bottom*_ly),scaleX*_lx,_ly,number[digit].getBitmap(),1,GLES20COMPOSITIONMODE.ALPHA);
             m++;
         }
     }

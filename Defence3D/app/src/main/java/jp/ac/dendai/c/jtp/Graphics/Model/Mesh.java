@@ -19,6 +19,9 @@ public abstract class Mesh {
     public abstract int getVBO();
     public abstract int getIBO();
 
+    protected abstract void setVBO(int o);
+    protected abstract void setIBO(int i);
+
     public FloatBuffer getVertexBuffer(){return vertex;}
     public IntBuffer getIndexBuffer(){return index;}
     protected void setVertexBufferObject(){
@@ -79,5 +82,13 @@ public abstract class Mesh {
         }
         intBuffer.position(0);
         return intBuffer;
+    }
+
+    public void useBufferObject(){
+        int object[] = GLES20Util.createBufferObject(2);
+        setVBO(object[0]);
+        setIBO(object[1]);
+        GLES20Util.setVertexBuffer(getVBO(),vertex,GLES20.GL_STATIC_DRAW);
+        GLES20Util.setIndexBuffer(getIBO(),index,GLES20.GL_STATIC_DRAW);
     }
 }

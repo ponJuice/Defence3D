@@ -1,54 +1,116 @@
 package jp.ac.dendai.c.jtp.Graphics.UI.Text;
 
 import android.graphics.Bitmap;
-import android.graphics.Paint;
 
-import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
-import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
-import jp.ac.dendai.c.jtp.Graphics.UI.UI;
-import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
-/**
- * Created by テツヤ on 2016/09/09.
- */
-public class Text implements UI {
-    StringBitmap sb;
-    Texture image;
-    public float x = 0,y = 0,z = 0;
-    public float sx = 1,sy = 1;
-    public float dx = 0,dy = 0,dz = 0;
-    public float alpha = 1;
-    int align_h = UI_CENTOR,align_v = UI_CENTOR;
+public class Text {
+	public enum TextAlign{
+		CENTOR ,
+		LEFT,
+		RIGHT,
+		TOP,
+		BOTTOM
+	}
 
-    public Text(String text){
-        sb = GLES20Util.stringToBitmap(text,1,255,255,255);
-        image = new Texture(sb.getBitmap(), GLES20COMPOSITIONMODE.ALPHA);
-    }
+	public  enum WrittingAlign{
+		VERTICCAL,
+		HOLIZONTAL
+	}
 
-    public void setAlpha(float a){
-        alpha = a;
-    }
+	private String text;
+	private Bitmap bitmap;
+	private TextAlign horizontalTextAlign = TextAlign.LEFT;
+	private TextAlign verticalTextAlign = TextAlign.TOP;
+	private float scaleX = 1f;
+	private float scaleY = 1f;
+	private float x = 0,y = 0;
+	private int r,g,b;
+	private float alpha;
 
-    public float getAlpha(){
-        return alpha;
-    }
+	public Text(String text,int r,int g,int b){
+		this.text = text;
+		this.r = r;
+		this.g = g;
+		this.b = b;
+		bitmap = GLES20Util.stringToBitmap(text,CharactorsMap.def_fontName ,1, r, g, b);
+		alpha = 1f;
+	}
+	public float getScaleX() {
+		return scaleX;
+	}
 
-    @Override
-    public void touch(Touch touch) {
+	public void setScaleX(float scaleX) {
+		this.scaleX = scaleX;
+	}
 
-    }
+	public float getScaleY() {
+		return scaleY;
+	}
 
-    @Override
-    public void proc() {
+	public void setScaleY(float scaleY) {
+		this.scaleY = scaleY;
+	}
 
-    }
+	public float getLengthX(){
+		return bitmap.getWidth() / 1000f * scaleX;
+	}
 
-    @Override
-    public void draw(UiShader shader) {
-        float bottom = sb.fm.bottom / (float)sb.bitmap.getHeight();
-        shader.draw(image,x,y-(bottom*sy),image.getTexture().getWidth()/image.getTexture().getHeight()*sx,sy,dx,alpha);
-        //shader.draw(image,0,0,image.getTexture().getWidth()/image.getTexture().getHeight()*sx,1,0,alpha);
-    }
+	public float getLengthY(){
+		return bitmap.getHeight() /  1000f * scaleY;
+	}
+
+
+	public void draw(float x,float y,float alpha,GLES20COMPOSITIONMODE mode){
+		if(horizontalTextAlign == TextAlign.CENTOR){
+			//this.x = bitmap.getWidth()/(scaleX*2000f);
+			this.x = 0;
+		}
+		else if(horizontalTextAlign == TextAlign.RIGHT){
+			this.x = bitmap.getWidth()/ 2000f * scaleX;
+		}
+		else{
+			this.x = -bitmap.getWidth()/ 2000f*scaleX;
+		}
+		if(verticalTextAlign == TextAlign.CENTOR){
+			//this.y = bitmap.getHeight()/(scaleY*2000f);
+			this.y = 0;
+		}
+		else if(verticalTextAlign == TextAlign.TOP){
+			this.y = bitmap.getHeight()/ 2000f * scaleY;
+		}
+		else{
+			this.y = -bitmap.getHeight()/ 2000f * scaleY;
+		}
+		GLES20Util.DrawGraph(x-this.x, y-this.y, bitmap.getWidth()/ 1000f * scaleX, bitmap.getHeight()/ 1000f * scaleY, bitmap,alpha,mode);
+	}
+
+	public void setAlpha(float a){
+		alpha = a;
+	}
+
+	public float getAlpha(){
+		return alpha;
+	}
+
+	public Bitmap getBitmap() {
+		return bitmap;
+	}
+
+	public void setBitmap(Bitmap bitmap) {
+		this.bitmap = bitmap;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public void setHorizontalTextAlign(TextAlign horizontalTextAlign) {
+		this.horizontalTextAlign = horizontalTextAlign;
+	}
+
+	public void setVerticalTextAlign(TextAlign verticalTextAlign) {
+		this.verticalTextAlign = verticalTextAlign;
+	}
 }

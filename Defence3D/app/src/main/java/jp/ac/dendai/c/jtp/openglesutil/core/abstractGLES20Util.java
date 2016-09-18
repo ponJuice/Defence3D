@@ -104,7 +104,7 @@ public abstract class abstractGLES20Util {
 	 * アルファ値
 	 */
 	private static int u_alpha;
-
+	protected static int[] textures;
 	/**
 	 * 視体積（立方体型）の近平面
 	 */
@@ -518,18 +518,18 @@ public abstract class abstractGLES20Util {
 	   		GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
 
 		    // テクスチャオブジェクトを作成する
-		    int[] textures = new int[1];
-		    GLES20.glGenTextures(1, textures, 0);
+		    textures = new int[2];
+		    GLES20.glGenTextures(2, textures, 0);
 
 		    // テクスチャを読み込み、サンプラに設定する
-		    loadTexture(textures[0], "u_Sampler");
+		    loadTexture("u_Sampler");
 	  }
 
 	  /**
 	   * サンプラーの場所取得とテクスチャパラメータなどを設定
 	   */
 	  //サンプラーの場所取得とテクスチャパラメータなどを設定
-	  private static void loadTexture(int texture, String sampler) {
+	  private static void loadTexture(String sampler) {
 	    // u_Samplerの格納場所を取得する
 	    u_Sampler = GLES20.glGetUniformLocation(program, sampler);
 	    if (u_Sampler == -1) {
@@ -539,13 +539,6 @@ public abstract class abstractGLES20Util {
 	    if(u_alpha == -1){
 	    	throw new RuntimeException("u_alphaの格納場所の取得に失敗");
 	    }*/
-
-	    GLES20.glActiveTexture(GLES20.GL_TEXTURE0);   // テクスチャユニット0を有効にする
-
-	    GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, texture); // テクスチャオブジェクトをバインドする
-
-	    // テクスチャパラメータを設定する
-	    GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
 	  }
 
 	  /**

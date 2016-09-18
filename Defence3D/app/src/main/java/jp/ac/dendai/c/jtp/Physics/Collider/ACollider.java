@@ -9,6 +9,7 @@ import jp.ac.dendai.c.jtp.Math.Vector;
  * Created by Goto on 2016/08/31.
  */
 public abstract class ACollider {
+    protected ACollider nextCol;
     protected GameObject gameObject;
     protected boolean isDebugDraw = false;
     public boolean getDebugDraw(){
@@ -23,7 +24,9 @@ public abstract class ACollider {
     public void setGameObject(GameObject gameObject){
         this.gameObject = gameObject;
     }
-    public abstract Vector[] getDirect();
+    public ACollider getNextCol(){
+        return nextCol;
+    }
     public abstract void debugDraw(Shader shader,GameObject pos);
 
     public static boolean isCollision(CircleCollider A,CircleCollider B) {
@@ -32,5 +35,16 @@ public abstract class ACollider {
         } else {
             return true;
         }
+    }
+
+
+    public static boolean isCollision(AABBCollider A,AABBCollider B){
+        float a_to_b_x = Math.abs(A.gameObject.getPos().getX() - B.gameObject.getPos().getX());
+        float a_to_b_y = Math.abs(A.gameObject.getPos().getY() - B.gameObject.getPos().getY());
+        float a_to_b_z = Math.abs(A.gameObject.getPos().getZ() - B.gameObject.getPos().getZ());
+        boolean x_flag = (A.width/2f + B.width/2f) >= a_to_b_x;
+        boolean y_flag = (A.height/2f + B.height/2f) >= a_to_b_y;
+        boolean z_flag = (A.depth/2f + B.depth/2f) > a_to_b_z;
+        return x_flag && y_flag & z_flag;
     }
 }

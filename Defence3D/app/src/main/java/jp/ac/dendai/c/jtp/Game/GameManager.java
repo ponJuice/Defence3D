@@ -1,12 +1,10 @@
 package jp.ac.dendai.c.jtp.Game;
 
-import android.view.MotionEvent;
 
 import jp.ac.dendai.c.jtp.Game.Screen.Screenable;
 import jp.ac.dendai.c.jtp.Game.Transition.Transitionable;
-import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
+import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
-import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 
 public class GameManager {
@@ -19,6 +17,8 @@ public class GameManager {
 
 	public static void init(){
 		uiShader = new UiShader();
+		uiShader.setCamera(new Camera(Camera.CAMERA_MODE.ORTHO,0,0,-5,0,0,0));
+		Constant.init();
 	}
 
 	public static void draw(){
@@ -34,9 +34,9 @@ public class GameManager {
 			nextScreen.Proc();
 		nowScreen.Proc();
 	}
-	public static void touch(MotionEvent touch){
+	public static void touch(){
 		if(!isTransition){
-			nowScreen.Touch(touch);
+			nowScreen.Touch();
 		}
 	}
 
