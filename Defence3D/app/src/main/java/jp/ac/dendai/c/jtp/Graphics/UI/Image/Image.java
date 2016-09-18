@@ -61,8 +61,8 @@ public class Image extends UI{
         this.mask_warp_s = mask_warp_s;
     }
 
-    public void setMast_warp_t(int mast_warp_t) {
-        this.mast_warp_t = mast_warp_t;
+    public void setMask_warp_t(int mask_warp_t) {
+        this.mask_warp_t = mask_warp_t;
     }
 
     public void setMask_filter_min(int mask_filter_min) {
@@ -74,11 +74,11 @@ public class Image extends UI{
     }
 
     protected int wrap_s = GLES20.GL_REPEAT
-            , wrap_t = GLES20.GL_REPEAT
+            ,wrap_t = GLES20.GL_REPEAT
             ,filter_min = GLES20.GL_NEAREST
             ,filter_mag = GLES20.GL_NEAREST
             ,mask_warp_s = GLES20.GL_CLAMP_TO_EDGE
-            ,mast_warp_t = GLES20.GL_CLAMP_TO_EDGE
+            ,mask_warp_t = GLES20.GL_CLAMP_TO_EDGE
             ,mask_filter_min = GLES20.GL_NEAREST
             ,mask_filter_mag = GLES20.GL_NEAREST;
     protected UIAlign.Align holizontal = UIAlign.Align.CENTOR,vertical = UIAlign.Align.CENTOR;
@@ -114,6 +114,10 @@ public class Image extends UI{
         x = image.x;
         y = image.y;
         mode = image.mode;
+    }
+
+    public Image(){
+        setBufferObject();
     }
     public void setWidth(float width){
         this.width = width;
@@ -230,7 +234,7 @@ public class Image extends UI{
 
     @Override
     public int getMaskWrapModeT() {
-        return mast_warp_t;
+        return mask_warp_t;
     }
 
     @Override
@@ -342,6 +346,7 @@ public class Image extends UI{
     }
 
     public void setImage(Bitmap image) {
+        aspect = (float)image.getWidth()/(float)image.getHeight();
         this.image = image;
     }
 

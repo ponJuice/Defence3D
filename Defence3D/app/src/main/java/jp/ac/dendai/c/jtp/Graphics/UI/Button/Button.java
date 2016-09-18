@@ -5,6 +5,7 @@ import android.util.Log;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
+import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.MaskInfo;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
@@ -19,7 +20,7 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
 /**
  * Created by Goto on 2016/09/06.
  */
-public class Button extends UI {
+public class Button extends Image {
     public UIAlign.Align getVertical() {
         return vertical;
     }
@@ -49,8 +50,6 @@ public class Button extends UI {
     protected float non_hover_alpha = 1f;
     protected float padding = 0;
     protected Rect rect;
-    protected Bitmap tex;
-    protected UIAlign.Align holizontal = UIAlign.Align.LEFT,vertical = UIAlign.Align.TOP;
     public Button(float left,float top,float right,float bottom,String text){
         rect = new Rect(left,top,right,bottom);
         if(text != null) {
@@ -59,7 +58,10 @@ public class Button extends UI {
             this.text.setHolizontal(UIAlign.Align.CENTOR);
             updateTextPos();
         }
-        tex = Constant.getBitmap(Constant.BITMAP.white);
+        image = Constant.getBitmap(Constant.BITMAP.white);
+        vertical = UIAlign.Align.TOP;
+        holizontal = UIAlign.Align.LEFT;
+        criteria = CRITERIA.HEIGHT;
     }
     public void setButtonListener(ButtonListener listener){
         this.listener = listener;
@@ -104,147 +106,19 @@ public class Button extends UI {
         updateTextPos();
     }
 
-    public void setBackground(Bitmap tex){
-        this.tex = tex;
-    }
-
+    @Override
     public void setX(float x){
         rect.setCx(x);
         if(text != null)
             text.setX(x);
     }
 
+    @Override
     public void setY(float y){
         rect.setCy(y);
         if(text != null)
             text.setY(y);
     }
-
-    @Override
-    public Bitmap getBitmap() {
-        return null;
-    }
-
-    @Override
-    public float getAlpha() {
-        return 0;
-    }
-
-    @Override
-    public void setAlpha(float a) {
-
-    }
-
-    @Override
-    public Vector2 getTexOffset() {
-        return null;
-    }
-
-    @Override
-    public Vector2 getTexScale() {
-        return null;
-    }
-
-    @Override
-    public int getMaskWrapModeT() {
-        return 0;
-    }
-
-    @Override
-    public int getMaskWrapModeS() {
-        return 0;
-    }
-
-    @Override
-    public int getMaskFilterModeMin() {
-        return 0;
-    }
-
-    @Override
-    public int getMaskFilterModeMag() {
-        return 0;
-    }
-
-    @Override
-    public Bitmap getMaskBitmap() {
-        return null;
-    }
-
-    @Override
-    public void setMaskBitmap(Bitmap bitmap) {
-
-    }
-
-    @Override
-    public float getMaskOffset(MASK flag) {
-        return 0;
-    }
-
-    @Override
-    public float getMaskScale(MASK flag) {
-        return 0;
-    }
-
-    @Override
-    public void setMaskOffset(MASK flag, float n) {
-
-    }
-
-    @Override
-    public void setMaskScale(MASK flag, float n) {
-
-    }
-
-    @Override
-    public float getMaskAlpha() {
-        return 0;
-    }
-
-    @Override
-    public void setMaskAlpha(float a) {
-
-    }
-
-    @Override
-    public int getFilterModeMin() {
-        return 0;
-    }
-
-    @Override
-    public int getFilterModeMag() {
-        return 0;
-    }
-
-    @Override
-    public int getWrapModeT() {
-        return 0;
-    }
-
-    @Override
-    public int getWrapModeS() {
-        return 0;
-    }
-
-    @Override
-    public GLES20COMPOSITIONMODE getBlendMode() {
-        return null;
-    }
-
-    @Override
-    public float getColor(COLOR col) {
-        return 0;
-    }
-
-    @Override
-    public int getVBO() {
-        return 0;
-    }
-
-    @Override
-    public int getIBO() {
-        return 0;
-    }
-
     @Override
     public void touch(Touch touch) {
         if(this.touch != null && this.touch != touch)
@@ -299,9 +173,27 @@ public class Button extends UI {
     @Override
     public void draw(UiShader shader) {
         if (state == BUTTON_STATE.NON) {
-            GLES20Util.DrawGraph(rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal), rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical), rect.getWidth(), rect.getHeight(), tex, non_hover_alpha, GLES20COMPOSITIONMODE.ALPHA);
+            shader.drawUi(this
+                    ,rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal)
+                    ,rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical)
+                    ,rect.getWidth()
+                    ,rect.getHeight()
+                    ,0,non_hover_alpha);
+            /*GLES20Util.DrawGraph(rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal)
+                    , rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical)
+                    , rect.getWidth()
+                    , rect.getHeight()
+                    , tex
+                    , non_hover_alpha
+                    , GLES20COMPOSITIONMODE.ALPHA);*/
         } else {
-            GLES20Util.DrawGraph(rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal), rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical), rect.getWidth(), rect.getHeight(), tex, hover_alpha, GLES20COMPOSITIONMODE.ALPHA);
+            shader.drawUi(this
+                    , rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal)
+                    , rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical)
+                    , rect.getWidth()
+                    , rect.getHeight()
+                    , 0, hover_alpha);
+            //GLES20Util.DrawGraph(rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal), rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical), rect.getWidth(), rect.getHeight(), tex, hover_alpha, GLES20COMPOSITIONMODE.ALPHA);
         }
         if(text != null)
             text.draw(shader);

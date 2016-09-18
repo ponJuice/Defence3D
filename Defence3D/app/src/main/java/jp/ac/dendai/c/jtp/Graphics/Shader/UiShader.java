@@ -79,9 +79,6 @@ public class UiShader extends Shader{
         Matrix.rotateM(modelMatrix, 0, degree, 0, 0, 1);
         setShaderModelMatrix(modelMatrix);
 
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, tex.getWrapModeS());
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, tex.getWrapModeT());
-
         setOnTexture(tex.getBitmap(),tex);
         setOnMask(tex.getMaskBitmap()
                 ,tex.getMaskOffset(MaskInfo.MASK.u),tex.getMaskOffset(MaskInfo.MASK.v)
@@ -116,6 +113,10 @@ public class UiShader extends Shader{
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);   // テクスチャユニット0を有効にする
 
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]); // テクスチャオブジェクトをバインドする
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, t.getWrapModeS());
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, t.getWrapModeT());
+
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, t.getFilterModeMin());
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, t.getFilterModeMag());
         // テクスチャ画像を設定する
@@ -130,6 +131,9 @@ public class UiShader extends Shader{
     protected void setOnMask(Bitmap mask, float offset_x, float offset_y, float scale_x, float scale_y, MaskInfo m){
         GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[1]);
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, m.getMaskWrapModeS());
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, m.getMaskWrapModeT());
 
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, m.getMaskFilterModeMin());
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, m.getMaskFilterModeMag());

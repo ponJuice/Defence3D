@@ -35,7 +35,9 @@ public class Constant {
     public static Camera getActiveUiCamera(){
         return activeUiCamera;
     }
-
+    public static void setActiveUiCamera(Camera c){
+        activeUiCamera = c;
+    }
     public static void init(){
         if(text_effect_white == null)
             text_effect_white = GLES20Util.loadBitmap(R.mipmap.text_effect_white);

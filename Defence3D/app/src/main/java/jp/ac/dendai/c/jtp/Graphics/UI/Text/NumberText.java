@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
+import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.MaskInfo;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.StringBitmap;
 import jp.ac.dendai.c.jtp.Math.Vector2;
@@ -24,6 +25,7 @@ public class NumberText extends UI {
     public float x = 0,y = 0,z = 0;
     public float lx = 1,ly = 1,lz = 1;
     public float textSize = 1f;
+    protected Image image;
     protected int align_h = UI_CENTOR,align_v = UI_CENTOR;
     public NumberText(String fontName){
         if(numberFont == null)
@@ -39,6 +41,7 @@ public class NumberText extends UI {
             }
             numberFont.put(fontName,number);
         }
+        image = new Image(number[0].bitmap);
     }
 
     public void setNumber(int num){
@@ -184,7 +187,7 @@ public class NumberText extends UI {
     }
 
     @Override
-    public void draw(UiShader shadeer) {
+    public void draw(UiShader shader) {
         float _lx = lx * textSize,_ly = ly * textSize;
         int line = (int)Math.log10(num) + 1;
         float x_offset = getHolizon(line,number[0].getBitmap().getHeight(),number[0].getBitmap().getWidth());
@@ -193,7 +196,15 @@ public class NumberText extends UI {
             int digit = getDigit(num,n);
             float bottom = number[digit].fm.bottom / (float)number[digit].bitmap.getHeight();
             float scaleX = (float)number[digit].getBitmap().getWidth() / (float)number[digit].getBitmap().getHeight();
-            GLES20Util.DrawGraph(scaleX*_lx * (float)m + x,y-(bottom*_ly),scaleX*_lx,_ly,number[digit].getBitmap(),1,GLES20COMPOSITIONMODE.ALPHA);
+            image.setImage(number[digit].getBitmap());
+            /*shader.DrawGraph(scaleX * _lx * (float) m + x,
+                    y - (bottom * _ly),
+                    scaleX * _lx,
+                    _ly,
+                    number[digit].getBitmap(),
+                    1,
+                    GLES20COMPOSITIONMODE.ALPHA);*/
+            shader.drawUi(image, scaleX * _lx * (float) m + x,y - (bottom * _ly),scaleX * _lx,_ly,0,1);
             m++;
         }
     }

@@ -4,8 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.opengl.GLES20;
 
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
+import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.MaskInfo;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
@@ -17,30 +19,28 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
 /**
  * Created by Goto on 2016/09/15.
  */
-public class StreamText extends UI {
+public class StreamText extends Image {
     protected UIAlign.Align holizontal = UIAlign.Align.CENTOR,vertical = UIAlign.Align.CENTOR;
     protected String[] string;
-    protected Bitmap text;
-    protected Bitmap mask;
     protected int max_x_length,offset;
     protected int char_x = 0,char_y = 0;
-    protected float aspect; //縦：横 = 1 : aspect
-    protected float length_x = 0,length_y = 0;
-    protected float x = 0,y = 0;
     public StreamText(String[] string,Bitmap text,Bitmap mask,int max_x_length,int offset){
+        super(text);
         this.string = string;
-        this.text = text;
+        this.image = text;
         this.max_x_length = max_x_length;
         this.mask = mask;
         aspect = (float)text.getWidth() / (float)text.getHeight();
-        length_y = 1;
-        length_x = aspect;
+        height = 1;
+        width = aspect;
         this.offset = offset;
-    }
 
-    public void setHeight(float n){
-        length_y = n;
-        length_x = n * aspect;
+        mask_filter_mag = GLES20.GL_NEAREST;
+        mask_filter_min = GLES20.GL_NEAREST;
+        mask_warp_s = GLES20.GL_CLAMP_TO_EDGE;
+        mask_warp_t = GLES20.GL_CLAMP_TO_EDGE;
+        filter_mag = GLES20.GL_LINEAR;
+        filter_min = GLES20.GL_LINEAR;
     }
 
     public void setChar_x(int n){
@@ -71,131 +71,6 @@ public class StreamText extends UI {
     }
 
     @Override
-    public Bitmap getBitmap() {
-        return null;
-    }
-
-    @Override
-    public float getAlpha() {
-        return 0;
-    }
-
-    @Override
-    public void setAlpha(float a) {
-
-    }
-
-    @Override
-    public Vector2 getTexOffset() {
-        return null;
-    }
-
-    @Override
-    public Vector2 getTexScale() {
-        return null;
-    }
-
-    @Override
-    public int getMaskWrapModeT() {
-        return 0;
-    }
-
-    @Override
-    public int getMaskWrapModeS() {
-        return 0;
-    }
-
-    @Override
-    public int getMaskFilterModeMin() {
-        return 0;
-    }
-
-    @Override
-    public int getMaskFilterModeMag() {
-        return 0;
-    }
-
-    @Override
-    public Bitmap getMaskBitmap() {
-        return null;
-    }
-
-    @Override
-    public void setMaskBitmap(Bitmap bitmap) {
-
-    }
-
-    @Override
-    public float getMaskOffset(MASK flag) {
-        return 0;
-    }
-
-    @Override
-    public float getMaskScale(MASK flag) {
-        return 0;
-    }
-
-    @Override
-    public void setMaskOffset(MASK flag, float n) {
-
-    }
-
-    @Override
-    public void setMaskScale(MASK flag, float n) {
-
-    }
-
-    @Override
-    public float getMaskAlpha() {
-        return 0;
-    }
-
-    @Override
-    public void setMaskAlpha(float a) {
-
-    }
-
-    @Override
-    public int getFilterModeMin() {
-        return 0;
-    }
-
-    @Override
-    public int getFilterModeMag() {
-        return 0;
-    }
-
-    @Override
-    public int getWrapModeT() {
-        return 0;
-    }
-
-    @Override
-    public int getWrapModeS() {
-        return 0;
-    }
-
-    @Override
-    public GLES20COMPOSITIONMODE getBlendMode() {
-        return null;
-    }
-
-    @Override
-    public float getColor(COLOR col) {
-        return 0;
-    }
-
-    @Override
-    public int getVBO() {
-        return 0;
-    }
-
-    @Override
-    public int getIBO() {
-        return 0;
-    }
-
-    @Override
     public void touch(Touch touch) {
 
     }
@@ -208,7 +83,21 @@ public class StreamText extends UI {
     @Override
     public void draw(UiShader shader) {
         float mojisuu = (float)max_x_length/2f - char_x;
-        float pos_x = (float)text.getWidth()/(float)max_x_length * mojisuu /(float)text.getWidth();
+        float pos_x = (float)image.getWidth()/(float)max_x_length * mojisuu /(float)image.getWidth();
+        getTexOffset().setX(0);
+        getTexOffset().setY(0);
+        getTexScale().setX(1);
+        getTexScale().setY(1);
+        mask_offset_u = pos_x;
+        mask_offset_v = -(float)char_y + ((float)(offset*(char_y)) / (float)image.getHeight());
+        mask_scale_u = 1;//string.length;
+        mask_scale_v = string.length;
+
+        shader.drawUi(this
+                ,x + UIAlign.convertAlign(width,holizontal)
+                ,y + UIAlign.convertAlign(height,vertical)
+                ,width,height
+                ,0,alpha);
         //GLES20Util.DrawString(x + UIAlign.convertAlign(length_x,holizontal),y + UIAlign.convertAlign(length_y,vertical)
          ///       ,length_x,length_y,0,0,1,1
           //      ,pos_x,-(float)char_y + ((float)(offset*(char_y)) / (float)text.getHeight()),string.length,0,text,mask,1, GLES20COMPOSITIONMODE.ALPHA);
@@ -237,7 +126,7 @@ public class StreamText extends UI {
         }
         Bitmap bitmap = Bitmap.createBitmap(textWidth, textHeight+height_offset*line.length, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        //canvas.drawARGB(255,0,0,0);
+        //canvas.drawARGB(255,126,126,126);
         for(int n = 0;n < line.length;n++) {
             //paint.getTextBounds(line[n], 0, line[n].length(), new Rect());
             //Typeface type = Typeface.createFromAsset(GameManager.act.getAssets(), fontName);
