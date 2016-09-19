@@ -36,12 +36,6 @@ public class Button extends Image {
         HOVER,
         UP,
     }
-    public enum CRITERIA{
-        NON,
-        WIDTH,
-        HEIGHT
-    }
-    protected CRITERIA criteria = CRITERIA.WIDTH;
     protected BUTTON_STATE state = BUTTON_STATE.NON;
     protected ButtonListener listener;
     protected Touch touch;
@@ -152,6 +146,18 @@ public class Button extends Image {
                 this.touch = touch;
             }
         }
+    }
+
+    @Override
+    public void setWidth(float width){
+        this.width = width;
+        this.height = width/aspect;
+    }
+
+    @Override
+    public void setHeight(float height){
+        this.height = height;
+        this.width = height*aspect;
     }
 
     @Override

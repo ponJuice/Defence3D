@@ -3,6 +3,8 @@ package jp.ac.dendai.c.jtp.Game;
 import android.graphics.Bitmap;
 
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
+import jp.ac.dendai.c.jtp.Graphics.Camera.UiCamera;
+import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.defence3d.R;
@@ -12,6 +14,10 @@ import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
  * Created by Goto on 2016/07/08.
  */
 public class Constant {
+    public enum SHADER{
+        ui,
+        diffuse
+    }
     public enum BITMAP{
         white,
         black,
@@ -27,6 +33,7 @@ public class Constant {
     protected static Bitmap text_effect_white,text_effect_mask,system_button,black;
     protected static Camera activeUiCamera;
     protected static UiShader loadingShader;
+    protected static Shader uiShader,diffuseShader;
 
     public static UiShader getLoadingShader(){
         return loadingShader;
@@ -47,6 +54,15 @@ public class Constant {
             system_button = GLES20Util.loadBitmap(R.mipmap.button);
         if(black == null)
             black = GLES20Util.createBitmap(255,0,0,0);
+
+        //カメラ
+        activeUiCamera = new UiCamera();
+
+        loadingShader = new UiShader();
+        loadingShader.setCamera(activeUiCamera);
+
+        diffuseShader = new DiffuseShader();
+        uiShader = new UiShader();
     }
     public static Bitmap getBitmap(BITMAP f){
         if(f == BITMAP.white)
@@ -60,5 +76,12 @@ public class Constant {
         }
         return text_effect_white;
     }
-
+    public static Shader getShader(SHADER type){
+        if(type == SHADER.ui)
+            return uiShader;
+        else if(type == SHADER.diffuse)
+            return diffuseShader;
+        else
+            return null;
+    }
 }

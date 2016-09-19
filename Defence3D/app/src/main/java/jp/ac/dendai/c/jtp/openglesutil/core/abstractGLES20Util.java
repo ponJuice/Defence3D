@@ -241,6 +241,24 @@ public abstract class abstractGLES20Util {
 	}
 
 	/**
+	 * GLES20を使えるようにします。
+	 */
+	public static void initGLES20Util(){
+		//アルファブレンディングの有効化
+		GLES20.glEnable(GLES20.GL_BLEND);
+		//ブレンディングメソッドの有効化
+		GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+		//隠面消去の有効化
+		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+		//Zファイティング
+		GLES20.glEnable(GLES20.GL_POLYGON_OFFSET_FILL);
+		GLES20.glPolygonOffset(1f,1f);
+		//裏面を表示しない
+		GLES20.glEnable(GLES20.GL_CULL_FACE);
+		GLES20.glCullFace(GLES20.GL_BACK);
+	}
+
+	/**
 	 * シェーダ―を初期化します
 	 */
 	private static void initShader(String vertexShaderString,String fragmentShaderString){

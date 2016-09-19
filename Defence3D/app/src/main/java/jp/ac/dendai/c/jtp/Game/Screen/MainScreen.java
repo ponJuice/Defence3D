@@ -24,6 +24,7 @@ import jp.ac.dendai.c.jtp.Graphics.UI.Text.Text;
 import jp.ac.dendai.c.jtp.Math.Vector;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
+import jp.ac.dendai.c.jtp.Physics.Collider.AABBCollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.CircleCollider;
 import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
@@ -66,32 +67,33 @@ public class MainScreen extends Screenable {
     private NumberText nt,timeNt;
     private Text tx;
     private Animator anim;
+    @Override
+    public void init() {
+        //バッファオブジェクトを使用する
+        box.useBufferObject();
+        gird.useBufferObject();
+        sphear.useBufferObject();
+        plane.useBufferObject();
+        plane2.useBufferObject();
+        tex.setBufferObject();
+    }
     public MainScreen(){
-        String vertexShader = new String(FileManager.readShaderFile("DiffuseShaderVertex.txt"));
-        String fragmentShader = new String(FileManager.readShaderFile("DiffuseShaderFragment.txt"));
-        //テクスチャを１枚使えるようにする
-        Shader.useTexture(1);
         //シェーダの作成
-        testShader = new DiffuseShader();
-        shader = new DiffuseShader();
-        uiShader = new UiShader();
+        testShader = (DiffuseShader) Constant.getShader(Constant.SHADER.diffuse);
+        shader = Constant.getShader(Constant.SHADER.diffuse);
+        uiShader = Constant.getLoadingShader();
         //OpenGLES20のもろもろを使えるようにする
-        GLES20Util.initGLES20Util(vertexShader, fragmentShader, false);
 
         //オブジェクトファイルの読み込み
         box = WavefrontObjConverter.createModel("untitled.obj");
         gird = WavefrontObjConverter.createModel("gird.obj");
         sphear = WavefrontObjConverter.createModel("sphear.obj");
-        //バッファオブジェクトを使用する
-        box.useBufferObject();
-        gird.useBufferObject();
-        sphear.useBufferObject();
+
 
         //プリミティブ型
         plane = new Plane();
-        plane.useBufferObject();
+
         plane2 = new Plane();
-        plane2.useBufferObject();
 
         plane.setImage(ImageReader.readImageToAssets("Block.png"));
 
@@ -102,13 +104,13 @@ public class MainScreen extends Screenable {
         //UI用のテクスチャ読み込み
         tex = new Texture(ImageReader.readImageToAssets("Block.png"), GLES20COMPOSITIONMODE.ALPHA);
         //バッファオブジェクトを使用する
-        tex.setBufferObject();
+
 
         //プレイヤーの玉
         playerBullet = new GameObject[5];
         for(int n = 0;n < 5;n++){
             playerBullet[n] = new GameObject();
-            //playerBullet[n].setCollider(new CircleCollider(0.125f));
+            playerBullet[n].setCollider(new AABBCollider(0.05f,0.05f,0.05f));
             playerBullet[n].getRenderMediator().isDraw = false;
             playerBullet[n].getRenderMediator().mesh = box;
             playerBullet[n].getScl().setX(0.05f);
@@ -357,6 +359,8 @@ public class MainScreen extends Screenable {
     public void death() {
 
     }
+
+
 
     private void tempTouchProcess(Touch t){
         if(t.getTouchID() == -1)

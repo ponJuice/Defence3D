@@ -3,15 +3,14 @@ varying vec2 v_TexCoord; 	//テクスチャ座標用のvarying変数
 varying vec2 v_TexCoord_mask;
 attribute vec2 a_TexCoord;	//テクスチャ座標
 attribute vec4 a_Position;	//頂点
-uniform vec4 u_texPos;
 uniform vec4 u_mask_pos;
 uniform mat4 u_ModelMatrix;	//モデル変換行列
 uniform mat4 u_ProjMatrix;	//ワールド行列
+uniform vec4 u_texPos;
 void main() {
   gl_Position = u_ProjMatrix * u_ModelMatrix * a_Position;
   v_TexCoord.x = (a_TexCoord.x + u_texPos.x) * u_texPos.z;
   v_TexCoord.y = (a_TexCoord.y + u_texPos.y) * u_texPos.w;
   v_TexCoord_mask.x = a_TexCoord.x * u_mask_pos.z + u_mask_pos.x;
   v_TexCoord_mask.y = a_TexCoord.y * u_mask_pos.w + u_mask_pos.y;
-  v_TexCoord = a_TexCoord;	//フラグシェーダにテクスチャ座標を渡す
 }

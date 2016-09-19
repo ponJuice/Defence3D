@@ -31,6 +31,13 @@ public class UiShader extends Shader{
     }
 
     @Override
+    protected void createTexture() {
+        textures = new int[2];
+        // テクスチャオブジェクトを作成する
+        GLES20.glGenTextures(2, textures, 0);
+    }
+
+    @Override
     protected void _useShader(){
         super._useShader();
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
@@ -144,5 +151,10 @@ public class UiShader extends Shader{
         GLES20.glUniform1i(u_Sampler_mask, 1);
 
         GLES20.glUniform4f(u_mask_pos, offset_x, offset_y, scale_x, scale_y);
+    }
+
+    @Override
+    protected void _clear(){
+
     }
 }

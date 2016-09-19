@@ -18,7 +18,7 @@ public class Player extends GameObject{
     protected Camera camera;
 
     public Player(){
-        direct = new Vector3(0,1f,5f);
+        direct = new Vector3(0,1f,-5f);
         direct.normalize();
     }
 

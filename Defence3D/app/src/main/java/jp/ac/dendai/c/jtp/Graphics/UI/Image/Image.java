@@ -20,6 +20,11 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
  * Created by wark on 2016/09/16.
  */
 public class Image extends UI{
+    public enum CRITERIA{
+        NON,
+        WIDTH,
+        HEIGHT
+    }
     protected static final float[] plane = {
             -0.5f,-0.5f,0,
             0.5f,-0.5f,0,
@@ -89,6 +94,7 @@ public class Image extends UI{
     protected float x = 0,y = 0;
     protected float r = 0.5f,g = 0.5f,b = 0.5f;
     protected float degree = 0;
+    protected CRITERIA criteria = CRITERIA.WIDTH;
     protected float mask_offset_u = 0
             ,mask_offset_v = 0
             ,mask_scale_u = 1
@@ -101,6 +107,8 @@ public class Image extends UI{
         image = bitmap;
         aspect = (float)image.getWidth()/(float)image.getHeight();
         setBufferObject();
+        height = 1;
+        width = height * aspect;
     }
     public Image(Image image){
         this.image = image.getImage();
@@ -121,11 +129,9 @@ public class Image extends UI{
     }
     public void setWidth(float width){
         this.width = width;
-        this.height = width/aspect;
     }
     public void setHeight(float height){
         this.height = height;
-        this.width = height*aspect;
     }
     @Override
     public void setAlpha(float a){

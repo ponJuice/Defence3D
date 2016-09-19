@@ -71,11 +71,7 @@ public abstract class Shader {
         loadShaderVariable();
     }
 
-    protected void createTexture(){
-        textures = new int[2];
-        // テクスチャオブジェクトを作成する
-        GLES20.glGenTextures(2, textures, 0);
-    }
+    protected abstract void createTexture();
 
     /**
      * テクスチャの使用を可能にします
@@ -226,8 +222,26 @@ public abstract class Shader {
      */
     //テクスチャ画像を設定する
     protected void setOnTexture(Bitmap image, int u_Sampler){
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);   // テクスチャユニット0を有効にする
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]); // テクスチャオブジェクトをバインドする
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,GLES20.GL_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,GLES20.GL_REPEAT);
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         // テクスチャ画像を設定する
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+
         GLES20.glUniform1i(u_Sampler, 0);     // サンプラにテクスチャユニットを設定する
     }
+
+    public void clear(){
+        _clear();
+        GLES20.glDeleteTextures(2,textures,0);
+        GLES20.glDeleteProgram(program);
+    }
+
+    protected abstract void _clear();
 }

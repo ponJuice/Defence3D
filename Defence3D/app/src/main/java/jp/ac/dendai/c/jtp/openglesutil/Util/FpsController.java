@@ -10,29 +10,29 @@ public class FpsController {
 	/**
 	 * 現在FPS
 	 */
-	private short fps = 0;
+	private static short fps = 0;
 	/**
 	 * 固定したいFPS
 	 */
-	private short settedFps;
+	private static short settedFps = 60;
 	/**
 	 * カウンター
 	 */
-	private short fpsCounter = 0;
+	private static short fpsCounter = 0;
 	/**
 	 * FPS計測用
 	 */
-	private long time;
+	private static long time;
 	/**
 	 * コンストラクタ
 	 */
-	public FpsController(short i){
+	public static void initFpsController(short i){
 		settedFps = i;
 	}
 	/**
 	 * FPS制御関数
 	 */
-	public void updateFps(){
+	public static void updateFps(){
 		if(fpsCounter > 0){	//二回目起動以降
 			long differenceTime = System.currentTimeMillis()-time;
 			long sleepTime = (fpsCounter*1000/settedFps)-differenceTime;
@@ -56,7 +56,7 @@ public class FpsController {
 	 * FPSのゲッタ
 	 * @return　FPS
 	 */
-	public short getFps(){
+	public static int getFps(){
 		return fps;
 	}
 

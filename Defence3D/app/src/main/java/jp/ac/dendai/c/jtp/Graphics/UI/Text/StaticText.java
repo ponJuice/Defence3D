@@ -38,9 +38,22 @@ public class StaticText extends Image {
     }
 
     @Override
+    public void setWidth(float width){
+        this.width = width;
+        this.height = width/aspect;
+    }
+
+    @Override
+    public void setHeight(float height){
+        this.height = height;
+        this.width = aspect * height;
+    }
+
+    @Override
     public void proc() {
         counter++;
         if(counter*delta_u >= 2)
             counter = -2f / delta_u;
+        mask_offset_u = counter * delta_u;
     }
 }

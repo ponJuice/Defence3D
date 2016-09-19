@@ -71,6 +71,18 @@ public class StreamText extends Image {
     }
 
     @Override
+    public void setWidth(float width){
+        this.width = width;
+        this.height = width/aspect;
+    }
+
+    @Override
+    public void setHeight(float height){
+        this.height = height;
+        this.width = aspect * height;
+    }
+
+    @Override
     public void touch(Touch touch) {
 
     }

@@ -8,6 +8,7 @@ public abstract class Screenable {
 	public abstract void Draw(float offsetX, float offsetY);
 	public abstract void Touch();
 	public abstract void death();
+	public abstract void init();
 	public void freeze(){freeze = true;};
 	public void unFreeze(){freeze = false;};
 }

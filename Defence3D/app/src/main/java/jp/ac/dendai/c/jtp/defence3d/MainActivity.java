@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import jp.ac.dendai.c.jtp.Game.GameManager;
+import jp.ac.dendai.c.jtp.Game.Screen.DebugScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestModelViewScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestUIScreen;
 import jp.ac.dendai.c.jtp.openglesutil.Util.ImageReader;
@@ -20,7 +21,6 @@ import jp.ac.dendai.c.jtp.openglesutil.Util.FpsController;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 public class MainActivity extends Activity implements GLSurfaceView.Renderer{
-    public static FpsController fpsController = new FpsController((short)60);
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -99,6 +99,9 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         //イメージリーダーを使えるようにする
         ImageReader.initImageReader(this);
 
+        //FPSマネージャを使えるようにする
+        FpsController.initFpsController((short)60);
+
         //タッチマネージャーを使えるようにする
         Input.setMaxTouch(1);
         Input.setOrientation(getResources().getConfiguration().orientation);
@@ -119,7 +122,10 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         GLES20Util.initDrawErea(width, height, true);
 
         GameManager.init();
+        GameManager.debugScreen = new DebugScreen();
+        GameManager.debug = true;
         GameManager.nowScreen = new TestUIScreen();
+        GameManager.nowScreen.init();
         GameManager.nowScreen.unFreeze();
 
         //テクスチャの再読み込み
@@ -134,7 +140,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // 画面をクリアする色を設定する
     }
     private void process(){
-        fpsController.updateFps();
+        FpsController.updateFps();
         GameManager.touch();
         GameManager.proc();
     }

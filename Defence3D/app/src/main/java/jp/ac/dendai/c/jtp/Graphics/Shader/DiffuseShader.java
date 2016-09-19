@@ -21,6 +21,13 @@ public class DiffuseShader extends Shader{
     }
 
     @Override
+    protected void createTexture() {
+        textures = new int[1];
+        // テクスチャオブジェクトを作成する
+        GLES20.glGenTextures(1, textures, 0);
+    }
+
+    @Override
     void loadShaderVariable() {
         u_Sampler = GLES20Util.getUniformLocation(program,"u_Sampler");
     }
@@ -92,13 +99,15 @@ public class DiffuseShader extends Shader{
         GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, GLES20Util.FSIZE * 8, 0);
         GLES20.glEnableVertexAttribArray(ma_Position);  // バッファオブジェクトの割り当ての有効化
 
+
+
         //テクスチャの有効化
         GLES20.glVertexAttribPointer(ma_texCoord, 2, GLES20.GL_FLOAT, false, GLES20Util.FSIZE * 8, GLES20Util.FSIZE * 6);
         GLES20.glEnableVertexAttribArray(ma_texCoord);  // バッファオブジェクトの割り当ての有効化
 
+        setMaterial(mesh.getFaces()[0]);
         GLES20.glUniform1f(u_alpha,alpha);
 
-        setMaterial(mesh.getFaces()[0]);
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, mesh.getFaces()[0].end - mesh.getFaces()[0].offset + 1, GLES20.GL_UNSIGNED_INT, GLES20Util.ISIZE * mesh.getFaces()[0].offset);
 
         GLES20.glDisableVertexAttribArray(ma_Position);
@@ -134,5 +143,10 @@ public class DiffuseShader extends Shader{
 
         GLES20.glDisableVertexAttribArray(ma_Position);
         GLES20.glDisableVertexAttribArray(ma_texCoord);
+    }
+
+    @Override
+    protected void _clear() {
+
     }
 }

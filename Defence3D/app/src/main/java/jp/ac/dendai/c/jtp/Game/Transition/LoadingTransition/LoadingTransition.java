@@ -1,15 +1,13 @@
 package jp.ac.dendai.c.jtp.Game.Transition.LoadingTransition;
 
-import android.graphics.Bitmap;
-
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.Transition.Transitionable;
+import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Math.Clamp;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
-import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 public class LoadingTransition implements Transitionable {
 	private enum LOAD_STATE{
@@ -22,9 +20,9 @@ public class LoadingTransition implements Transitionable {
 	private LOAD_STATE state = LOAD_STATE.NON;
 	private static LoadingTransition instance;
 	private Class<?> nextScreenClass;
-	private Bitmap bitmap;
+	private Image image;
 	private StaticText loading;
-	private int r = 0,g = 0, b = 0;
+	private int r = 0,g = 255, b = 0;
 	private LoadingThread thread;
 	private Object lock;
 	private int count = 0;
@@ -34,7 +32,6 @@ public class LoadingTransition implements Transitionable {
 		return instance;
 	}
 	private LoadingTransition(){
-		bitmap = GLES20Util.createBitmap(r,g,b,255);
 		lock = new Object();
 		loading = new StaticText("Loading...");
 		loading.setMaskBitmap(Constant.getBitmap(Constant.BITMAP.bilinear));
@@ -43,6 +40,12 @@ public class LoadingTransition implements Transitionable {
 		loading.setVertical(UIAlign.Align.BOTTOM);
 		loading.setX(GLES20Util.getWidth_gl());
 		loading.setY(0);
+		loading.setDelta_u(0.05f);
+		image = new Image(GLES20Util.createBitmap(r,g,b,255));
+		image.setHeight(GLES20Util.getHeight_gl());
+		image.setWidth(GLES20Util.getWidth_gl());
+		image.setHolizontal(UIAlign.Align.LEFT);
+		image.setVertical(UIAlign.Align.BOTTOM);
 	}
 	public void initTransition(Class<?> nextScreenClass){
 		thread = new LoadingThread(lock);
@@ -60,32 +63,32 @@ public class LoadingTransition implements Transitionable {
 			//ロードの開始
 			//ロード画面のトランジョン
 			float a = Clamp.clamp(0f, 1f, 60f, (float) count);
-			GLES20Util.DrawGraph(GLES20Util.getWidth_gl()/2f,GLES20Util.getHeight_gl()/2f,
-					GLES20Util.getWidth_gl(),GLES20Util.getHeight_gl(),
-					bitmap, a ,GLES20COMPOSITIONMODE.ALPHA);
+			image.setAlpha(a);
+			image.draw(Constant.getLoadingShader());
 			loading.setAlpha(a);
 			loading.draw(Constant.getLoadingShader());
-			if(count > 60) {
+			if(count >= 60) {
 				state = LOAD_STATE.LOAD_START;
 				count = 0;
 			}
 		}else if(state == LOAD_STATE.LOAD_START){
-			GLES20Util.DrawGraph(GLES20Util.getWidth_gl() / 2f, GLES20Util.getHeight_gl() / 2f,
-					GLES20Util.getWidth_gl(), GLES20Util.getHeight_gl(),
-					bitmap, 1f, GLES20COMPOSITIONMODE.ALPHA);
+			image.setAlpha(1);
+			image.draw(Constant.getLoadingShader());
 			loading.setAlpha(1);
 			loading.draw(Constant.getLoadingShader());
 			thread.start();
+			GameManager.nowScreen.death();
 			state = LOAD_STATE.LOAD_STAY;
 		}else if(state == LOAD_STATE.LOAD_STAY){
-			GLES20Util.DrawGraph(GLES20Util.getWidth_gl() / 2f, GLES20Util.getHeight_gl() / 2f,
-					GLES20Util.getWidth_gl(), GLES20Util.getHeight_gl(),
-					bitmap, 1f, GLES20COMPOSITIONMODE.ALPHA);
+			image.setAlpha(1);
+			image.draw(Constant.getLoadingShader());
+			loading.setAlpha(1);
 			loading.draw(Constant.getLoadingShader());
 			if(count > 120) {
 				//ロード中
 				if (thread.isEnd()) {
 					GameManager.nowScreen = thread.getScreen();
+					GameManager.nowScreen.init();
 					GameManager.nowScreen.freeze();
 					thread = null;
 					state = LOAD_STATE.END;
@@ -95,9 +98,10 @@ public class LoadingTransition implements Transitionable {
 		}else if(state == LOAD_STATE.END){
 			GameManager.nowScreen.Draw(0, 0);
 			float a = Clamp.clamp(1f, 0f, 60f, (float) count);
-			GLES20Util.DrawGraph(GLES20Util.getWidth_gl()/2f,GLES20Util.getHeight_gl()/2f,
-					GLES20Util.getWidth_gl(),GLES20Util.getHeight_gl(),
-					bitmap, Clamp.clamp(1f,0f,60f,(float)count),GLES20COMPOSITIONMODE.ALPHA);
+			image.setAlpha(a);
+			image.draw(Constant.getLoadingShader());
+			loading.setAlpha(a);
+			loading.draw(Constant.getLoadingShader());
 			if(count >= 60) {
 				//終了処理
 				state = LOAD_STATE.NON;
