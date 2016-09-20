@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.Screen.DebugScreen;
+import jp.ac.dendai.c.jtp.Game.Screen.StageSelectScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestModelViewScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestUIScreen;
 import jp.ac.dendai.c.jtp.openglesutil.Util.ImageReader;
@@ -124,7 +125,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         GameManager.init();
         GameManager.debugScreen = new DebugScreen();
         GameManager.debug = true;
-        GameManager.nowScreen = new TestUIScreen();
+        GameManager.nowScreen = new StageSelectScreen();
         GameManager.nowScreen.init();
         GameManager.nowScreen.unFreeze();
 

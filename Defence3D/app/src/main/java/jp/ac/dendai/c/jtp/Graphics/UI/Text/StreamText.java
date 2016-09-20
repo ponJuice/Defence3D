@@ -8,13 +8,8 @@ import android.opengl.GLES20;
 
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
-import jp.ac.dendai.c.jtp.Graphics.UI.MaskInfo;
-import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
-import jp.ac.dendai.c.jtp.Math.Vector2;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
-import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
-import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by Goto on 2016/09/15.
@@ -27,7 +22,7 @@ public class StreamText extends Image {
     public StreamText(String[] string,Bitmap text,Bitmap mask,int max_x_length,int offset){
         super(text);
         this.string = string;
-        this.image = text;
+        this.bitmap = text;
         this.max_x_length = max_x_length;
         this.mask = mask;
         aspect = (float)text.getWidth() / (float)text.getHeight();
@@ -35,12 +30,12 @@ public class StreamText extends Image {
         width = aspect;
         this.offset = offset;
 
-        mask_filter_mag = GLES20.GL_NEAREST;
-        mask_filter_min = GLES20.GL_NEAREST;
-        mask_warp_s = GLES20.GL_CLAMP_TO_EDGE;
-        mask_warp_t = GLES20.GL_CLAMP_TO_EDGE;
-        filter_mag = GLES20.GL_LINEAR;
-        filter_min = GLES20.GL_LINEAR;
+        textureSetting.setMask_filter_mag(GLES20.GL_NEAREST);
+        textureSetting.setMask_filter_min(GLES20.GL_NEAREST);
+        textureSetting.setMask_warp_s(GLES20.GL_CLAMP_TO_EDGE);
+        textureSetting.setMask_warp_t(GLES20.GL_CLAMP_TO_EDGE);
+        textureSetting.setFilter_mag(GLES20.GL_LINEAR);
+        textureSetting.setFilter_min(GLES20.GL_LINEAR);
     }
 
     public void setChar_x(int n){
@@ -95,15 +90,15 @@ public class StreamText extends Image {
     @Override
     public void draw(UiShader shader) {
         float mojisuu = (float)max_x_length/2f - char_x;
-        float pos_x = (float)image.getWidth()/(float)max_x_length * mojisuu /(float)image.getWidth();
-        getTexOffset().setX(0);
-        getTexOffset().setY(0);
-        getTexScale().setX(1);
-        getTexScale().setY(1);
-        mask_offset_u = pos_x;
-        mask_offset_v = -(float)char_y + ((float)(offset*(char_y)) / (float)image.getHeight());
-        mask_scale_u = 1;//string.length;
-        mask_scale_v = string.length;
+        float pos_x = (float)bitmap.getWidth()/(float)max_x_length * mojisuu /(float)bitmap.getWidth();
+        texOffset.setX(0);
+        texOffset.setY(0);
+        texScale.setX(1);
+        texScale.setY(1);
+        maskOffset.setX(pos_x);
+        maskOffset.setY(-(float)char_y + ((float)(offset*(char_y)) / (float)bitmap.getHeight()));
+        maskScale.setX(1);//string.length;
+        maskScale.setY(string.length);
 
         shader.drawUi(this
                 ,x + UIAlign.convertAlign(width,holizontal)

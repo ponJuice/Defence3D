@@ -14,9 +14,9 @@ public class DebugScreen extends Screenable {
 
     public DebugScreen(){
         nt = new NumberText("メイリオ");
-        nt.textSize = 0.1f;
-        nt.x = 0.05f;
-        nt.y = GLES20Util.getHeight_gl()-0.05f;
+        nt.setHeight(0.1f);
+        nt.setX(0.05f);
+        nt.setY(GLES20Util.getHeight_gl()-0.05f);
     }
 
     @Override

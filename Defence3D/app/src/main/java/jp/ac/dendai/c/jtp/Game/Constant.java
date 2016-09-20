@@ -7,6 +7,7 @@ import jp.ac.dendai.c.jtp.Graphics.Camera.UiCamera;
 import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
+import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.defence3d.R;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
@@ -63,6 +64,9 @@ public class Constant {
 
         diffuseShader = new DiffuseShader();
         uiShader = new UiShader();
+
+        //UIを使えるようにする
+        UI.init();
     }
     public static Bitmap getBitmap(BITMAP f){
         if(f == BITMAP.white)

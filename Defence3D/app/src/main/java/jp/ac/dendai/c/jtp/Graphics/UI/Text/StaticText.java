@@ -28,7 +28,7 @@ public class StaticText extends Image {
         delta_v = v;
     }
 
-    public void init(){
+    public void reset(){
         counter = 0;
     }
 
@@ -54,6 +54,6 @@ public class StaticText extends Image {
         counter++;
         if(counter*delta_u >= 2)
             counter = -2f / delta_u;
-        mask_offset_u = counter * delta_u;
+        setMaskOffset(UV.u,counter * delta_u);
     }
 }

@@ -1,41 +1,32 @@
 package jp.ac.dendai.c.jtp.Graphics.UI.Button;
 
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
-import jp.ac.dendai.c.jtp.Graphics.UI.MaskInfo;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
-import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Graphics.UI.Util.Figure.Rect;
-import jp.ac.dendai.c.jtp.Math.Vector2;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
-
-import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
-import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by Goto on 2016/09/06.
  */
 public class Button extends Image {
-    public UIAlign.Align getVertical() {
-        return vertical;
-    }
-
-
-    public UIAlign.Align getHolizontal() {
-        return holizontal;
-    }
-
     private enum BUTTON_STATE{
         NON,
         DOWN,
         HOVER,
         UP,
     }
+    //テキストの大きさをボタンのどの方向を基準にするか
+    public enum CRITERIA{
+        WIDTH,
+        HEIGHT,
+        NON
+    }
+    protected CRITERIA criteria;
     protected BUTTON_STATE state = BUTTON_STATE.NON;
     protected ButtonListener listener;
     protected Touch touch;
@@ -44,40 +35,23 @@ public class Button extends Image {
     protected float non_hover_alpha = 1f;
     protected float padding = 0;
     protected Rect rect;
-    public Button(float left,float top,float right,float bottom,String text){
-        rect = new Rect(left,top,right,bottom);
+    public Button(float cx,float cy,float width,float height,String string){
+        rect = new Rect(cx-width/2f,cy+height/2f,cx+width/2f,cy-width/2f);
+        this.width = rect.getWidth();
+        this.height = rect.getHeight();
         if(text != null) {
-            this.text = new StaticText(text);
+            this.text = new StaticText(string);
             this.text.setVertical(UIAlign.Align.CENTOR);
-            this.text.setHolizontal(UIAlign.Align.CENTOR);
+            this.text.setHorizontal(UIAlign.Align.CENTOR);
             updateTextPos();
         }
-        image = Constant.getBitmap(Constant.BITMAP.white);
+        bitmap = Constant.getBitmap(Constant.BITMAP.white);
         vertical = UIAlign.Align.TOP;
-        holizontal = UIAlign.Align.LEFT;
+        horizontal = UIAlign.Align.LEFT;
         criteria = CRITERIA.HEIGHT;
     }
     public void setButtonListener(ButtonListener listener){
         this.listener = listener;
-    }
-    public void setTop(float value){
-        rect.setTop(value);
-        updateTextPos();
-    }
-
-    public void setLeft(float value){
-        rect.setLeft(value);
-        updateTextPos();
-    }
-
-    public void setBottom(float value){
-        rect.setBottom(value);
-        updateTextPos();
-    }
-
-    public void setRight(float value){
-        rect.setRight(value);
-        updateTextPos();
     }
     private void updateTextPos(){
         if(text != null){
@@ -112,6 +86,11 @@ public class Button extends Image {
         rect.setCy(y);
         if(text != null)
             text.setY(y);
+    }
+
+    @Override
+    public void setWidth(float width){
+
     }
     @Override
     public void touch(Touch touch) {
@@ -149,18 +128,6 @@ public class Button extends Image {
     }
 
     @Override
-    public void setWidth(float width){
-        this.width = width;
-        this.height = width/aspect;
-    }
-
-    @Override
-    public void setHeight(float height){
-        this.height = height;
-        this.width = height*aspect;
-    }
-
-    @Override
     public void proc() {
         if(state == BUTTON_STATE.UP){
             if(listener != null)
@@ -180,7 +147,7 @@ public class Button extends Image {
     public void draw(UiShader shader) {
         if (state == BUTTON_STATE.NON) {
             shader.drawUi(this
-                    ,rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal)
+                    ,rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), horizontal)
                     ,rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical)
                     ,rect.getWidth()
                     ,rect.getHeight()
@@ -194,7 +161,7 @@ public class Button extends Image {
                     , GLES20COMPOSITIONMODE.ALPHA);*/
         } else {
             shader.drawUi(this
-                    , rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal)
+                    , rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), horizontal)
                     , rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical)
                     , rect.getWidth()
                     , rect.getHeight()

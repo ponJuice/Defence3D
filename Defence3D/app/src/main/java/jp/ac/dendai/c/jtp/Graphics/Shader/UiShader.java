@@ -10,8 +10,8 @@ import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model.Model;
 import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
-import jp.ac.dendai.c.jtp.Graphics.UI.MaskInfo;
-import jp.ac.dendai.c.jtp.Graphics.UI.TextureInfo;
+import jp.ac.dendai.c.jtp.Graphics.UI.Textrue.MaskInfo;
+import jp.ac.dendai.c.jtp.Graphics.UI.Textrue.TextureInfo;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
@@ -88,12 +88,12 @@ public class UiShader extends Shader{
 
         setOnTexture(tex.getBitmap(),tex);
         setOnMask(tex.getMaskBitmap()
-                ,tex.getMaskOffset(MaskInfo.MASK.u),tex.getMaskOffset(MaskInfo.MASK.v)
-                ,tex.getMaskScale(MaskInfo.MASK.u),tex.getMaskScale(MaskInfo.MASK.v)
+                ,tex.getMaskOffset(TextureInfo.UV.u),tex.getMaskOffset(TextureInfo.UV.v)
+                ,tex.getMaskScale(TextureInfo.UV.u),tex.getMaskScale(TextureInfo.UV.v)
                 ,tex);
 
         GLES20.glUniform1f(u_alpha, alpha);
-        GLES20.glUniform3f(uv_color,tex.getColor(UI.COLOR.R),tex.getColor(UI.COLOR.G),tex.getColor(UI.COLOR.B));
+        GLES20.glUniform3f(uv_color,tex.getR(),tex.getG(),tex.getB());
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, tex.getVBO());
         GLES20.glVertexAttribPointer(ma_Position, 3, GLES20.GL_FLOAT, false, 0, 0);
@@ -129,7 +129,7 @@ public class UiShader extends Shader{
         // テクスチャ画像を設定する
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
 
-        GLES20.glUniform4f(u_texPos,t.getTexOffset().getX(),t.getTexOffset().getY(),t.getTexScale().getX(),t.getTexScale().getY());
+        GLES20.glUniform4f(u_texPos,t.getTexOffset(TextureInfo.UV.u),t.getTexOffset(TextureInfo.UV.v),t.getTexScale(TextureInfo.UV.u),t.getTexScale(TextureInfo.UV.v));
         GLES20.glUniform1f(u_alpha, t.getAlpha());		//サンプラにアルファを設定する
         GLES20.glUniform1i(u_Sampler, 0);     // サンプラにテクスチャユニットを設定する
     }

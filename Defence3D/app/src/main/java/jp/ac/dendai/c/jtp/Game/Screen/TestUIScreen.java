@@ -45,7 +45,7 @@ public class TestUIScreen extends Screenable {
         image.setFilter_mag(GLES20.GL_NEAREST);
         image.setFilter_min(GLES20.GL_NEAREST);
         image.setAlpha(1.0f);
-        image.setHolizontal(UIAlign.Align.LEFT);
+        image.setHorizontal(UIAlign.Align.LEFT);
         image.setVertical(UIAlign.Align.BOTTOM);
         StaticText text = new StaticText("TEXT");
         text.setX(0);
@@ -53,7 +53,7 @@ public class TestUIScreen extends Screenable {
         text.setWidth(0.5f);
         text.setFilter_mag(GLES20.GL_LINEAR);
         text.setFilter_min(GLES20.GL_LINEAR);
-        text.setHolizontal(UIAlign.Align.LEFT);
+        text.setHorizontal(UIAlign.Align.LEFT);
         text.setVertical(UIAlign.Align.BOTTOM);
 
         String str = "あいうえお\nかきくけこ";
@@ -65,12 +65,12 @@ public class TestUIScreen extends Screenable {
         st.setVertical(UIAlign.Align.BOTTOM);
 
         nt = new NumberText("メイリオ");
-        nt.x = GLES20Util.getWidth_gl()/2f;
-        nt.y = GLES20Util.getHeight_gl()/2f;
-        nt.textSize = 0.1f;
+        nt.setX(GLES20Util.getWidth_gl()/2f);
+        nt.setY(GLES20Util.getHeight_gl()/2f);
+        nt.setHeight(0.1f);
 
         btn = new Button(0,0.5f,0.2f,0.4f,"ボタン");
-        btn.setImage(GLES20Util.loadBitmap(R.mipmap.button));
+        btn.setBitmap(GLES20Util.loadBitmap(R.mipmap.button));
         btn.setButtonListener(new ButtonListener() {
             @Override
             public void touchDown(Button button) {

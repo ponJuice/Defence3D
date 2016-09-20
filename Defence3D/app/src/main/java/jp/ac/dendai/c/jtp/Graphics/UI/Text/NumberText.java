@@ -7,8 +7,10 @@ import java.util.HashMap;
 
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
-import jp.ac.dendai.c.jtp.Graphics.UI.MaskInfo;
-import jp.ac.dendai.c.jtp.Graphics.UI.Text.StringBitmap;
+import jp.ac.dendai.c.jtp.Graphics.UI.Textrue.MaskInfo;
+import jp.ac.dendai.c.jtp.Graphics.UI.Textrue.TextureInfo;
+import jp.ac.dendai.c.jtp.Graphics.UI.Textrue.TextureSetting;
+import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Math.Vector2;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
@@ -20,13 +22,15 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
  */
 public class NumberText extends UI {
     protected static HashMap<String,StringBitmap[]> numberFont;
+    protected TextureSetting ts = new TextureSetting();
+    protected Vector2 texOffset = new Vector2(),texScale = new Vector2(1,1);
+    protected Vector2 maskOffset = new Vector2(),maskScale = new Vector2(1,1);
     protected StringBitmap[] number;
+    protected Bitmap mask;
+    protected float one_width,one_height,one_aspect;
     protected int num;
-    public float x = 0,y = 0,z = 0;
-    public float lx = 1,ly = 1,lz = 1;
-    public float textSize = 1f;
-    protected Image image;
-    protected int align_h = UI_CENTOR,align_v = UI_CENTOR;
+    protected float mask_alpha = 1f;
+    protected UIAlign.Align align_h = UIAlign.Align.CENTOR,align_v = UIAlign.Align.CENTOR;
     public NumberText(String fontName){
         if(numberFont == null)
             numberFont = new HashMap<>();
@@ -41,139 +45,9 @@ public class NumberText extends UI {
             }
             numberFont.put(fontName,number);
         }
-        image = new Image(number[0].bitmap);
-    }
-
-    public void setNumber(int num){
-        this.num = num;
-    }
-    public int getNumber(){
-        return num;
-    }
-
-    @Override
-    public Bitmap getBitmap() {
-        return null;
-    }
-
-    @Override
-    public float getAlpha() {
-        return 0;
-    }
-
-    @Override
-    public void setAlpha(float a) {
-
-    }
-
-    @Override
-    public Vector2 getTexOffset() {
-        return null;
-    }
-
-    @Override
-    public Vector2 getTexScale() {
-        return null;
-    }
-
-    @Override
-    public int getMaskWrapModeT() {
-        return 0;
-    }
-
-    @Override
-    public int getMaskWrapModeS() {
-        return 0;
-    }
-
-    @Override
-    public int getMaskFilterModeMin() {
-        return 0;
-    }
-
-    @Override
-    public int getMaskFilterModeMag() {
-        return 0;
-    }
-
-    @Override
-    public Bitmap getMaskBitmap() {
-        return null;
-    }
-
-    @Override
-    public void setMaskBitmap(Bitmap bitmap) {
-
-    }
-
-    @Override
-    public float getMaskOffset(MASK flag) {
-        return 0;
-    }
-
-    @Override
-    public float getMaskScale(MASK flag) {
-        return 0;
-    }
-
-    @Override
-    public void setMaskOffset(MASK flag, float n) {
-
-    }
-
-    @Override
-    public void setMaskScale(MASK flag, float n) {
-
-    }
-
-    @Override
-    public float getMaskAlpha() {
-        return 0;
-    }
-
-    @Override
-    public void setMaskAlpha(float a) {
-
-    }
-
-    @Override
-    public int getFilterModeMin() {
-        return 0;
-    }
-
-    @Override
-    public int getFilterModeMag() {
-        return 0;
-    }
-
-    @Override
-    public int getWrapModeT() {
-        return 0;
-    }
-
-    @Override
-    public int getWrapModeS() {
-        return 0;
-    }
-
-    @Override
-    public GLES20COMPOSITIONMODE getBlendMode() {
-        return null;
-    }
-
-    @Override
-    public float getColor(COLOR col) {
-        return 0;
-    }
-
-    @Override
-    public int getVBO() {
-        return 0;
-    }
-
-    @Override
-    public int getIBO() {
-        return 0;
+        one_width = number[0].bitmap.getWidth();
+        one_height = number[0].bitmap.getHeight();
+        one_aspect = calcAspect(number[0].bitmap);
     }
 
     @Override
@@ -187,37 +61,41 @@ public class NumberText extends UI {
     }
 
     @Override
-    public void draw(UiShader shader) {
-        float _lx = lx * textSize,_ly = ly * textSize;
-        int line = (int)Math.log10(num) + 1;
-        float x_offset = getHolizon(line,number[0].getBitmap().getHeight(),number[0].getBitmap().getWidth());
-        int m = 0;
-        for(int n = line;n > 0;n--){
-            int digit = getDigit(num,n);
-            float bottom = number[digit].fm.bottom / (float)number[digit].bitmap.getHeight();
-            float scaleX = (float)number[digit].getBitmap().getWidth() / (float)number[digit].getBitmap().getHeight();
-            image.setImage(number[digit].getBitmap());
-            /*shader.DrawGraph(scaleX * _lx * (float) m + x,
-                    y - (bottom * _ly),
-                    scaleX * _lx,
-                    _ly,
-                    number[digit].getBitmap(),
-                    1,
-                    GLES20COMPOSITIONMODE.ALPHA);*/
-            shader.drawUi(image, scaleX * _lx * (float) m + x,y - (bottom * _ly),scaleX * _lx,_ly,0,1);
-            m++;
+    public void setWidth(float width){
+        this.width = width;
+        if(useAspect){
+            height = width / (float)getNumOfDigit(num) /one_aspect;
+            aspect = width / height;
         }
     }
 
-    public float getHolizon(int line,int h,int w){
-        if(align_h == UI_CENTOR)
-            return (float)(w*line)/2f/(float)h;
-        else if(align_h == UI.UI_LEFT)
-            return (float)w/2f;
-        else if(align_h == UI_RIGHT)
-            return -(float)(w*line)+(float)w/2f;
-        return 0;
+    @Override
+    public void setHeight(float height){
+        this.height = height;
+        if(useAspect){
+            width = height * one_aspect;
+            width *= (float)getNumOfDigit(num);
+        }
     }
+
+    @Override
+    public void useAspect(boolean flag){
+        useAspect = flag;
+        if(useAspect)
+            aspect = height / (height * one_aspect * (float)getNumOfDigit(num));
+    }
+
+
+    @Override
+    public void draw(UiShader shader) {
+        int l = getNumOfDigit(num);
+        for(int n = 0;n < l;n++){
+
+        }
+    }
+
+
+
 
     protected int pow(int num, int count) {
         if (count < 0) {
@@ -242,5 +120,145 @@ public class NumberText extends UI {
         int b = num / d;
 
         return a - (b * 10);
+    }
+
+    protected int getNumOfDigit(int num){
+        return (int) Math.log10(num);
+    }
+
+    public void setNumber(int num){
+        this.num = num;
+    }
+
+    public int getNumber(){
+        return num;
+    }
+
+    @Override
+    public int getMaskWrapModeT() {
+        return ts.getMask_warp_t();
+    }
+
+    @Override
+    public int getMaskWrapModeS() {
+        return ts.getMask_warp_s();
+    }
+
+    @Override
+    public int getMaskFilterModeMin() {
+        return ts.getMask_filter_min();
+    }
+
+    @Override
+    public int getMaskFilterModeMag() {
+        return ts.getMask_filter_mag();
+    }
+
+    @Override
+    public Bitmap getMaskBitmap() {
+        return mask;
+    }
+
+    @Override
+    public void setMaskBitmap(Bitmap bitmap) {
+        mask = bitmap;
+    }
+
+    @Override
+    public float getMaskOffset(UV flag) {
+        if(flag == UV.u)
+            return maskOffset.getX();
+        else
+            return maskOffset.getY();
+    }
+
+    @Override
+    public float getMaskScale(UV flag) {
+        if(flag == UV.u)
+            return maskScale.getX();
+        else
+            return maskScale.getY();
+    }
+
+    @Override
+    public void setMaskOffset(UV flag, float n) {
+        if(flag == UV.u)
+            maskOffset.setX(n);
+        else
+            maskOffset.setY(n);
+    }
+
+    @Override
+    public void setMaskScale(UV flag, float n) {
+        if(flag == UV.u)
+            maskScale.setX(n);
+        else
+            maskScale.setY(n);
+    }
+
+    @Override
+    public float getMaskAlpha() {
+        return mask_alpha;
+    }
+
+    @Override
+    public void setMaskAlpha(float a) {
+        mask_alpha = a;
+    }
+
+    @Override
+    public int getFilterModeMin() {
+        return ts.getFilter_min();
+    }
+
+    @Override
+    public int getFilterModeMag() {
+        return ts.getFilter_mag();
+    }
+
+    @Override
+    public int getWrapModeT() {
+        return ts.getWrap_t();
+    }
+
+    @Override
+    public int getWrapModeS() {
+        return ts.getWrap_s();
+    }
+
+    @Override
+    public Bitmap getBitmap() {
+        return number[0].bitmap;
+    }
+
+    @Override
+    public void setBitmap(Bitmap bitmap) {
+
+    }
+
+    @Override
+    public float getTexOffset(UV flag) {
+        if(flag == UV.u)
+            return texOffset.getX();
+        else
+            return texOffset.getY();
+    }
+
+    @Override
+    public float getTexScale(UV flag) {
+        if(flag == UV.u)
+            return texScale.getX();
+        else
+            return texScale.getY();
+    }
+
+    @Override
+    public void setTexOffset(UV flag, float n) {
+
+    }
+
+    @Override
+    public void setTexScale(UV flag, float n) {
+
     }
 }

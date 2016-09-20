@@ -275,7 +275,7 @@ public class MainScreen extends Screenable {
         //button2.setButtonListener(new TestButtonListener2(player,gameObjects[0]));
 
         //ナンバーテキスト
-        nt = new NumberText("メイリオ");
+        /*nt = new NumberText("メイリオ");
         nt.setNumber(100);
         nt.y = 0.5f;
         nt.lx = 0.25f;
@@ -287,7 +287,7 @@ public class MainScreen extends Screenable {
         timeNt.y = 0.85f;
         timeNt.lx = 0.25f;
         timeNt.ly = 0.25f;
-        timeNt.lz = 0.25f;
+        timeNt.lz = 0.25f;*/
 
         //テキスト
         //tx = new Text("abcefghij");

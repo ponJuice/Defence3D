@@ -36,7 +36,7 @@ public class LoadingTransition implements Transitionable {
 		loading = new StaticText("Loading...");
 		loading.setMaskBitmap(Constant.getBitmap(Constant.BITMAP.bilinear));
 		loading.setWidth(0.5f);
-		loading.setHolizontal(UIAlign.Align.RIGHT);
+		loading.setHorizontal(UIAlign.Align.RIGHT);
 		loading.setVertical(UIAlign.Align.BOTTOM);
 		loading.setX(GLES20Util.getWidth_gl());
 		loading.setY(0);
@@ -44,7 +44,7 @@ public class LoadingTransition implements Transitionable {
 		image = new Image(GLES20Util.createBitmap(r,g,b,255));
 		image.setHeight(GLES20Util.getHeight_gl());
 		image.setWidth(GLES20Util.getWidth_gl());
-		image.setHolizontal(UIAlign.Align.LEFT);
+		image.setHorizontal(UIAlign.Align.LEFT);
 		image.setVertical(UIAlign.Align.BOTTOM);
 	}
 	public void initTransition(Class<?> nextScreenClass){
