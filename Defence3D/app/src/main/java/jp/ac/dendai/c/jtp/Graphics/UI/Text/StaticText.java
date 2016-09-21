@@ -19,7 +19,7 @@ public class StaticText extends Image {
     protected float delta_u = 0,delta_v = 0;
     protected float counter = 0;
     public StaticText(String text){
-        super(GLES20Util.stringToBitmap(text,"メイリオ",25,255,255,255));
+        super(GLES20Util.stringToBitmap(text,null,25,255,255,255));
     }
     public void setDelta_u(float u){
         delta_u = u;
@@ -37,7 +37,7 @@ public class StaticText extends Image {
 
     }
 
-    @Override
+    /*@Override
     public void setWidth(float width){
         this.width = width;
         this.height = width/aspect;
@@ -47,7 +47,7 @@ public class StaticText extends Image {
     public void setHeight(float height){
         this.height = height;
         this.width = aspect * height;
-    }
+    }*/
 
     @Override
     public void proc() {

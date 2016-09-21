@@ -26,7 +26,7 @@ public class Button extends Image {
         HEIGHT,
         NON
     }
-    protected CRITERIA criteria;
+    protected CRITERIA criteria = CRITERIA.NON;
     protected BUTTON_STATE state = BUTTON_STATE.NON;
     protected ButtonListener listener;
     protected Touch touch;
@@ -36,19 +36,17 @@ public class Button extends Image {
     protected float padding = 0;
     protected Rect rect;
     public Button(float cx,float cy,float width,float height,String string){
-        rect = new Rect(cx-width/2f,cy+height/2f,cx+width/2f,cy-width/2f);
+        useAspect(false);
+        rect = new Rect(cx-width/2f,cy+height/2f,cx+width/2f,cy-height/2f);
         this.width = rect.getWidth();
         this.height = rect.getHeight();
-        if(text != null) {
+        if(string != null) {
             this.text = new StaticText(string);
             this.text.setVertical(UIAlign.Align.CENTOR);
             this.text.setHorizontal(UIAlign.Align.CENTOR);
             updateTextPos();
         }
-        bitmap = Constant.getBitmap(Constant.BITMAP.white);
-        vertical = UIAlign.Align.TOP;
-        horizontal = UIAlign.Align.LEFT;
-        criteria = CRITERIA.HEIGHT;
+        setBitmap(Constant.getBitmap(Constant.BITMAP.white));
     }
     public void setButtonListener(ButtonListener listener){
         this.listener = listener;
@@ -58,7 +56,7 @@ public class Button extends Image {
             text.setX(rect.getCx());
             text.setY(rect.getCy());
             if(criteria == CRITERIA.WIDTH)
-                text.setWidth(rect.getWidth()-padding);
+                text.setWidth(rect.getWidth() - padding);
             else if(criteria == CRITERIA.HEIGHT)
                 text.setHeight(rect.getHeight() - padding);
         }
@@ -66,6 +64,11 @@ public class Button extends Image {
 
     public void setCriteria(CRITERIA c){
         this.criteria = c;
+        if(criteria == CRITERIA.NON) {
+            text.useAspect(false);
+        }else{
+            text.useAspect(true);
+        }
         updateTextPos();
     }
 
@@ -75,23 +78,72 @@ public class Button extends Image {
     }
 
     @Override
+    public void setHorizontal(UIAlign.Align align){
+        horizontal = align;
+        setX(rect.getCx() + UIAlign.convertAlign(rect.getWidth(),horizontal));
+    }
+
+    @Override
+    public void setVertical(UIAlign.Align align){
+        vertical = align;
+        setY(rect.getCy() + UIAlign.convertAlign(rect.getHeight(),vertical));
+    }
+
+    @Override
     public void setX(float x){
+        x = x + UIAlign.convertAlign(rect.getWidth(),horizontal);
         rect.setCx(x);
+        this.x = rect.getCx();
         if(text != null)
             text.setX(x);
     }
 
     @Override
     public void setY(float y){
+        y = y + UIAlign.convertAlign(rect.getHeight(),vertical);
         rect.setCy(y);
+        this.y = rect.getCy();
         if(text != null)
             text.setY(y);
     }
 
     @Override
     public void setWidth(float width){
-
+        rect.setCx((width - rect.getWidth())/2f);
+        rect.setWidth(width);
+        if(useAspect){
+            rect.setCy((width/aspect - rect.getHeight()/2f));
+            rect.setHeight(width/aspect);
+        }
+        if(text != null) {
+            text.setX(rect.getCx());
+            text.setY(rect.getCy());
+            if(criteria == CRITERIA.WIDTH){
+                text.setWidth(width - padding);
+            }else if(criteria == CRITERIA.HEIGHT){
+                text.setHeight(rect.getHeight()-padding);
+            }
+        }
     }
+    @Override
+    public void setHeight(float height){
+        rect.setCy((height - rect.getHeight())/2f);
+        rect.setHeight(height);
+        if(useAspect){
+            rect.setCy((height*aspect - rect.getWidth()/2f));
+            rect.setWidth(height*aspect);
+        }
+        if(text != null) {
+            text.setY(rect.getCy());
+            text.setX(rect.getCx());
+            if(criteria == CRITERIA.HEIGHT){
+                text.setHeight(height - padding);
+            }else if(criteria == CRITERIA.WIDTH){
+                text.setWidth(rect.getWidth() - padding);
+            }
+        }
+    }
+
     @Override
     public void touch(Touch touch) {
         if(this.touch != null && this.touch != touch)
@@ -147,26 +199,18 @@ public class Button extends Image {
     public void draw(UiShader shader) {
         if (state == BUTTON_STATE.NON) {
             shader.drawUi(this
-                    ,rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), horizontal)
-                    ,rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical)
+                    ,rect.getCx()
+                    ,rect.getCy()
                     ,rect.getWidth()
                     ,rect.getHeight()
                     ,0,non_hover_alpha);
-            /*GLES20Util.DrawGraph(rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal)
-                    , rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical)
-                    , rect.getWidth()
-                    , rect.getHeight()
-                    , tex
-                    , non_hover_alpha
-                    , GLES20COMPOSITIONMODE.ALPHA);*/
         } else {
             shader.drawUi(this
-                    , rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), horizontal)
-                    , rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical)
+                    , rect.getCx()
+                    , rect.getCy()
                     , rect.getWidth()
                     , rect.getHeight()
                     , 0, hover_alpha);
-            //GLES20Util.DrawGraph(rect.getLeft() + UIAlign.convertAlign(rect.getWidth(), holizontal), rect.getTop() + UIAlign.convertAlign(rect.getHeight(), vertical), rect.getWidth(), rect.getHeight(), tex, hover_alpha, GLES20COMPOSITIONMODE.ALPHA);
         }
         if(text != null)
             text.draw(shader);

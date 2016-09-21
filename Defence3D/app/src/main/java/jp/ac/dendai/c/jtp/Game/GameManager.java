@@ -1,6 +1,8 @@
 package jp.ac.dendai.c.jtp.Game;
 
 
+import android.app.Activity;
+
 import jp.ac.dendai.c.jtp.Game.Screen.Screenable;
 import jp.ac.dendai.c.jtp.Game.Transition.Transitionable;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
@@ -15,11 +17,16 @@ public class GameManager {
 	public static Screenable debugScreen;
 	public static boolean isTransition = false;
 	public static Transitionable transition;
+	protected static Activity act;
 
-	public static void init(){
+	public static void init(Activity _act){
+		act = _act;
 		GLES20Util.initGLES20Util();
 		Constant.init();
 
+	}
+	public static Activity getAct(){
+		return act;
 	}
 
 	public static void draw(){

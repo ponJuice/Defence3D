@@ -46,6 +46,14 @@ public class Rect implements Figure{
     }
 
     public float getWidth(){return right - left;}
+    public void setWidth(float width){
+        left = cx - width/2f;
+        right= cx + width/2f;
+    }
+    public void setHeight(float height){
+        top = cy + height/2f;
+        bottom = cy - height/2f;
+    }
 
     public float getHeight(){return top - bottom;}
 

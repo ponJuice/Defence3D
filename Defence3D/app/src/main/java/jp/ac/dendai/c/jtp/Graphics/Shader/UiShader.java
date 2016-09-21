@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+import android.view.textservice.TextInfo;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
@@ -74,7 +75,6 @@ public class UiShader extends Shader{
 
     }
 
-
     public void drawUi(UI tex, float x, float y, float lengthX, float lengthY, float degree, float alpha){
         //裏面を表示しない
         //GLES20.glCullFace(GLES20.GL_FRONT_AND_BACK);
@@ -134,6 +134,28 @@ public class UiShader extends Shader{
         GLES20.glUniform1i(u_Sampler, 0);     // サンプラにテクスチャユニットを設定する
     }
 
+    /**
+     * テクスチャ画像を設定する
+     */
+    //テクスチャ画像を設定する
+    protected void setOnTexture(Bitmap image,float alpha,int ws,int wt,int min,int mag,float ox,float oy,float sx,float sy){
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);   // テクスチャユニット0を有効にする
+
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]); // テクスチャオブジェクトをバインドする
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, ws);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, wt);
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, min);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, mag);
+        // テクスチャ画像を設定する
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+
+        GLES20.glUniform4f(u_texPos,ox,oy,sx,sy);
+        GLES20.glUniform1f(u_alpha, alpha);		//サンプラにアルファを設定する
+        GLES20.glUniform1i(u_Sampler, 0);     // サンプラにテクスチャユニットを設定する
+    }
+
     //マスクの設定
     protected void setOnMask(Bitmap mask, float offset_x, float offset_y, float scale_x, float scale_y, MaskInfo m){
         GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
@@ -151,6 +173,25 @@ public class UiShader extends Shader{
         GLES20.glUniform1i(u_Sampler_mask, 1);
 
         GLES20.glUniform4f(u_mask_pos, offset_x, offset_y, scale_x, scale_y);
+    }
+
+    //マスクの設定
+    protected void setOnMask(Bitmap mask,float alpha,int ws,int wt,int min,int mag,float ox,float oy,float sx,float sy){
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[1]);
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, ws);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, wt);
+
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, min);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, mag);
+        if(mask == null)
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,Constant.getBitmap(Constant.BITMAP.white),0);
+        else
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,mask,0);
+        GLES20.glUniform1i(u_Sampler_mask, 1);
+
+        GLES20.glUniform4f(u_mask_pos, ox, oy, sx, sy);
     }
 
     @Override

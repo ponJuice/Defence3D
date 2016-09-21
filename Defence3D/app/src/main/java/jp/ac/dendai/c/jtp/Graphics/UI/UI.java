@@ -170,7 +170,7 @@ public abstract class UI implements TextureInfo,MaskInfo {
         GLES20Util.setVertexBuffer(bufferObject[1],texPosBuffer,GLES20.GL_STATIC_DRAW);
     }
     protected static float calcAspect(Bitmap image){
-        return image.getWidth()/image.getHeight();
+        return (float)image.getWidth()/(float)image.getHeight();
     }
 
     public abstract void touch(Touch touch);

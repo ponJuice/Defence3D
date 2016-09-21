@@ -13,7 +13,7 @@ public class UIAlign {
 
 	public static float convertAlign(float length,Align align){
 		if(align == Align.LEFT || align == Align.BOTTOM){
-			return +length/2f;
+			return length/2f;
 		}
 		else if(align == Align.RIGHT || align == Align.TOP){
 			return -length/2f;

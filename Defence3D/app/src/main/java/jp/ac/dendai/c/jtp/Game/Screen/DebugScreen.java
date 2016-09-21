@@ -3,6 +3,7 @@ package jp.ac.dendai.c.jtp.Game.Screen;
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.NumberText;
+import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FpsController;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
@@ -14,9 +15,12 @@ public class DebugScreen extends Screenable {
 
     public DebugScreen(){
         nt = new NumberText("メイリオ");
-        nt.setHeight(0.1f);
-        nt.setX(0.05f);
-        nt.setY(GLES20Util.getHeight_gl()-0.05f);
+        nt.setHeight(0.3f);
+        nt.setX(GLES20Util.getWidth_gl());
+        nt.setY(GLES20Util.getHeight_gl());
+        nt.setHorizontal(UIAlign.Align.RIGHT);
+        nt.setVertical(UIAlign.Align.TOP);
+        nt.setAlpha(0.8f);
     }
 
     @Override

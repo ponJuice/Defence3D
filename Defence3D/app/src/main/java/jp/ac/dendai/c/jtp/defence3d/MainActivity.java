@@ -122,7 +122,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         // 表示領域を設定する
         GLES20Util.initDrawErea(width, height, true);
 
-        GameManager.init();
+        GameManager.init(this);
         GameManager.debugScreen = new DebugScreen();
         GameManager.debug = true;
         GameManager.nowScreen = new StageSelectScreen();

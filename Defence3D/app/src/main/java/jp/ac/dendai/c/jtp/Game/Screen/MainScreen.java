@@ -9,7 +9,6 @@ import jp.ac.dendai.c.jtp.Game.Player;
 import jp.ac.dendai.c.jtp.Graphics.Bitmap.AnimationBitmap;
 import jp.ac.dendai.c.jtp.Graphics.Bitmap.Animator;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
-import jp.ac.dendai.c.jtp.Graphics.Line.Line;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model.ModelObject;
 import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
 import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
@@ -20,7 +19,6 @@ import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.Button;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.ButtonListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.NumberText;
-import jp.ac.dendai.c.jtp.Graphics.UI.Text.Text;
 import jp.ac.dendai.c.jtp.Math.Vector;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
@@ -34,9 +32,7 @@ import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 import jp.ac.dendai.c.jtp.TouchUtil.TouchListener;
-import jp.ac.dendai.c.jtp.defence3d.MainActivity;
 import jp.ac.dendai.c.jtp.defence3d.R;
-import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.Util.ImageReader;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
@@ -46,7 +42,6 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
  */
 public class MainScreen extends Screenable {
     private float rotateX = 0 ,rotateY = 0;
-    private Line line_x,line_y,line_z;
     private Renderer renderer,alphaRenderer;
     private Renderer testRenderer;
     private Plane plane,plane2;
@@ -65,7 +60,6 @@ public class MainScreen extends Screenable {
     private ModelObject box,gird,sphear;
     private Enemy enemy;
     private NumberText nt,timeNt;
-    private Text tx;
     private Animator anim;
     @Override
     public void init() {

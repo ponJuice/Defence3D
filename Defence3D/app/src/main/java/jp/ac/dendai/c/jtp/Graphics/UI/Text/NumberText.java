@@ -1,6 +1,7 @@
 package jp.ac.dendai.c.jtp.Graphics.UI.Text;
 
 import android.graphics.Bitmap;
+import android.widget.ImageView;
 
 import java.util.HashMap;
 
@@ -20,14 +21,20 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
 /**
  * Created by テツヤ on 2016/09/09.
  */
-public class NumberText extends UI {
+public class NumberText extends Image {
+    public enum ORIENTATION{
+        horizontal,
+        vertical
+    }
+    protected ORIENTATION orientation = ORIENTATION.horizontal;
     protected static HashMap<String,StringBitmap[]> numberFont;
     protected TextureSetting ts = new TextureSetting();
     protected Vector2 texOffset = new Vector2(),texScale = new Vector2(1,1);
     protected Vector2 maskOffset = new Vector2(),maskScale = new Vector2(1,1);
     protected StringBitmap[] number;
-    protected Bitmap mask;
-    protected float one_width,one_height,one_aspect;
+    protected float offset_x = 0,offset_y = 0;
+    protected float top_margin,bottom_margin,base_margin;
+    //width,height は　一文字の横,縦の長さ aspectは一文字のアスペクト比
     protected int num;
     protected float mask_alpha = 1f;
     protected UIAlign.Align align_h = UIAlign.Align.CENTOR,align_v = UIAlign.Align.CENTOR;
@@ -45,9 +52,36 @@ public class NumberText extends UI {
             }
             numberFont.put(fontName,number);
         }
-        one_width = number[0].bitmap.getWidth();
-        one_height = number[0].bitmap.getHeight();
-        one_aspect = calcAspect(number[0].bitmap);
+        //aspect = (float)number[0].bitmap.getWidth() / (float)(-number[0].fm.ascent+number[0].fm.descent);
+        float fm_height = number[0].fm.bottom - number[0].fm.top;
+        //float fm_height = number[0].bitmap.getHeight();
+        top_margin = ( fm_height - (number[0].fm.bottom - number[0].fm.ascent))*1.5f/fm_height;
+        bottom_margin = (fm_height - (- number[0].fm.top))/fm_height;
+        base_margin =(fm_height - (number[0].fm.bottom))/fm_height;
+        aspect = calcAspect(number[0].bitmap);
+        height = 1;
+        width = height * aspect;
+        updatePosition();
+
+    }
+
+    public void setOrientation(ORIENTATION o){
+        orientation = o;
+        updatePosition();
+    }
+
+    public ORIENTATION getOrientation(){
+        return orientation;
+    }
+
+    @Override
+    public void setX(float x){
+        this.x = x;
+    }
+
+    @Override
+    public void setY(float y){
+        this.y = y;
     }
 
     @Override
@@ -60,41 +94,83 @@ public class NumberText extends UI {
 
     }
 
+    /**
+     * 横の長さを設定します
+     * @param width
+     */
     @Override
     public void setWidth(float width){
-        this.width = width;
+        float numDigit = (float) getNumOfDigit(num);
+        if(orientation == ORIENTATION.horizontal) {
+            this.width = width / numDigit;
+        }else{
+            this.width = width;
+        }
         if(useAspect){
-            height = width / (float)getNumOfDigit(num) /one_aspect;
-            aspect = width / height;
+            //アスペクトを使用する場合はオリエンテーションによって処理が異なる
+            if(orientation == ORIENTATION.horizontal){
+                //横書き
+                height = this.width / aspect;
+            }else{
+                //縦書き
+                height = this.width / aspect * numDigit;
+            }
         }
     }
 
     @Override
     public void setHeight(float height){
-        this.height = height;
+        float numDigit = (float) getNumOfDigit(num);
+        if(orientation == ORIENTATION.horizontal) {
+            this.height = height * numDigit;
+        }else{
+            this.height = height;
+        }
         if(useAspect){
-            width = height * one_aspect;
-            width *= (float)getNumOfDigit(num);
+            //アスペクトを使用する場合はオリエンテーションによって処理が異なる
+            if(orientation == ORIENTATION.horizontal){
+                //横書き
+                width = this.height * aspect;
+            }else{
+                //縦書き
+                width = this.height * aspect * numDigit;
+            }
         }
     }
 
     @Override
     public void useAspect(boolean flag){
         useAspect = flag;
-        if(useAspect)
-            aspect = height / (height * one_aspect * (float)getNumOfDigit(num));
     }
 
 
     @Override
     public void draw(UiShader shader) {
         int l = getNumOfDigit(num);
+        float _x = x + offset_x;
+        float _y = y + offset_y;
         for(int n = 0;n < l;n++){
-
+            bitmap = number[getDigit(num,l-n)].bitmap;
+            shader.drawUi(this,_x,_y,width,height,0,alpha);
+            if(orientation == ORIENTATION.horizontal) {
+                _x += width;
+            }else {
+                _y -= height;
+            }
         }
     }
 
+    @Override
+    public void setHorizontal(UIAlign.Align align){
+        horizontal = align;
+        updatePosition();
+    }
 
+    @Override
+    public void setVertical(UIAlign.Align align){
+        vertical = align;
+        updatePosition();
+    }
 
 
     protected int pow(int num, int count) {
@@ -123,11 +199,49 @@ public class NumberText extends UI {
     }
 
     protected int getNumOfDigit(int num){
-        return (int) Math.log10(num);
+        if(num <= 0){
+            return 1;
+        }
+        return (int) Math.log10(num) + 1;
     }
 
     public void setNumber(int num){
         this.num = num;
+        updatePosition();
+    }
+
+    protected void updatePosition(){
+        int digit = getNumOfDigit(num);
+        offset_y = base_margin * height;
+        offset_x = 0;
+        if(orientation == ORIENTATION.horizontal) {
+            if (horizontal == UIAlign.Align.LEFT) {
+                offset_x = width / 2f;
+            } else if (horizontal == UIAlign.Align.CENTOR) {
+                offset_x = - width * (float) digit / 2f + width / 2f;
+            } else {
+                offset_x = - width * (float) digit + width / 2f;
+            }
+            if(vertical == UIAlign.Align.TOP){
+                offset_y = -height /2f + top_margin * height;
+            }else if(vertical == UIAlign.Align.BOTTOM){
+                offset_y = height /2f - bottom_margin * height;
+            }
+        }
+        else {
+            if (vertical == UIAlign.Align.TOP) {
+                offset_y = -height / 2f + top_margin*height;
+            } else if (vertical == UIAlign.Align.CENTOR) {
+                offset_y = height * (float) digit / 2f - height/2f;
+            } else {
+                offset_y = height * (float) digit - height / 2f -bottom_margin * height;
+            }
+            if(horizontal == UIAlign.Align.LEFT){
+                offset_x = width/2f;
+            }else if(horizontal == UIAlign.Align.RIGHT){
+                offset_x = -width/2f;
+            }
+        }
     }
 
     public int getNumber(){
@@ -228,7 +342,7 @@ public class NumberText extends UI {
 
     @Override
     public Bitmap getBitmap() {
-        return number[0].bitmap;
+        return bitmap;
     }
 
     @Override
