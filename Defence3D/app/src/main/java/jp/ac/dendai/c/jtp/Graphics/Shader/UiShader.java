@@ -91,8 +91,6 @@ public class UiShader extends Shader{
                 ,tex.getMaskOffset(TextureInfo.UV.u),tex.getMaskOffset(TextureInfo.UV.v)
                 ,tex.getMaskScale(TextureInfo.UV.u),tex.getMaskScale(TextureInfo.UV.v)
                 ,tex);
-
-        GLES20.glUniform1f(u_alpha, alpha);
         GLES20.glUniform3f(uv_color,tex.getR(),tex.getG(),tex.getB());
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, tex.getVBO());

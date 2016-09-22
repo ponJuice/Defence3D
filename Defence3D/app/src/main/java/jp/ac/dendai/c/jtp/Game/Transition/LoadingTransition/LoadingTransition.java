@@ -3,6 +3,7 @@ package jp.ac.dendai.c.jtp.Game.Transition.LoadingTransition;
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.Transition.Transitionable;
+import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
@@ -46,6 +47,8 @@ public class LoadingTransition implements Transitionable {
 		image.setWidth(GLES20Util.getWidth_gl());
 		image.setHorizontal(UIAlign.Align.LEFT);
 		image.setVertical(UIAlign.Align.BOTTOM);
+		image.setX(0);
+		image.setY(0);
 	}
 	public void initTransition(Class<?> nextScreenClass){
 		thread = new LoadingThread(lock);
@@ -63,6 +66,7 @@ public class LoadingTransition implements Transitionable {
 			//ロードの開始
 			//ロード画面のトランジョン
 			float a = Clamp.clamp(0f, 1f, 60f, (float) count);
+			//Constant.getLoadingShader().useShader();
 			image.setAlpha(a);
 			image.draw(Constant.getLoadingShader());
 			loading.setAlpha(a);

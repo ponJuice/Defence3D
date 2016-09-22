@@ -30,6 +30,7 @@ public class DebugScreen extends Screenable {
 
     @Override
     public void Draw(float offsetX, float offsetY) {
+        Constant.getShader(Constant.SHADER.ui).useShader();
         nt.draw((UiShader) Constant.getShader(Constant.SHADER.ui));
     }
 

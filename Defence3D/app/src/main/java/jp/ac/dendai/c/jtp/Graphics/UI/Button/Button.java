@@ -198,6 +198,7 @@ public class Button extends Image {
     @Override
     public void draw(UiShader shader) {
         if (state == BUTTON_STATE.NON) {
+            alpha = non_hover_alpha;
             shader.drawUi(this
                     ,rect.getCx()
                     ,rect.getCy()
@@ -205,6 +206,7 @@ public class Button extends Image {
                     ,rect.getHeight()
                     ,0,non_hover_alpha);
         } else {
+            alpha = hover_alpha;
             shader.drawUi(this
                     , rect.getCx()
                     , rect.getCy()

@@ -33,8 +33,11 @@ public abstract class Mesh {
     protected int[] createBufferObject(int num){
         // バッファオブジェクトを作成する
         int[] bufferObjects = new int[num];
-        GLES20.glGenBuffers(num,bufferObjects, 0);
+        GLES20.glGenBuffers(num, bufferObjects, 0);
         return bufferObjects;
+    }
+    public void deleteBufferObject(){
+        GLES20.glDeleteBuffers(2,new int[]{getVBO(),getIBO()},0);
     }
     public abstract Face[] getFaces();
     public static FloatBuffer makeFloatBuffer(float[] array) {
