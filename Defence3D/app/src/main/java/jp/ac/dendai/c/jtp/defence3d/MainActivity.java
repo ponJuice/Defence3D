@@ -14,6 +14,7 @@ import jp.ac.dendai.c.jtp.Game.Screen.DebugScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.StageSelectScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestModelViewScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestUIScreen;
+import jp.ac.dendai.c.jtp.Time;
 import jp.ac.dendai.c.jtp.openglesutil.Util.ImageReader;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
@@ -142,6 +143,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     }
     private void process(){
         FpsController.updateFps();
+        Time.tick();
         GameManager.touch();
         GameManager.proc();
     }

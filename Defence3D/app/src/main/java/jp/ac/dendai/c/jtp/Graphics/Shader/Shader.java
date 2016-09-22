@@ -5,6 +5,7 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.util.Log;
 
+import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
@@ -232,7 +233,11 @@ public abstract class Shader {
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
         // テクスチャ画像を設定する
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+        if(image == null){
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0, Constant.getBitmap(Constant.BITMAP.white),0);
+        }else {
+            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+        }
 
         GLES20.glUniform1i(u_Sampler, 0);     // サンプラにテクスチャユニットを設定する
     }

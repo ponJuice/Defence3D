@@ -159,7 +159,7 @@ public class Button extends Image {
             }
             return;
         }
-        Log.d("button touch pos", "device pos:" + "(" + touch.getPosition(Touch.Pos_Flag.X) + "," + touch.getPosition(Touch.Pos_Flag.Y) + ")" + "camera pos:(" + x + "," + y + ")");
+        Log.d("button touch pos", "device pos:" + "(" + touch.getPosition(Touch.Pos_Flag.X) + "," + touch.getPosition(Touch.Pos_Flag.Y) + ")" + "camera pos:(" + x + "," + y + ") delta:"+touch.getDelta(Touch.Pos_Flag.X)+","+touch.getDelta(Touch.Pos_Flag.Y)+")");
         if(touch.getTouchID() != -1 && rect.contains(x,y)){
             if(state == BUTTON_STATE.NON) {
                 state = BUTTON_STATE.DOWN;

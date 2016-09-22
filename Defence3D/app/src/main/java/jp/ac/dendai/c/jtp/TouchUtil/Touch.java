@@ -35,6 +35,11 @@ public class Touch{
 		//tl.remove(l);
 	}
 
+	public void resetDelta(){
+		deltaX = 0;
+		deltaY = 0;
+	}
+
 	public void setTouch(float x,float y,int touchID){
 		this.x = getOrientPosition(x,y,Pos_Flag.X);
 		this.y = getOrientPosition(x,y,Pos_Flag.Y);
