@@ -1,5 +1,7 @@
 package jp.ac.dendai.c.jtp.Game.Screen;
 
+import android.graphics.Bitmap;
+
 import javax.microedition.khronos.opengles.GL;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
@@ -36,16 +38,17 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
  * Created by wark on 2016/09/21.
  */
 public class TestGameScreen extends Screenable {
-    private Mesh inveder_model,player_model,plane_model;
+    private Mesh inveder_model,houdai_model,yuka_model,daiza_model;
     private Renderer renderer;
     private UiRenderer uiRenderer;
     private Shader shader;
     private Camera mainCamera;
     private GameObject[] inveders;
     private GameObject floor;
-    private Button button;
+    private Button button,attackButton;
     private EnemyObserver eo;
     private Player player;
+    private Bitmap buttonImage;
 
     public TestGameScreen(){
         mainCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,-5f,0,0,0);
@@ -57,28 +60,29 @@ public class TestGameScreen extends Screenable {
         uiRenderer.setShader((UiShader)Constant.getShader(Constant.SHADER.ui));
 
         inveder_model = WavefrontObjConverter.createModel("inveder.obj");
-        player_model = WavefrontObjConverter.createModel("untitled.obj");
-        plane_model = new Plane();
+        houdai_model = WavefrontObjConverter.createModel("houdai.obj");
+        yuka_model = WavefrontObjConverter.createModel("yuka.obj");
+        daiza_model = WavefrontObjConverter.createModel("daiza.obj");
 
-        player = new Player();
+        GameObject[] parts = new GameObject[2];
+        parts[0] = new GameObject();
+        parts[0].getRenderMediator().mesh = daiza_model;
+        parts[0].getRenderMediator().isDraw = true;
+        parts[1] = new GameObject();
+        parts[1].getRenderMediator().mesh = houdai_model;
+        parts[1].getRenderMediator().isDraw = true;
+
+        player = new Player(parts);
         player.setCamera(mainCamera);
-        player.getRenderMediator() .mesh = player_model;
-        player.getRenderMediator().isDraw = true;
-        player.getScl().setX(0.1f);
-        player.getScl().setY(0.1f);
-        player.getScl().setZ(0.1f);
-        //player.getPos().setY(-5f);
+        player.getPos().setY(0.4f);
         player.setRadius(5f);
-        renderer.addItem(player);
+        renderer.addItem(parts[0]);
+        renderer.addItem(parts[1]);
 
         floor = new GameObject();
-        plane_model.getFaces()[0].matelial.tex_diffuse = ImageReader.readImageToAssets("Block.png");
-        floor.getRenderMediator().mesh = plane_model;
+        floor.getRenderMediator().mesh = yuka_model;
         floor.getRenderMediator().isDraw = true;
-        floor.getScl().setX(50f);
-        floor.getScl().setY(50f);
-        floor.getScl().setZ(50f);
-        floor.getPos().setY(-5f);
+        //floor.getPos().setY(-5f);
         renderer.addItem(floor);
 
         inveders = new GameObject[55];
@@ -94,6 +98,8 @@ public class TestGameScreen extends Screenable {
 
         eo = new EnemyObserver(inveders);
 
+        buttonImage = GLES20Util.loadBitmap(R.mipmap.button);
+
         button = new Button(0,0,0.3f,0.1f,"TEST");
         button.useAspect(true);
         button.setCriteria(Button.CRITERIA.HEIGHT);
@@ -101,7 +107,7 @@ public class TestGameScreen extends Screenable {
         button.setVertical(UIAlign.Align.BOTTOM);
         button.setX(0);
         button.setY(0);
-        button.setBitmap(GLES20Util.loadBitmap(R.mipmap.button));
+        button.setBitmap(buttonImage);
         button.setButtonListener(new ButtonListener() {
             @Override
             public void touchDown(Button button) {
@@ -122,7 +128,33 @@ public class TestGameScreen extends Screenable {
             }
         });
 
+        attackButton = new Button(0,0,0.3f,0.1f,"Attack");
+        attackButton.useAspect(true);
+        attackButton.setCriteria(Button.CRITERIA.HEIGHT);
+        attackButton.setHorizontal(UIAlign.Align.LEFT);
+        attackButton.setVertical(UIAlign.Align.BOTTOM);
+        attackButton.setX(0);
+        attackButton.setY(0.1f);
+        attackButton.setBitmap(buttonImage);
+        attackButton.setButtonListener(new ButtonListener() {
+            @Override
+            public void touchDown(Button button) {
+
+            }
+
+            @Override
+            public void touchHover(Button button) {
+
+            }
+
+            @Override
+            public void touchUp(Button button) {
+
+            }
+        });
+
         uiRenderer.addItem(button);
+        uiRenderer.addItem(attackButton);
     }
 
     @Override
@@ -132,6 +164,7 @@ public class TestGameScreen extends Screenable {
         player.proc();
         eo.procAll();
         button.proc();
+        attackButton.proc();
     }
 
     @Override
@@ -147,7 +180,7 @@ public class TestGameScreen extends Screenable {
         for(int n = 0;n < Input.getMaxTouch();n++){
             player.touch(Input.getTouchArray()[n]);
             button.touch(Input.getTouchArray()[n]);
-
+            attackButton.touch(Input.getTouchArray()[n]);
             Input.getTouchArray()[n].resetDelta();
             //Input.getTouchArray()[n].updatePosition(Input.getTouchArray()[n].getPosition(Touch.Pos_Flag.X),Input.getTouchArray()[n].getPosition(Touch.Pos_Flag.Y));
         }
@@ -156,14 +189,16 @@ public class TestGameScreen extends Screenable {
     @Override
     public void death() {
         inveder_model.deleteBufferObject();
-        player_model.deleteBufferObject();
-        plane_model.deleteBufferObject();
+        houdai_model.deleteBufferObject();
+        daiza_model.deleteBufferObject();
+        yuka_model.deleteBufferObject();
     }
 
     @Override
     public void init() {
         inveder_model.useBufferObject();
-        player_model.useBufferObject();
-        plane_model.useBufferObject();
+        houdai_model.useBufferObject();
+        daiza_model.useBufferObject();
+        yuka_model.useBufferObject();
     }
 }

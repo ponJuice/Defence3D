@@ -11,6 +11,7 @@ import jp.ac.dendai.c.jtp.TouchUtil.Touch;
  * Created by テツヤ on 2016/09/04.
  */
 public class Player extends GameObject{
+    protected GameObject[] parts;
     protected Vector3 direct;
     protected float radius = 1f;
     protected float[] p = {0,0,0,1f};
@@ -19,9 +20,14 @@ public class Player extends GameObject{
     protected Touch touch;
     protected Camera camera;
 
-    public Player(){
+    public Player(GameObject[] parts){
         direct = new Vector3(0,1f,-5f);
         direct.normalize();
+        this.parts = parts;
+        for(int n = 0;n < parts.length;n++){
+            parts[n].pos = this.pos;
+            parts[n].scl = this.scl;
+        }
     }
 
     public void setRadius(float r){
@@ -41,6 +47,10 @@ public class Player extends GameObject{
             return;
         rot.setY(rot.getY() + this.touch.getDelta(Touch.Pos_Flag.X)/10f);
         rot.setX(rot.getX() + this.touch.getDelta(Touch.Pos_Flag.Y)/10f);
+
+        parts[0].getRot().setY(rot.getY());
+        parts[1].getRot().setY(rot.getY());
+        parts[1].getRot().setX(rot.getX());
 
     }
 

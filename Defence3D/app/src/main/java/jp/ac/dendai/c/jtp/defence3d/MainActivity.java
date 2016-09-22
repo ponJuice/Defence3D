@@ -139,7 +139,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
     public void onSurfaceCreated(GL10 arg0, EGLConfig arg1) {
 
 
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // 画面をクリアする色を設定する
+        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
     private void process(){
         FpsController.updateFps();

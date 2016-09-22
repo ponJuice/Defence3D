@@ -145,6 +145,8 @@ public abstract class UI implements TextureInfo,MaskInfo {
     public void setY(float y){
         this.y = y + UIAlign.convertAlign(height,vertical);
     }
+    public float getX(){return x;}
+    public float getY(){return y;}
     @Override
     public void setAlpha(float a){
         alpha = a;

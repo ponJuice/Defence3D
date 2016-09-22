@@ -150,7 +150,7 @@ public class MainScreen extends Screenable {
         //あたり判定用の処理を追加
 
         //プレイヤー
-        player = new Player();
+        player = new Player(gameObjects);
         player.getPos().zeroReset();
         player.getRenderMediator().mesh = box;
         player.getScl().setX(0.1f);

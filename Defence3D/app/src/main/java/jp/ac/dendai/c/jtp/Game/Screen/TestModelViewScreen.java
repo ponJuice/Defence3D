@@ -144,7 +144,7 @@ public class TestModelViewScreen extends Screenable {
         testCamera.setNear(0.01f);
 
         testShader.setCamera(testCamera);
-        player = new Player();
+        player = new Player(null);
         player.setCamera(testCamera);
         player.getScl().setX(0.1f);
         player.getScl().setY(0.1f);

@@ -4,10 +4,13 @@ import android.graphics.Bitmap;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
+import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.Textrue.TextureInfo;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.Graphics.UI.Util.Figure.Rect;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
+import jp.ac.dendai.c.jtp.defence3d.R;
+import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 /**
  * Created by Goto on 2016/07/11.
@@ -21,7 +24,7 @@ public class Slider extends UI {
     protected float min = 0,max = 1,innerValue = 0.5f;
     protected SLIDER_ORIENT slider_orient;
     protected Rect slider,line;
-    protected Bitmap slider_image,line_image;
+    protected Image slider_image,line_image;
 
     public Slider(float cx,float cy,float line_width,float line_height,float slide_width,float slide_height,SLIDER_ORIENT s){
         this.slider_orient = s;
@@ -31,6 +34,19 @@ public class Slider extends UI {
         this.y = cy;
         line = new Rect(cx - line_width/2f,cy + line_height/2f,cx + line_width/2f,cy - line_height/2f);
         slider = new Rect(cx - slide_width/2f,cy + slide_height/2f,cx + slide_width/2f,cy - slide_height/2f);
+        line_image = new Image(Constant.getBitmap(Constant.BITMAP.system_button));
+        line_image.useAspect(false);
+        line_image.setWidth(line_width);
+        line_image.setHeight(line_height);
+        line_image.setX(cx);
+        line_image.setY(cy);
+
+        slider_image = new Image(Constant.getBitmap(Constant.BITMAP.system_button));
+        slider_image.useAspect(false);
+        slider_image.setWidth(slide_width);
+        slider_image.setHeight(slide_height);
+        slider_image.setX(cx);
+        slider_image.setY(cy);
     }
 
     public float getMin() {
@@ -71,14 +87,34 @@ public class Slider extends UI {
     Touch touch;
     @Override
     public void touch(Touch touch) {
+        /*if(this.touch == null && touch.getTouchID() == -1)
+            return;
+        if(this.touch == null)
+            this.touch = touch;
+        else if(this.touch != touch || this.touch.getTouchID() == -1)
+            return;*/
+
         float _x = Constant.getActiveUiCamera().convertTouchPosToGLPosX(touch.getPosition(Touch.Pos_Flag.X));
         float _y = Constant.getActiveUiCamera().convertTouchPosToGLPosY(touch.getPosition(Touch.Pos_Flag.Y));
-        if(this.touch != touch)
+
+        if(this.touch != null && this.touch.getTouchID() == -1) {
+            this.touch = null;
             return;
-        if(slider.contains(_x,_y)){
-            this.touch = touch;
+        }
+
+        if(slider.contains(_x,_y) || this.touch == touch){
+            if(this.touch == null)
+                this.touch = touch;
+
+            slider_image.setY(_y);
+            slider.setCy(_y);
 
         }else if(line.contains(_x,_y)){
+            if(this.touch == null)
+                this.touch = touch;
+
+            slider_image.setY(_y);
+            slider.setCy(_y);
         }
     }
 
@@ -89,7 +125,8 @@ public class Slider extends UI {
 
     @Override
     public void draw(UiShader shader) {
-
+        shader.drawUi(line_image,line_image.getX(),line_image.getY(),line_image.getWidth(),line_image.getHeight(),0,1);
+        shader.drawUi(slider_image,slider_image.getX(),slider_image.getY(),slider_image.getWidth(),slider_image.getHeight(),0,1);
     }
 
     @Override
