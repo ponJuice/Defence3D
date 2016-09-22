@@ -1,8 +1,11 @@
 package jp.ac.dendai.c.jtp.Graphics.Shader;
 
+import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
 
+import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Graphics.Model.Material.Face;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Model.Model.Model;
@@ -34,7 +37,7 @@ public class DiffuseShader extends Shader{
 
     @Override
     void setMaterial(Face face) {
-        setOnTexture(face.matelial.tex_diffuse,u_Sampler);
+        setOnTexture(face.matelial.tex_diffuse, u_Sampler);
     }
 
     @Override

@@ -25,6 +25,7 @@ public class Constant {
         bilinear,
         system_button
     }
+    public static Bitmap tex_chash;
     public static final int COLLISION_PLAYERBULLET = 1;
     public static final int COLLISION_ENEMY = 2;
     private static float sens = 1.0f;

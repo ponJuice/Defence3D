@@ -20,6 +20,7 @@ import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.Button;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.ButtonListener;
+import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontMtlReader;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
@@ -46,8 +47,6 @@ public class TestGameScreen extends Screenable {
     private EnemyObserver eo;
     private Player player;
 
-    private Texture tex;
-
     public TestGameScreen(){
         mainCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,-5f,0,0,0);
         shader = Constant.getShader(Constant.SHADER.diffuse);
@@ -68,19 +67,19 @@ public class TestGameScreen extends Screenable {
         player.getScl().setX(0.1f);
         player.getScl().setY(0.1f);
         player.getScl().setZ(0.1f);
+        //player.getPos().setY(-5f);
         player.setRadius(5f);
         renderer.addItem(player);
 
-        /*floor = new GameObject();
-        //plane_model.getFaces()[0].matelial.tex_diffuse = GLES20Util.loadBitmap(R.mipmap.grid);
+        floor = new GameObject();
+        plane_model.getFaces()[0].matelial.tex_diffuse = ImageReader.readImageToAssets("Block.png");
         floor.getRenderMediator().mesh = plane_model;
         floor.getRenderMediator().isDraw = true;
-        /*floor.getScl().setX(50f);
+        floor.getScl().setX(50f);
         floor.getScl().setY(50f);
         floor.getScl().setZ(50f);
         floor.getPos().setY(-5f);
-        renderer.addItem(floor);*/
-        tex = new Texture(ImageReader.readImageToAssets("Block.png"), GLES20COMPOSITIONMODE.ALPHA);
+        renderer.addItem(floor);
 
         inveders = new GameObject[55];
         for(int n = 0;n < inveders.length;n++){
@@ -139,7 +138,6 @@ public class TestGameScreen extends Screenable {
     public void Draw(float offsetX, float offsetY) {
         renderer.drawAll();
         uiRenderer.drawAll();
-        shader.draw(tex,0,-5f,0,50,1,50,0,0,0,1);
     }
 
     @Override
@@ -167,6 +165,5 @@ public class TestGameScreen extends Screenable {
         inveder_model.useBufferObject();
         player_model.useBufferObject();
         plane_model.useBufferObject();
-        tex.setBufferObject();
     }
 }

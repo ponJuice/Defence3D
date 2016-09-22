@@ -218,8 +218,9 @@ public abstract class Shader {
     }
 
     /**
-     * テクスチャ画像を設定する
-     * @param 使用する画像のbitmapデータ
+     *
+     * @param image     Bitmap
+     * @param u_Sampler サンプラ
      */
     //テクスチャ画像を設定する
     protected void setOnTexture(Bitmap image, int u_Sampler){
@@ -232,14 +233,28 @@ public abstract class Shader {
 
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-        // テクスチャ画像を設定する
-        if(image == null){
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0, Constant.getBitmap(Constant.BITMAP.white),0);
-        }else {
-            GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
-        }
+
+        chasedTexImage2D(image);
 
         GLES20.glUniform1i(u_Sampler, 0);     // サンプラにテクスチャユニットを設定する
+    }
+
+    protected void chasedTexImage2D(Bitmap image){
+        if(image == null){
+            if(Constant.tex_chash == null){
+                image = Constant.getBitmap(Constant.BITMAP.white);
+                Constant.tex_chash = image;
+            }else if(Constant.tex_chash != Constant.getBitmap(Constant.BITMAP.white)){
+                image = Constant.getBitmap(Constant.BITMAP.white);
+                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+            }
+        }else{
+            if(image != Constant.tex_chash){
+                Constant.tex_chash = image;
+                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+            }
+        }
+        //GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
     }
 
     public void clear(){

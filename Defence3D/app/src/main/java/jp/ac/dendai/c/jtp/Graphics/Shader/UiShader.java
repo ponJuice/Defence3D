@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+import android.util.Log;
 import android.view.textservice.TextInfo;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
@@ -125,7 +126,7 @@ public class UiShader extends Shader{
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, t.getFilterModeMin());
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, t.getFilterModeMag());
         // テクスチャ画像を設定する
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, image, 0);
+        chasedTexImage2D(image);
 
         GLES20.glUniform4f(u_texPos,t.getTexOffset(TextureInfo.UV.u),t.getTexOffset(TextureInfo.UV.v),t.getTexScale(TextureInfo.UV.u),t.getTexScale(TextureInfo.UV.v));
         GLES20.glUniform1f(u_alpha, t.getAlpha());		//サンプラにアルファを設定する
