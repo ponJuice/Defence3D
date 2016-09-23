@@ -56,8 +56,19 @@ public class GameObject implements FrameListener{
         return collider;
     }
     public void setCollider(OBBCollider col){
+        OBBCollider ob = col;
+        do{
+            ob.setGameObject(this);
+            ob = ob.getNext();
+        }while(ob != null);
         collider = col;
-        collider.setGameObject(this);
+    }
+    public void setDebugColliderDraw(boolean flag){
+        OBBCollider ob = collider;
+        do{
+            ob.setDebugDraw(flag);
+            ob = ob.getNext();
+        }while(ob != null);
     }
     public void setCollisionListener(CollisionListener cl){
         this.cl = cl;

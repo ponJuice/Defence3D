@@ -4,9 +4,11 @@ import android.graphics.Bitmap;
 
 import javax.microedition.khronos.opengles.GL;
 
+import jp.ac.dendai.c.jtp.Game.Bullet.BulletTemplate;
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.Enemy.EnemyObserver;
 import jp.ac.dendai.c.jtp.Game.Enemy.Invader.InvaderFrontMoveState;
+import jp.ac.dendai.c.jtp.Game.Enemy.Inveder;
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Game.Player;
@@ -28,6 +30,11 @@ import jp.ac.dendai.c.jtp.Graphics.UI.Slider.SliderChangeValueListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontMtlReader;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
+import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
+import jp.ac.dendai.c.jtp.Physics.Physics.Physics;
+import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
+import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsInfo;
+import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 import jp.ac.dendai.c.jtp.defence3d.R;
@@ -40,7 +47,7 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
  * Created by wark on 2016/09/21.
  */
 public class TestGameScreen extends Screenable {
-    private Mesh inveder_model,houdai_model,yuka_model,daiza_model;
+    private Mesh inveder_model,houdai_model,yuka_model,daiza_model,bullet_model;
     private Renderer renderer;
     private UiRenderer uiRenderer;
     private Shader shader;
@@ -52,6 +59,8 @@ public class TestGameScreen extends Screenable {
     private Player player;
     private Bitmap buttonImage;
     private Slider angle;
+    private Physics3D physics;
+    private GameObject testBullet;
 
     public TestGameScreen(){
         mainCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,-5f,0,0,0);
@@ -62,10 +71,17 @@ public class TestGameScreen extends Screenable {
         renderer.setShader(shader);
         uiRenderer.setShader((UiShader)Constant.getShader(Constant.SHADER.ui));
 
+        PhysicsInfo pi = new PhysicsInfo();
+        pi.gravity.setY(-9.8f);
+        pi.maxObject = 100;
+        pi.enabled = true;
+        physics = new Physics3D(pi);
+
         inveder_model = WavefrontObjConverter.createModel("inveder.obj");
         houdai_model = WavefrontObjConverter.createModel("houdai.obj");
         yuka_model = WavefrontObjConverter.createModel("yuka.obj");
         daiza_model = WavefrontObjConverter.createModel("daiza.obj");
+        bullet_model = WavefrontObjConverter.createModel("untitled.obj");
 
         GameObject[] parts = new GameObject[2];
         parts[0] = new GameObject();
@@ -88,9 +104,27 @@ public class TestGameScreen extends Screenable {
         //floor.getPos().setY(-5f);
         renderer.addItem(floor);
 
-        inveders = new GameObject[55];
+        testBullet = new GameObject();
+        testBullet.getRenderMediator().mesh = bullet_model;
+        testBullet.getRenderMediator().isDraw = false;
+        testBullet.setPhysicsObject(new PhysicsObject(testBullet));
+        testBullet.getPhysicsObject().mask = Constant.COLLISION_ENEMY;
+        testBullet.getPhysicsObject().tag = Constant.COLLISION_ENEMY;
+        testBullet.getPhysicsObject().useGravity = true;
+        testBullet.getPhysicsObject().freeze = true;
+        testBullet.setCollider(new OBBCollider(0,0,0,1,1,1));
+        testBullet.getScl().setX(0.1f);
+        testBullet.getScl().setY(0.1f);
+        testBullet.getScl().setZ(0.1f);
+
+        physics.addObject(testBullet.getPhysicsObject());
+        renderer.addItem(testBullet);
+
+        BulletTemplate bt = new BulletTemplate(bullet_model,new OBBCollider(0,0,0,1,1,1),1f);
+
+        inveders = new Inveder[55];
         for(int n = 0;n < inveders.length;n++){
-            inveders[n] = new GameObject();
+            inveders[n] = new Inveder(physics,renderer,bt,player);
             inveders[n].getRenderMediator().mesh = inveder_model;
             inveders[n].getRenderMediator().isDraw = true;
             inveders[n].getPos().setY(-5f);
@@ -137,13 +171,13 @@ public class TestGameScreen extends Screenable {
         angle.setVertical(UIAlign.Align.TOP);
         angle.setX(GLES20Util.getWidth_gl());
         angle.setY(GLES20Util.getHeight_gl());
-        angle.setMin(0.5f);
-        angle.setMax(2);
-        angle.setValue(1);
+        angle.setMin(1);
+        angle.setMax(70);
+        angle.setValue(40);
         angle.setChangeListener(new SliderChangeValueListener() {
             @Override
             public void changeValue(float value) {
-                player.getScl().setX(value);
+                mainCamera.setAngleOfView(value);
             }
         });
         angle.setTouchThrough(false);
@@ -169,7 +203,14 @@ public class TestGameScreen extends Screenable {
 
             @Override
             public void touchUp(Button button) {
-
+                testBullet.getPos().setX(0);
+                testBullet.getPos().setY(-5f);
+                testBullet.getPos().setZ(50f);
+                testBullet.getPhysicsObject().velocity.setX(0);
+                testBullet.getPhysicsObject().velocity.setY(16.5f);
+                testBullet.getPhysicsObject().velocity.setZ(-50f/3f);
+                testBullet.getPhysicsObject().freeze = false;
+                testBullet.getRenderMediator().isDraw = true;
             }
         });
         attackButton.setTouchThrough(false);
@@ -184,9 +225,13 @@ public class TestGameScreen extends Screenable {
         if(freeze)
             return;
         player.proc();
+        for(int n = 0;n < inveders.length;n++){
+            inveders[0].update();
+        }
         eo.procAll();
         button.proc();
         attackButton.proc();
+        physics.simulate();
     }
 
     @Override
@@ -219,6 +264,7 @@ public class TestGameScreen extends Screenable {
         houdai_model.deleteBufferObject();
         daiza_model.deleteBufferObject();
         yuka_model.deleteBufferObject();
+        bullet_model.deleteBufferObject();
     }
 
     @Override
@@ -227,5 +273,6 @@ public class TestGameScreen extends Screenable {
         houdai_model.useBufferObject();
         daiza_model.useBufferObject();
         yuka_model.useBufferObject();
+        bullet_model.useBufferObject();
     }
 }

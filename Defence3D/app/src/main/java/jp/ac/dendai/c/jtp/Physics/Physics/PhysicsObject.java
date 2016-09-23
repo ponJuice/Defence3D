@@ -2,6 +2,7 @@ package jp.ac.dendai.c.jtp.Physics.Physics;
 
 
 import jp.ac.dendai.c.jtp.Game.GameObject;
+import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Math.Vector;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 

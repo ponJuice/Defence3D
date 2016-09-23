@@ -38,6 +38,8 @@ public class Button extends Image {
     public Button(float cx,float cy,float width,float height,String string){
         useAspect(false);
         rect = new Rect(cx-width/2f,cy+height/2f,cx+width/2f,cy-height/2f);
+        this.x = cx;
+        this.y = cy;
         this.width = rect.getWidth();
         this.height = rect.getHeight();
         if(string != null) {
@@ -46,6 +48,8 @@ public class Button extends Image {
             this.text.setHorizontal(UIAlign.Align.CENTOR);
             updateTextPos();
         }
+        setX(cx);
+        setY(cy);
         setBitmap(Constant.getBitmap(Constant.BITMAP.white));
     }
     public void setButtonListener(ButtonListener listener){
@@ -80,36 +84,38 @@ public class Button extends Image {
     @Override
     public void setHorizontal(UIAlign.Align align){
         horizontal = align;
-        setX(rect.getCx() + UIAlign.convertAlign(rect.getWidth(),horizontal));
+        setX(getX());
     }
 
     @Override
     public void setVertical(UIAlign.Align align){
         vertical = align;
-        setY(rect.getCy() + UIAlign.convertAlign(rect.getHeight(),vertical));
+        setY(getY());
     }
 
     @Override
     public void setX(float x){
+        this.x = x;
         x = x + UIAlign.convertAlign(rect.getWidth(),horizontal);
         rect.setCx(x);
-        this.x = rect.getCx();
+        //this.x = rect.getCx();
         if(text != null)
             text.setX(x);
     }
 
     @Override
     public void setY(float y){
+        this.y = y;
         y = y + UIAlign.convertAlign(rect.getHeight(),vertical);
         rect.setCy(y);
-        this.y = rect.getCy();
+        //this.y = rect.getCy();
         if(text != null)
             text.setY(y);
     }
 
     @Override
     public void setWidth(float width){
-        rect.setCx((width - rect.getWidth())/2f);
+        //rect.setCx((width - rect.getWidth())/2f);
         rect.setWidth(width);
         if(useAspect){
             rect.setCy((width/aspect - rect.getHeight()/2f));
@@ -124,10 +130,12 @@ public class Button extends Image {
                 text.setHeight(rect.getHeight()-padding);
             }
         }
+        setX(x);
+        setY(y);
     }
     @Override
     public void setHeight(float height){
-        rect.setCy((height - rect.getHeight())/2f);
+        //rect.setCy((height - rect.getHeight())/2f);
         rect.setHeight(height);
         if(useAspect){
             rect.setCy((height*aspect - rect.getWidth()/2f));
@@ -142,6 +150,8 @@ public class Button extends Image {
                 text.setWidth(rect.getWidth() - padding);
             }
         }
+        setX(x);
+        setY(y);
     }
 
     @Override

@@ -16,9 +16,12 @@ import jp.ac.dendai.c.jtp.Graphics.Renderer.UiRenderer;
 import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
+import jp.ac.dendai.c.jtp.Graphics.UI.Button.Button;
+import jp.ac.dendai.c.jtp.Graphics.UI.Button.ButtonListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.Slider;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.SliderChangeValueListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.NumberText;
+import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
@@ -48,9 +51,9 @@ public class TestModelViewScreen extends Screenable {
     protected UiRenderer uiRenderer;
     protected GameObject ob1,ob2;
     protected Physics3D physics;
-    protected Mesh box,grid,sphear;
+    protected Mesh box,inveder;
     protected Slider slider_ob1_x,slider_ob1_y,slider_ob1_z,slider_ob2_x,slider_ob2_y,slider_ob2_z;
-    protected float rotateX,rotateY;
+    protected Button back;
     public TestModelViewScreen(){
         //シェーダの作成
         testShader = Constant.getShader(Constant.SHADER.diffuse);
@@ -61,15 +64,15 @@ public class TestModelViewScreen extends Screenable {
 
         //オブジェクトファイルの読み込み
         box = WavefrontObjConverter.createModel("untitled.obj");
-        grid = WavefrontObjConverter.createModel("gird.obj");
-        sphear = WavefrontObjConverter.createModel("sphear.obj");
+        inveder = WavefrontObjConverter.createModel("inveder.obj");
 
         ob1 = new GameObject();
         ob1.setName("ob1");
-        ob1.getRenderMediator().mesh = box;
+        ob1.getRenderMediator().mesh = box;//inveder;
         ob1.getRenderMediator().isDraw = true;
         ob1.getPos().setZ(5f);
-        OBBCollider col = new OBBCollider(0,0,0,1,1,1);
+        OBBCollider col = new OBBCollider(0,0,0,1,1,1);//(0,0.49273f,0,1.6282f/2f,0.7141f/2f,0.13568f/2f);
+        col.setNext(new OBBCollider(0,0,0,1,1,1));//(0,0.474895f,0,1.08548f/2f,0.94979f/2f,0.13568f/2f));
         col.setUseOBB(true);
         ob1.setCollider(col);
         ob1.setPhysicsObject(new PhysicsObject(ob1));
@@ -92,6 +95,10 @@ public class TestModelViewScreen extends Screenable {
                 Log.d("Collision!!",owner.getName()+" to "+col.getGameObject().getName());
             }
         });
+        ob1.getScl().setX(0.5f);
+        ob1.getScl().setY(0.5f);
+        ob1.getScl().setZ(0.5f);
+
 
         ob2 = new GameObject();
         ob2.setName("ob2");
@@ -230,6 +237,37 @@ public class TestModelViewScreen extends Screenable {
             }
         });
 
+        back = new Button(0,0,0.1f,0.05f,"戻る");
+        back.setBitmap(Constant.getBitmap(Constant.BITMAP.system_button));
+        back.useAspect(true);
+        back.setCriteria(Button.CRITERIA.HEIGHT);
+        back.setHorizontal(UIAlign.Align.LEFT);
+        back.setVertical(UIAlign.Align.BOTTOM);
+        back.setHeight(0.2f);
+        //back.setX(0);
+        //back.setY(0);
+        back.setButtonListener(new ButtonListener() {
+            @Override
+            public void touchDown(Button button) {
+
+            }
+
+            @Override
+            public void touchHover(Button button) {
+
+            }
+
+            @Override
+            public void touchUp(Button button) {
+                LoadingTransition lt = LoadingTransition.getInstance();
+                lt.initTransition(StageSelectScreen.class);
+                GameManager.transition = lt;
+                GameManager.isTransition = true;
+            }
+        });
+        back.setTouchThrough(false);
+
+
         //レンダラを作成
         testRenderer = new Renderer();
         uiRenderer = new UiRenderer();
@@ -244,6 +282,7 @@ public class TestModelViewScreen extends Screenable {
         uiRenderer.addItem(slider_ob2_x);
         uiRenderer.addItem(slider_ob2_y);
         uiRenderer.addItem(slider_ob2_z);
+        uiRenderer.addItem(back);
 
 
         testRenderer.addItem(ob1);
@@ -263,6 +302,7 @@ public class TestModelViewScreen extends Screenable {
     public void Proc() {
         if(freeze)
             return;
+        back.proc();
         physics.simulate();
         /*if(ACollider.isCollision((AABBCollider) ob1.getCollider(),(AABBCollider) ob2.getCollider())){
             ob1.getRenderMediator().alpha = 0.5f;
@@ -297,6 +337,8 @@ public class TestModelViewScreen extends Screenable {
                 flag = slider_ob2_y.touch(Input.getTouchArray()[n]);
             if(flag || Input.getTouchArray()[n].getTouchID() == -1)
                 flag = slider_ob2_z.touch(Input.getTouchArray()[n]);
+            if(flag || Input.getTouchArray()[n].getTouchID() == -1)
+                flag = back.touch(Input.getTouchArray()[n]);
             if(flag || Input.getTouchArray()[0].getTouchID() == -1) {
                 ob2.getPos().setX(Input.getTouchArray()[0].getDelta(Touch.Pos_Flag.X) * 0.001f + ob2.getPos().getX());
                 ob2.getPos().setY(-Input.getTouchArray()[0].getDelta(Touch.Pos_Flag.Y) * 0.001f + ob2.getPos().getY());
@@ -308,15 +350,13 @@ public class TestModelViewScreen extends Screenable {
     @Override
     public void death() {
         box.deleteBufferObject();
-        grid.deleteBufferObject();
-        sphear.deleteBufferObject();
+        inveder.deleteBufferObject();
     }
 
     @Override
     public void init() {
         //バッファオブジェクトを使用する
         box.useBufferObject();
-        grid.useBufferObject();
-        sphear.useBufferObject();
+        inveder.useBufferObject();
     }
 }
