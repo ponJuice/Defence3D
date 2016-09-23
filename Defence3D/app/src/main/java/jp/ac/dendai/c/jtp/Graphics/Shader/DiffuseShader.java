@@ -45,14 +45,14 @@ public class DiffuseShader extends Shader{
         Matrix.setIdentityM(modelMatrix, 0);
 
         Matrix.translateM(modelMatrix, 0, x, y, z);
-        if(scaleX != 0 || scaleY != 0 || scaleZ != 0)
-            Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
         if(degreeZ != 0)
             Matrix.rotateM(modelMatrix, 0, degreeZ, 0, 0, 1);
         if(degreeY != 0)
             Matrix.rotateM(modelMatrix, 0, degreeY, 0, 1, 0);
         if(degreeX != 0)
             Matrix.rotateM(modelMatrix, 0, degreeX, 1, 0, 0);
+        if(scaleX != 0 || scaleY != 0 || scaleZ != 0)
+            Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
 
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
@@ -82,14 +82,14 @@ public class DiffuseShader extends Shader{
         Matrix.setIdentityM(modelMatrix, 0);
 
         Matrix.translateM(modelMatrix, 0, x, y, z);
-        if(scaleX != 1 || scaleY != 1 || scaleZ != 1)
-            Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
         if(degreeZ != 0)
             Matrix.rotateM(modelMatrix, 0, degreeZ, 0, 0, 1);
         if(degreeY != 0)
             Matrix.rotateM(modelMatrix, 0, degreeY, 0, 1, 0);
         if(degreeX != 0)
             Matrix.rotateM(modelMatrix, 0, degreeX, 1, 0, 0);
+        if(scaleX != 1 || scaleY != 1 || scaleZ != 1)
+            Matrix.scaleM(modelMatrix, 0, scaleX, scaleY, scaleZ);
 
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);

@@ -7,6 +7,7 @@ import jp.ac.dendai.c.jtp.Math.Vector;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.Physics.Collider.AABBCollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
+import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 
 /**
  * Created by Goto on 2016/08/31.
@@ -146,7 +147,22 @@ public class Physics3D implements Physics {
                     continue;
                 PhysicsObject A = objects[n].object;
                 PhysicsObject B = objects[m].object;
-                if(ACollider.isCollision((AABBCollider) A.gameObject.getCollider(),(AABBCollider) B.gameObject.getCollider())){
+
+                //OBBを回転させる
+                OBBCollider temp = A.gameObject.getCollider();
+                do{
+                    temp.calcRotate();
+                    temp = temp.getNext();
+                }while(temp != null);
+                temp = B.gameObject.getCollider();
+                do{
+                    temp.calcRotate();
+                    temp = temp.getNext();
+                }while(temp != null);
+
+                //衝突判定
+
+                if(OBBCollider.isCollisionAABB(A.gameObject.getCollider(),B.gameObject.getCollider()) && OBBCollider.isCollision(A.gameObject.getCollider(),B.gameObject.getCollider())){
                     if(!A.freeze && (A.mask & B.tag) >= 1) {
                         if (A.collisionMode == PhysicsObject.COLLISION.NON) {
                             //始めて接触した→STAYに移行

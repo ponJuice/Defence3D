@@ -4,13 +4,15 @@ package jp.ac.dendai.c.jtp.Physics.Collider;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Math.Vector;
+import jp.ac.dendai.c.jtp.Math.Vector3;
 
 /**
  * Created by Goto on 2016/08/31.
  */
 public abstract class ACollider {
-    protected ACollider nextCol;
+    //protected ACollider nextCol;
     protected GameObject gameObject;
+    protected Vector3 offset = new Vector3();
     protected boolean isDebugDraw = false;
     public boolean getDebugDraw(){
         return isDebugDraw;
@@ -24,9 +26,9 @@ public abstract class ACollider {
     public void setGameObject(GameObject gameObject){
         this.gameObject = gameObject;
     }
-    public ACollider getNextCol(){
+    /*public ACollider getNextCol(){
         return nextCol;
-    }
+    }*/
     public abstract void debugDraw(Shader shader,GameObject pos);
 
     public static boolean isCollision(CircleCollider A,CircleCollider B) {

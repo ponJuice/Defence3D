@@ -23,6 +23,8 @@ import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.Button;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.ButtonListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
+import jp.ac.dendai.c.jtp.Graphics.UI.Slider.Slider;
+import jp.ac.dendai.c.jtp.Graphics.UI.Slider.SliderChangeValueListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontMtlReader;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
@@ -49,6 +51,7 @@ public class TestGameScreen extends Screenable {
     private EnemyObserver eo;
     private Player player;
     private Bitmap buttonImage;
+    private Slider angle;
 
     public TestGameScreen(){
         mainCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,-5f,0,0,0);
@@ -127,6 +130,23 @@ public class TestGameScreen extends Screenable {
                 GameManager.isTransition = true;
             }
         });
+        button.setTouchThrough(false);
+
+        angle = new Slider(0,0,0.025f,0.5f,0.1f,0.05f, Slider.SLIDER_ORIENT.portrait);
+        angle.setHorizontal(UIAlign.Align.RIGHT);
+        angle.setVertical(UIAlign.Align.TOP);
+        angle.setX(GLES20Util.getWidth_gl());
+        angle.setY(GLES20Util.getHeight_gl());
+        angle.setMin(0.5f);
+        angle.setMax(2);
+        angle.setValue(1);
+        angle.setChangeListener(new SliderChangeValueListener() {
+            @Override
+            public void changeValue(float value) {
+                player.getScl().setX(value);
+            }
+        });
+        angle.setTouchThrough(false);
 
         attackButton = new Button(0,0,0.3f,0.1f,"Attack");
         attackButton.useAspect(true);
@@ -152,9 +172,11 @@ public class TestGameScreen extends Screenable {
 
             }
         });
+        attackButton.setTouchThrough(false);
 
         uiRenderer.addItem(button);
         uiRenderer.addItem(attackButton);
+        uiRenderer.addItem(angle);
     }
 
     @Override
@@ -177,10 +199,15 @@ public class TestGameScreen extends Screenable {
     public void Touch() {
         if(freeze)
             return;
+        boolean flag;
         for(int n = 0;n < Input.getMaxTouch();n++){
-            player.touch(Input.getTouchArray()[n]);
-            button.touch(Input.getTouchArray()[n]);
-            attackButton.touch(Input.getTouchArray()[n]);
+            flag = button.touch(Input.getTouchArray()[n]);
+            if(flag || Input.getTouchArray()[n].getTouchID() == -1)
+                flag = attackButton.touch(Input.getTouchArray()[n]);
+            if(flag || Input.getTouchArray()[n].getTouchID() == -1)
+                flag = angle.touch(Input.getTouchArray()[n]);
+            if(flag || Input.getTouchArray()[n].getTouchID() == -1)
+                player.touch(Input.getTouchArray()[n]);
             Input.getTouchArray()[n].resetDelta();
             //Input.getTouchArray()[n].updatePosition(Input.getTouchArray()[n].getPosition(Touch.Pos_Flag.X),Input.getTouchArray()[n].getPosition(Touch.Pos_Flag.Y));
         }

@@ -33,8 +33,8 @@ public class StaticText extends Image {
     }
 
     @Override
-    public void touch(Touch touch) {
-
+    public boolean touch(Touch touch) {
+        return through;
     }
 
     /*@Override

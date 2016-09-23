@@ -221,8 +221,8 @@ public class Image extends UI{
     }
 
     @Override
-    public void touch(Touch touch) {
-
+    public boolean touch(Touch touch) {
+        return through;
     }
 
     @Override

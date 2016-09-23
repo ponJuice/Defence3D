@@ -5,6 +5,7 @@ import android.opengl.GLES20;
 
 import java.nio.FloatBuffer;
 
+import jp.ac.dendai.c.jtp.Game.Touchable;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Textrue.MaskInfo;
@@ -16,7 +17,7 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
 /**
  * Created by Goto on 2016/09/06.
  */
-public abstract class UI implements TextureInfo,MaskInfo {
+public abstract class UI implements TextureInfo,MaskInfo,Touchable {
     protected static final float[] plane = {
             -0.5f,-0.5f,0,
             0.5f,-0.5f,0,
@@ -43,6 +44,7 @@ public abstract class UI implements TextureInfo,MaskInfo {
     protected float degree = 0;
     protected GLES20COMPOSITIONMODE mode = GLES20COMPOSITIONMODE.ALPHA;
     protected float r = 0.5f,g = 0.5f,b = 0.5f;
+    protected boolean through = true;
 
     public void copy(UI ui) {
         horizontal = ui.horizontal;
@@ -175,7 +177,15 @@ public abstract class UI implements TextureInfo,MaskInfo {
         return (float)image.getWidth()/(float)image.getHeight();
     }
 
-    public abstract void touch(Touch touch);
+    @Override
+    public boolean getTouchThrough(){
+        return through;
+    }
+    @Override
+    public void setTouchThrough(boolean flag){
+        through = flag;
+    }
+
     public abstract void proc();
     public abstract void draw(UiShader shader);
 }

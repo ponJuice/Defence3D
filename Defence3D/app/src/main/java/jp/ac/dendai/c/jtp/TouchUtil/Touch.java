@@ -13,6 +13,12 @@ public class Touch{
 		X,
 		Y
 	}
+	public enum ACTION{
+		DOWN,
+		MOVE,
+		UP,
+	}
+	protected ACTION action;
 	protected float x;
 	protected float y;
 	protected float deltaX;
@@ -25,6 +31,10 @@ public class Touch{
 		deltaX = 0;
 		deltaY = 0;
 		touchID = -1;
+	}
+
+	public ACTION getAction(){
+		return action;
 	}
 
 	public void addTouchListener(TouchListener l){
@@ -46,12 +56,14 @@ public class Touch{
 		this.touchID = touchID;
 		deltaX = 0;
 		deltaY = 0;
+		action = ACTION.DOWN;
 	}
 	public void updatePosition(float x,float y){
 		deltaX = this.x - getOrientPosition(x,y,Pos_Flag.X);
 		deltaY = this.y - getOrientPosition(x,y,Pos_Flag.Y);
 		this.x = getOrientPosition(x,y,Pos_Flag.X);
 		this.y = getOrientPosition(x,y,Pos_Flag.Y);
+		action = ACTION.MOVE;
 		if(tl != null)
 			tl.execute(this);
 	}
@@ -103,6 +115,7 @@ public class Touch{
 		touchID = -1;
 		deltaX = 0;
 		deltaY = 0;
+		action = ACTION.UP;
 	}
 	@Override
 	public String toString(){

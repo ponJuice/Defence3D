@@ -21,6 +21,15 @@ public abstract class Vector {
     public abstract Vector getCross(Vector vec);
     public abstract void cross(Vector vec);
     public abstract float getCrossX(Vector vec);
+    public float getCrossX(float[] a){
+        return getY()*a[2] - getZ()*a[1];
+    }
+    public float getCrossY(float[] a){
+        return getZ()*a[0] -getX()*a[2];
+    }
+    public float getCrossZ(float[] a){
+        return getX()*a[1]-getY()*a[0];
+    }
     public abstract float getCrossY(Vector vec);
     public abstract float getCrossZ(Vector vec);
     public abstract Vector getNormalize();
@@ -29,11 +38,48 @@ public abstract class Vector {
     public abstract void normalize();
     public abstract Vector copy();
     public abstract void copy(Vector vec);
+    public void copy(float[] a){
+        setX(a[0]);
+        setY(a[1]);
+        if(a.length >= 3)
+            setZ(a[2]);
+        else
+            setZ(0);
+    }
+    public void cross(float[] a){
+        float lx = getCrossX(a);
+        float ly = getCrossY(a);
+        float lz = getCrossZ(a);
+        setX(lx);
+        setY(ly);
+        setZ(lz);
+    }
     public static double distanceAtoB(Vector a,Vector b){
         return Math.sqrt((b.getX()-a.getX())*(b.getX()-a.getX())
                             +(b.getY()-a.getY())*(b.getY()-a.getY())
                             +(b.getZ()-a.getZ())*(b.getZ()-a.getZ()));
     }
+
+    public static float dot_axis(float[] vec,float x,float y,float z){
+        return vec[0] * x + vec[1] * y + vec[2] * z;
+    }
+
+    public static float dot(Vector a,Vector b){
+        return a.getX() * b.getX() + a.getY() * b.getY() + a.getZ() * b.getZ();
+    }
+
+    public static float dot(Vector a,float[] b){
+        return a.getX() * b[0] + a.getY() * b[1] + a.getZ() * b[2];
+    }
+
+    public static float dot(float[] a,Vector b){
+        return b.getX() * a[0] + b.getY() * a[1] + b.getZ() * a[2];
+    }
+
+    public static float dot(float[] a,float[] b){
+        return b[0] * a[0] + b[1] * a[1] + b[2] * a[2];
+    }
+
     public static void rotateX(float rad,Vector vec,Vector out){
         float x = vec.getX();
         float y = vec.getY() * (float)Math.cos(rad) - vec.getZ() * (float)Math.sin(rad);

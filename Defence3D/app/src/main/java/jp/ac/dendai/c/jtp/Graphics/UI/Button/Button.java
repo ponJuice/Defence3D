@@ -145,9 +145,9 @@ public class Button extends Image {
     }
 
     @Override
-    public void touch(Touch touch) {
+    public boolean touch(Touch touch) {
         if(this.touch != null && this.touch != touch)
-            return;
+            return true;
         float x = Constant.getActiveUiCamera().convertTouchPosToGLPosX(touch.getPosition(Touch.Pos_Flag.X));
         float y = Constant.getActiveUiCamera().convertTouchPosToGLPosY(touch.getPosition(Touch.Pos_Flag.Y));
         if(touch.getTouchID() == -1){
@@ -157,7 +157,7 @@ public class Button extends Image {
             }else{
                 this.touch = null;
             }
-            return;
+            return through;
         }
         Log.d("button touch pos", "device pos:" + "(" + touch.getPosition(Touch.Pos_Flag.X) + "," + touch.getPosition(Touch.Pos_Flag.Y) + ")" + "camera pos:(" + x + "," + y + ") delta:"+touch.getDelta(Touch.Pos_Flag.X)+","+touch.getDelta(Touch.Pos_Flag.Y)+")");
         if(touch.getTouchID() != -1 && rect.contains(x,y)){
@@ -177,6 +177,10 @@ public class Button extends Image {
                 this.touch = touch;
             }
         }
+        if(state == BUTTON_STATE.NON)
+            return true;
+        else
+            return through;
     }
 
     @Override

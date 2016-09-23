@@ -6,6 +6,7 @@ import javax.microedition.khronos.opengles.GL;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.GameManager;
+import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Game.Transition.LoadingTransition.LoadingThread;
 import jp.ac.dendai.c.jtp.Game.Transition.LoadingTransition.LoadingTransition;
 import jp.ac.dendai.c.jtp.Graphics.Camera.UiCamera;
@@ -15,6 +16,8 @@ import jp.ac.dendai.c.jtp.Graphics.UI.Button.Button;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.ButtonListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.Slider;
+import jp.ac.dendai.c.jtp.Graphics.UI.Slider.SliderChangeValueListener;
+import jp.ac.dendai.c.jtp.Graphics.UI.Text.NumberText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
@@ -30,6 +33,7 @@ public class StageSelectScreen extends Screenable {
     protected UiRenderer uiRenderer;
     protected Image grid;
     protected Slider slider;
+    protected NumberText sliderValue;
     public StageSelectScreen(){
         grid = new Image(GLES20Util.loadBitmap(R.mipmap.grid));
         grid.setWidth(0.5f);
@@ -78,8 +82,43 @@ public class StageSelectScreen extends Screenable {
         button2.setWidth(0.6f);
         button2.setX(GLES20Util.getWidth_gl()/2f);
         button2.setY(GLES20Util.getHeight_gl()/2f);
+        button2.setButtonListener(new ButtonListener() {
+            @Override
+            public void touchDown(Button button) {
 
-        slider = new Slider(GLES20Util.getWidth_gl()/2f,GLES20Util.getHeight_gl()/2f,0.01f,0.6f,0.2f,0.1f, Slider.SLIDER_ORIENT.landscape);
+            }
+
+            @Override
+            public void touchHover(Button button) {
+
+            }
+
+            @Override
+            public void touchUp(Button button) {
+                LoadingTransition lt = LoadingTransition.getInstance();
+                lt.initTransition(TestModelViewScreen.class);
+                GameManager.transition = lt;
+                GameManager.isTransition = true;
+            }
+        });
+
+        sliderValue = new NumberText("normal");
+        sliderValue.setHorizontal(UIAlign.Align.LEFT);
+        sliderValue.setVertical(UIAlign.Align.TOP);
+        sliderValue.useAspect(true);
+        sliderValue.setWidth(0.2f);
+        sliderValue.setX(0);
+        sliderValue.setY(GLES20Util.getHeight_gl());
+
+        slider = new Slider(GLES20Util.getWidth_gl()/2f,GLES20Util.getHeight_gl()/2f,0.05f,0.6f,0.2f,0.1f, Slider.SLIDER_ORIENT.landscape);
+        slider.setX(0);
+        slider.setMax(10);
+        slider.setChangeListener(new SliderChangeValueListener() {
+            @Override
+            public void changeValue(float value) {
+                sliderValue.setNumber((int)value);
+            }
+        });
 
         uiShader = (UiShader) Constant.getShader(Constant.SHADER.ui);
         uiShader.setCamera(Constant.getActiveUiCamera());
@@ -90,6 +129,7 @@ public class StageSelectScreen extends Screenable {
         uiRenderer.addItem(button1);
         uiRenderer.addItem(button2);
         uiRenderer.addItem(slider);
+        uiRenderer.addItem(sliderValue);
     }
     float count = 0;
     @Override
@@ -119,6 +159,7 @@ public class StageSelectScreen extends Screenable {
             button2.touch(Input.getTouchArray()[n]);
             slider.touch(Input.getTouchArray()[n]);
             //Input.getTouchArray()[n].updatePosition(Input.getTouchArray()[n].getPosition(Touch.Pos_Flag.X),Input.getTouchArray()[n].getPosition(Touch.Pos_Flag.Y));
+            Input.getTouchArray()[n].resetDelta();
         }
     }
 

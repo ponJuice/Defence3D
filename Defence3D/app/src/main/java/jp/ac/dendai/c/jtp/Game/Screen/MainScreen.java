@@ -104,7 +104,7 @@ public class MainScreen extends Screenable {
         playerBullet = new GameObject[5];
         for(int n = 0;n < 5;n++){
             playerBullet[n] = new GameObject();
-            playerBullet[n].setCollider(new AABBCollider(0.05f,0.05f,0.05f));
+            //playerBullet[n].setCollider(new AABBCollider(0.05f,0.05f,0.05f));
             playerBullet[n].getRenderMediator().isDraw = false;
             playerBullet[n].getRenderMediator().mesh = box;
             playerBullet[n].getScl().setX(0.05f);

@@ -10,6 +10,7 @@ import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.Physics.Collider.AABBCollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.CircleCollider;
+import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 
@@ -18,7 +19,7 @@ import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
  */
 public class GameObject implements FrameListener{
     protected Vector pos,rot,scl;
-    protected AABBCollider collider;
+    protected OBBCollider collider;
     protected PhysicsObject po;
     protected RenderMediator rm;
     protected CollisionListener cl;
@@ -51,10 +52,10 @@ public class GameObject implements FrameListener{
     public Vector getPos(){
         return pos;
     }
-    public ACollider getCollider(){
+    public OBBCollider getCollider(){
         return collider;
     }
-    public void setCollider(AABBCollider col){
+    public void setCollider(OBBCollider col){
         collider = col;
         collider.setGameObject(this);
     }

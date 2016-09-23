@@ -10,13 +10,14 @@ import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 /**
  * Created by テツヤ on 2016/09/04.
  */
-public class Player extends GameObject{
+public class Player extends GameObject implements Touchable{
     protected GameObject[] parts;
     protected Vector3 direct;
     protected float radius = 1f;
     protected float[] p = {0,0,0,1f};
     protected float[] l = {0,0,0,1f};
     protected float[] t = new float[16];
+    protected boolean through;
     protected Touch touch;
     protected Camera camera;
 
@@ -38,20 +39,30 @@ public class Player extends GameObject{
         return radius;
     }
 
-    public void touch(Touch touch){
+    public boolean touch(Touch touch){
         if(this.touch == null && touch.getTouchID() == -1)
-            return;
+            return true;
         if(this.touch == null)
             this.touch = touch;
         else if(this.touch != touch || this.touch.getTouchID() == -1)
-            return;
+            return true;
         rot.setY(rot.getY() + this.touch.getDelta(Touch.Pos_Flag.X)/10f);
         rot.setX(rot.getX() + this.touch.getDelta(Touch.Pos_Flag.Y)/10f);
 
         parts[0].getRot().setY(rot.getY());
         parts[1].getRot().setY(rot.getY());
         parts[1].getRot().setX(rot.getX());
+        return through;
+    }
 
+    @Override
+    public boolean getTouchThrough() {
+        return through;
+    }
+
+    @Override
+    public void setTouchThrough(boolean flag) {
+        through = flag;
     }
 
     public void setCamera(Camera camera){
