@@ -1,7 +1,10 @@
 package jp.ac.dendai.c.jtp.Graphics.Renderer;
 
+import android.util.Log;
+
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
+import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 
 /**
  * Created by Goto on 2016/09/01.
@@ -88,11 +91,23 @@ public class Renderer extends ARenderer {
         shader.useShader();
         shader.updateCamera();
         RenderItem temp = ite;
+        long start = System.currentTimeMillis();
         do{
             if(temp.rm != null && temp.rm.isDraw) {
                 temp.rm.draw();
             }
+            if(temp.rm != null && temp.rm.gameObject.getDebugDraw()){
+                if(temp.rm.gameObject.getCollider() != null){
+                    OBBCollider o = temp.rm.gameObject.getCollider();
+                    do{
+                        o.debugDraw();
+                        o = o.getNext();
+                    }while(o != null);
+                }
+            }
             temp = temp.prev;
         }while(temp != null && temp != ite);
+        float t = (float)(System.currentTimeMillis() - start)/1000f;
+        Log.d("Renderer","rendering time:"+t);
     }
 }

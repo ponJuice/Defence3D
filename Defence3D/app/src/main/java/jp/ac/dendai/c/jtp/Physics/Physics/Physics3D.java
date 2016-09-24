@@ -1,6 +1,7 @@
 package jp.ac.dendai.c.jtp.Physics.Physics;
 
 import android.os.Debug;
+import android.provider.Settings;
 import android.util.Log;
 
 import jp.ac.dendai.c.jtp.Math.Vector;
@@ -118,6 +119,15 @@ public class Physics3D implements Physics {
                 temp.object.bufferPos.zeroReset();
                 temp.object.bufferRot.zeroReset();
                 temp.object.bufferScl.zeroReset();
+                //OBBを回転させる
+                OBBCollider t = temp.object.gameObject.getCollider();
+                do{
+                    t.calcRotate();
+                    if(t.getDebugDraw()){
+                        t.debugDraw();
+                    }
+                    t = t.getNext();
+                }while(t != null);
             }
             temp = temp.prev;
         }while(temp != ite);
@@ -148,50 +158,38 @@ public class Physics3D implements Physics {
                 PhysicsObject A = objects[n].object;
                 PhysicsObject B = objects[m].object;
 
-                //OBBを回転させる
-                OBBCollider temp = A.gameObject.getCollider();
-                do{
-                    temp.calcRotate();
-                    temp = temp.getNext();
-                }while(temp != null);
-                temp = B.gameObject.getCollider();
-                do{
-                    temp.calcRotate();
-                    temp = temp.getNext();
-                }while(temp != null);
-
                 //衝突判定
 
                 if(OBBCollider.isCollisionAABB(A.gameObject.getCollider(),B.gameObject.getCollider()) && OBBCollider.isCollision(A.gameObject.getCollider(),B.gameObject.getCollider())){
                     if(!A.freeze && (A.mask & B.tag) >= 1) {
                         if (A.collisionMode == PhysicsObject.COLLISION.NON) {
                             //始めて接触した→STAYに移行
-                                A.gameObject.getCollisionListener().collEnter(B.gameObject.getCollider(),A.gameObject);
+                                A.gameObject.collEnter(B.gameObject.getCollider(),A.gameObject);
                                 A.collisionMode = PhysicsObject.COLLISION.STAY;
                         } else if (A.collisionMode == PhysicsObject.COLLISION.STAY) {
                             //接触し続けている→そのまま
-                            A.gameObject.getCollisionListener().collStay(B.gameObject.getCollider(),A.gameObject);
+                            A.gameObject.collStay(B.gameObject.getCollider(),A.gameObject);
                         }
                     }
                     if(!B.freeze && (B.mask & A.tag) >= 1) {
                         if (B.collisionMode == PhysicsObject.COLLISION.NON) {
                             //始めて接触した→STAYに移行
-                                B.gameObject.getCollisionListener().collEnter(A.gameObject.getCollider(),B.gameObject);
+                                B.gameObject.collEnter(A.gameObject.getCollider(),B.gameObject);
                                 B.collisionMode = PhysicsObject.COLLISION.STAY;
                         } else if (B.collisionMode == PhysicsObject.COLLISION.STAY) {
                             //接触し続けている→そのまま
-                            B.gameObject.getCollisionListener().collStay(A.gameObject.getCollider(),B.gameObject);
+                            B.gameObject.collStay(A.gameObject.getCollider(),B.gameObject);
                         }
                     }
                 }else{
                     if(A.collisionMode == PhysicsObject.COLLISION.STAY){
                         //離れた→NONに移行
-                        A.gameObject.getCollisionListener().collExit(B.gameObject.getCollider(),A.gameObject);
+                        A.gameObject.collExit(B.gameObject.getCollider(),A.gameObject);
                         A.collisionMode = PhysicsObject.COLLISION.NON;
                     }
                     if(B.collisionMode == PhysicsObject.COLLISION.STAY){
                         //離れた→NONに移行
-                        B.gameObject.getCollisionListener().collExit(A.gameObject.getCollider(),B.gameObject);
+                        B.gameObject.collExit(A.gameObject.getCollider(),B.gameObject);
                         B.collisionMode = PhysicsObject.COLLISION.NON;
                     }
                 }
@@ -213,6 +211,8 @@ public class Physics3D implements Physics {
         }while(temp != ite);
     }
 
+    protected long start,preparetion_end,external_end,physics_end,update_end;
+
     @Override
     public void simulate() {
         deltaTime = 0;
@@ -225,9 +225,21 @@ public class Physics3D implements Physics {
         currentTime = (timeBuffer - startTime)/1000f;
         time = timeBuffer;
         deltaTimeSum += deltaTime;
+        start = System.currentTimeMillis();
         preparation();
+        preparetion_end = System.currentTimeMillis();
         externalForceProc(deltaTime);
+        external_end = System.currentTimeMillis();
         physicsProc(deltaTime);
+        physics_end = System.currentTimeMillis();
         updatePosProc(deltaTime);
+        update_end = System.currentTimeMillis();
+
+        float pre = (float)(preparetion_end - start) /1000f;
+        float ex = (float)(external_end - preparetion_end) /1000f;
+        float ph = (float)(physics_end - external_end)/1000f;
+        float up = (float)(update_end - physics_end)/1000f;
+
+        Log.d("pipline","pre:"+pre+" ex:"+ex+" ph:"+ph+" up:"+up);
     }
 }

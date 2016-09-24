@@ -12,7 +12,8 @@ import jp.ac.dendai.c.jtp.Math.Vector3;
 public abstract class ACollider {
     //protected ACollider nextCol;
     protected GameObject gameObject;
-    protected Vector3 offset = new Vector3();
+    protected float[] base_offset = {0,0,0,1};
+    protected float[] offset = {0,0,0,1};
     protected boolean isDebugDraw = false;
     public boolean getDebugDraw(){
         return isDebugDraw;
@@ -29,7 +30,7 @@ public abstract class ACollider {
     /*public ACollider getNextCol(){
         return nextCol;
     }*/
-    public abstract void debugDraw(Shader shader,GameObject pos);
+    public abstract void debugDraw();
 
     public static boolean isCollision(CircleCollider A,CircleCollider B) {
         if (A.radius + B.radius <= Vector.distanceAtoB(A.gameObject.getPos(), B.gameObject.getPos())) {

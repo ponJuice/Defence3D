@@ -1,12 +1,15 @@
 package jp.ac.dendai.c.jtp.Physics.Collider;
 
 import android.opengl.Matrix;
+import android.util.Log;
 
+import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Math.Vector;
 import jp.ac.dendai.c.jtp.Math.Vector3;
+import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by Goto on 2016/09/23.
@@ -27,9 +30,12 @@ public class OBBCollider extends ACollider{
         base_length[0] = lx;
         base_length[1] = ly;
         base_length[2] = lz;
-        offset.setX(ox);
-        offset.setY(oy);
-        offset.setZ(oz);
+        offset[0] = ox;
+        offset[1] = oy;
+        offset[2] = oz;
+        base_offset[0] = ox;
+        base_offset[1] = oy;
+        base_offset[2] = oz;
         directs[0] = new float[]{1,0,0,0};
         directs[1] = new float[]{0,1,0,0};
         directs[2] = new float[]{0,0,1,0};
@@ -78,12 +84,16 @@ public class OBBCollider extends ACollider{
         directs[2][2] = 1;
         Matrix.multiplyMV(directs[2], 0, rotateMatrix, 0, directs[2], 0);
 
+        Matrix.multiplyMV(offset,0,rotateMatrix,0,base_offset,0);
+
     }
 
     public static boolean isCollisionAABB(OBBCollider A,OBBCollider B){
-        float a_to_b_x = Math.abs((A.gameObject.getPos().getX()+A.offset.getX()) - (B.gameObject.getPos().getX()+B.offset.getX()));
-        float a_to_b_y = Math.abs((A.gameObject.getPos().getY()+A.offset.getY()) - (B.gameObject.getPos().getY()+B.offset.getY()));
-        float a_to_b_z = Math.abs((A.gameObject.getPos().getZ()+A.offset.getZ()) - (B.gameObject.getPos().getZ()+B.offset.getZ()));
+        float a_to_b_x = Math.abs((A.gameObject.getPos().getX()+A.offset[0]) - (B.gameObject.getPos().getX()+B.offset[0]));
+        float a_to_b_y = Math.abs((A.gameObject.getPos().getY()+A.offset[1]) - (B.gameObject.getPos().getY()+B.offset[1]));
+        float a_to_b_z = Math.abs((A.gameObject.getPos().getZ()+A.offset[2]) - (B.gameObject.getPos().getZ()+B.offset[2]));
+
+        Log.d("AABB","offset x:"+A.offset[0]+" y:"+A.offset[1]+" z:"+A.offset[2]);
 
         float width_mul_2_A = Math.abs(Vector.dot_axis(A.directs[0],1,0,0)) + Math.abs(Vector.dot_axis(A.directs[1],1,0,0)) + Math.abs(Vector.dot_axis(A.directs[2],1,0,0));
         width_mul_2_A *= A.gameObject.getScl().getX() * A.base_length[0];
@@ -104,6 +114,18 @@ public class OBBCollider extends ACollider{
         boolean y_flag = (height_mul_2_A + height_mul_2_B) >= a_to_b_y;
         boolean z_flag = (depth_mul_2_A + depth_mul_2_B) > a_to_b_z;
         return x_flag && y_flag & z_flag;
+    }
+
+    @Override
+    public void debugDraw(){
+        Constant.debugDraw(gameObject.getPos().getX() + offset[0],gameObject.getPos().getY() + offset[1],gameObject.getPos().getZ() + offset[2]
+                        ,base_length[0] * gameObject.getScl().getX(),base_length[1] * gameObject.getScl().getY(),base_length[2] * gameObject.getScl().getZ()
+                        ,gameObject.getRot().getX(),gameObject.getRot().getY(),gameObject.getRot().getZ()
+                        ,1);
+    }
+
+    public float[] getOffset(){
+        return offset;
     }
 
     public static boolean isCollision(OBBCollider A,OBBCollider B){
@@ -295,10 +317,5 @@ public class OBBCollider extends ACollider{
             c2 = C.gameObject.getScl().getZ();
         return Math.abs(Vector.dot(C.directs[num1],cross) * c1 * C.base_length[num1])
                 +Math.abs(Vector.dot(C.directs[num2],cross) * c2 * C.base_length[num2]);
-    }
-
-    @Override
-    public void debugDraw(Shader shader, GameObject pos) {
-
     }
 }

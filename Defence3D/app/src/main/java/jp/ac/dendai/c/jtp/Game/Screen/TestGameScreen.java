@@ -1,6 +1,7 @@
 package jp.ac.dendai.c.jtp.Game.Screen;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import javax.microedition.khronos.opengles.GL;
 
@@ -28,6 +29,7 @@ import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.Slider;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.SliderChangeValueListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
+import jp.ac.dendai.c.jtp.Graphics.UI.UIObserver;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontMtlReader;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
 import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
@@ -54,13 +56,14 @@ public class TestGameScreen extends Screenable {
     private Camera mainCamera;
     private GameObject[] inveders;
     private GameObject floor;
-    private Button button,attackButton;
+    private Button button,attackButton,leftButton,rightButton;
     private EnemyObserver eo;
     private Player player;
     private Bitmap buttonImage;
     private Slider angle;
     private Physics3D physics;
     private GameObject testBullet;
+    private UIObserver uiObserver;
 
     public TestGameScreen(){
         mainCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,-5f,0,0,0);
@@ -83,7 +86,7 @@ public class TestGameScreen extends Screenable {
         daiza_model = WavefrontObjConverter.createModel("daiza.obj");
         bullet_model = WavefrontObjConverter.createModel("untitled.obj");
 
-        GameObject[] parts = new GameObject[2];
+        final GameObject[] parts = new GameObject[2];
         parts[0] = new GameObject();
         parts[0].getRenderMediator().mesh = daiza_model;
         parts[0].getRenderMediator().isDraw = true;
@@ -98,6 +101,8 @@ public class TestGameScreen extends Screenable {
         renderer.addItem(parts[0]);
         renderer.addItem(parts[1]);
 
+        uiObserver = new UIObserver();
+
         floor = new GameObject();
         floor.getRenderMediator().mesh = yuka_model;
         floor.getRenderMediator().isDraw = true;
@@ -109,13 +114,14 @@ public class TestGameScreen extends Screenable {
         testBullet.getRenderMediator().isDraw = false;
         testBullet.setPhysicsObject(new PhysicsObject(testBullet));
         testBullet.getPhysicsObject().mask = Constant.COLLISION_ENEMY;
-        testBullet.getPhysicsObject().tag = Constant.COLLISION_ENEMY;
+        testBullet.getPhysicsObject().tag = Constant.COLLISION_PLAYERBULLET;
         testBullet.getPhysicsObject().useGravity = true;
         testBullet.getPhysicsObject().freeze = true;
         testBullet.setCollider(new OBBCollider(0,0,0,1,1,1));
         testBullet.getScl().setX(0.1f);
         testBullet.getScl().setY(0.1f);
         testBullet.getScl().setZ(0.1f);
+        player.setBullte(testBullet);
 
         physics.addObject(testBullet.getPhysicsObject());
         renderer.addItem(testBullet);
@@ -124,12 +130,13 @@ public class TestGameScreen extends Screenable {
 
         inveders = new Inveder[55];
         for(int n = 0;n < inveders.length;n++){
-            inveders[n] = new Inveder(physics,renderer,bt,player);
+            inveders[n] = new Inveder(physics);
             inveders[n].getRenderMediator().mesh = inveder_model;
             inveders[n].getRenderMediator().isDraw = true;
             inveders[n].getPos().setY(-5f);
             inveders[n].getPos().setZ(50f - (float)(n / 11) * 5f);
             inveders[n].getPos().setX((float)n % 11 * 2f - 11f);
+            inveders[n].setDebugDraw(false);
             renderer.addItem(inveders[n]);
         }
 
@@ -137,14 +144,15 @@ public class TestGameScreen extends Screenable {
 
         buttonImage = GLES20Util.loadBitmap(R.mipmap.button);
 
-        button = new Button(0,0,0.3f,0.1f,"TEST");
-        button.useAspect(true);
+        button = new Button(0,0,0.3f,0.1f,"Back");
         button.setCriteria(Button.CRITERIA.HEIGHT);
         button.setHorizontal(UIAlign.Align.LEFT);
-        button.setVertical(UIAlign.Align.BOTTOM);
+        button.setVertical(UIAlign.Align.TOP);
+        button.setWidth(0.2f);
         button.setX(0);
-        button.setY(0);
+        button.setY(GLES20Util.getHeight_gl());
         button.setBitmap(buttonImage);
+        button.useAspect(true);
         button.setButtonListener(new ButtonListener() {
             @Override
             public void touchDown(Button button) {
@@ -165,6 +173,59 @@ public class TestGameScreen extends Screenable {
             }
         });
         button.setTouchThrough(false);
+
+        leftButton = new Button(0,0,0.1f,0.1f,"<");
+        leftButton.setBitmap(buttonImage);
+        leftButton.setCriteria(Button.CRITERIA.HEIGHT);
+        leftButton.setHorizontal(UIAlign.Align.LEFT);
+        leftButton.setVertical(UIAlign.Align.BOTTOM);
+        leftButton.setX(0);
+        leftButton.setY(0);
+        leftButton.setWidth(0.2f);
+        leftButton.useAspect(true);
+        leftButton.setTouchThrough(false);
+        leftButton.setButtonListener(new ButtonListener() {
+            @Override
+            public void touchDown(Button button) {
+
+            }
+
+            @Override
+            public void touchHover(Button button) {
+                player.getPos().setX(player.getPos().getX() + 0.1f);
+            }
+
+            @Override
+            public void touchUp(Button button) {
+            }
+        });
+
+        rightButton = new Button(0,0,0.1f,0.1f,">");
+        rightButton.setBitmap(buttonImage);
+        rightButton.setCriteria(Button.CRITERIA.HEIGHT);
+        rightButton.setHorizontal(UIAlign.Align.RIGHT);
+        rightButton.setVertical(UIAlign.Align.BOTTOM);
+        rightButton.setX(GLES20Util.getWidth_gl());
+        rightButton.setY(0);
+        rightButton.setWidth(0.2f);
+        rightButton.useAspect(true);
+        rightButton.setTouchThrough(false);
+        rightButton.setButtonListener(new ButtonListener() {
+            @Override
+            public void touchDown(Button button) {
+
+            }
+
+            @Override
+            public void touchHover(Button button) {
+                player.getPos().setX(player.getPos().getX() - 0.1f);
+            }
+
+            @Override
+            public void touchUp(Button button) {
+
+            }
+        });
 
         angle = new Slider(0,0,0.025f,0.5f,0.1f,0.05f, Slider.SLIDER_ORIENT.portrait);
         angle.setHorizontal(UIAlign.Align.RIGHT);
@@ -203,14 +264,7 @@ public class TestGameScreen extends Screenable {
 
             @Override
             public void touchUp(Button button) {
-                testBullet.getPos().setX(0);
-                testBullet.getPos().setY(-5f);
-                testBullet.getPos().setZ(50f);
-                testBullet.getPhysicsObject().velocity.setX(0);
-                testBullet.getPhysicsObject().velocity.setY(16.5f);
-                testBullet.getPhysicsObject().velocity.setZ(-50f/3f);
-                testBullet.getPhysicsObject().freeze = false;
-                testBullet.getRenderMediator().isDraw = true;
+                player.attack();
             }
         });
         attackButton.setTouchThrough(false);
@@ -218,6 +272,17 @@ public class TestGameScreen extends Screenable {
         uiRenderer.addItem(button);
         uiRenderer.addItem(attackButton);
         uiRenderer.addItem(angle);
+        uiRenderer.addItem(leftButton);
+        uiRenderer.addItem(rightButton);
+
+        uiObserver.addItem(button);
+        uiObserver.addItem(attackButton);
+        uiObserver.addItem(angle);
+        uiObserver.addItem(leftButton);
+        uiObserver.addItem(rightButton);
+
+        Constant.setDebugModel(bullet_model);
+        Constant.setDebugCamera(mainCamera);
     }
 
     @Override
@@ -225,12 +290,15 @@ public class TestGameScreen extends Screenable {
         if(freeze)
             return;
         player.proc();
+        uiObserver.proc();
         for(int n = 0;n < inveders.length;n++){
-            inveders[0].update();
+            //inveders[n].update();
         }
         eo.procAll();
         button.proc();
         attackButton.proc();
+        //
+        //
         physics.simulate();
     }
 
@@ -244,17 +312,13 @@ public class TestGameScreen extends Screenable {
     public void Touch() {
         if(freeze)
             return;
-        boolean flag;
-        for(int n = 0;n < Input.getMaxTouch();n++){
-            flag = button.touch(Input.getTouchArray()[n]);
-            if(flag || Input.getTouchArray()[n].getTouchID() == -1)
-                flag = attackButton.touch(Input.getTouchArray()[n]);
-            if(flag || Input.getTouchArray()[n].getTouchID() == -1)
-                flag = angle.touch(Input.getTouchArray()[n]);
-            if(flag || Input.getTouchArray()[n].getTouchID() == -1)
+        for(int n = 0;n < Input.getTouchArray().length;n++){
+            boolean flag = true;
+            flag = uiObserver.touch(Input.getTouchArray()[n],flag);
+            if(flag)
                 player.touch(Input.getTouchArray()[n]);
+            //Log.d("touch","index:"+n+" flag:"+flag);
             Input.getTouchArray()[n].resetDelta();
-            //Input.getTouchArray()[n].updatePosition(Input.getTouchArray()[n].getPosition(Touch.Pos_Flag.X),Input.getTouchArray()[n].getPosition(Touch.Pos_Flag.Y));
         }
     }
 

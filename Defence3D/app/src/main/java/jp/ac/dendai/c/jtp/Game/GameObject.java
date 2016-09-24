@@ -19,6 +19,7 @@ import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
  */
 public class GameObject implements FrameListener{
     protected Vector pos,rot,scl;
+    protected boolean debugDraw = false;
     protected OBBCollider collider;
     protected PhysicsObject po;
     protected RenderMediator rm;
@@ -39,6 +40,21 @@ public class GameObject implements FrameListener{
         rm = new RenderMediator();
         rm.gameObject = this;
         rm.alpha = 1.0f;
+    }
+    public void setDebugDraw(boolean flag){
+        debugDraw = flag;
+    }
+    public boolean getDebugDraw(){
+        return debugDraw;
+    }
+    public void useOBB(boolean flag){
+        if(collider == null)
+            return;
+        OBBCollider o = collider;
+        do{
+            o.setUseOBB(flag);
+            o = o.getNext();
+        }while(o != null);
     }
     public void setPhysicsObject(PhysicsObject object){
         this.po = object;
@@ -72,6 +88,18 @@ public class GameObject implements FrameListener{
     }
     public void setCollisionListener(CollisionListener cl){
         this.cl = cl;
+    }
+    public void collEnter(ACollider col,GameObject owner){
+        if(cl != null)
+            cl.collEnter(col,owner);
+    }
+    public void collExit(ACollider col,GameObject owner){
+        if(cl != null)
+            cl.collExit(col,owner);
+    }
+    public void collStay(ACollider col,GameObject owner){
+        if(cl != null)
+            cl.collStay(col,owner);
     }
     public Vector getRot(){
         return rot;

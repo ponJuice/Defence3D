@@ -167,9 +167,9 @@ public class Button extends Image {
             }else{
                 this.touch = null;
             }
-            return through;
+            return true;
         }
-        Log.d("button touch pos", "device pos:" + "(" + touch.getPosition(Touch.Pos_Flag.X) + "," + touch.getPosition(Touch.Pos_Flag.Y) + ")" + "camera pos:(" + x + "," + y + ") delta:"+touch.getDelta(Touch.Pos_Flag.X)+","+touch.getDelta(Touch.Pos_Flag.Y)+")");
+        //Log.d("button touch pos", "device pos:" + "(" + touch.getPosition(Touch.Pos_Flag.X) + "," + touch.getPosition(Touch.Pos_Flag.Y) + ")" + "camera pos:(" + x + "," + y + ") delta:"+touch.getDelta(Touch.Pos_Flag.X)+","+touch.getDelta(Touch.Pos_Flag.Y)+")");
         if(touch.getTouchID() != -1 && rect.contains(x,y)){
             if(state == BUTTON_STATE.NON) {
                 state = BUTTON_STATE.DOWN;
@@ -188,6 +188,8 @@ public class Button extends Image {
             }
         }
         if(state == BUTTON_STATE.NON)
+            return true;
+        else if(touch.getTouchID() == -1)
             return true;
         else
             return through;

@@ -1,5 +1,6 @@
 package jp.ac.dendai.c.jtp.Game;
 
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
@@ -13,7 +14,9 @@ import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 public class Player extends GameObject implements Touchable{
     protected GameObject[] parts;
     protected Vector3 direct;
+    protected GameObject bullet;
     protected float radius = 1f;
+    protected float lookRadius = 10f;
     protected float[] p = {0,0,0,1f};
     protected float[] l = {0,0,0,1f};
     protected float[] t = new float[16];
@@ -40,12 +43,15 @@ public class Player extends GameObject implements Touchable{
     }
 
     public boolean touch(Touch touch){
-        if(this.touch == null && touch.getTouchID() == -1)
-            return true;
         if(this.touch == null)
             this.touch = touch;
-        else if(this.touch != touch || this.touch.getTouchID() == -1)
+        if(this.touch.getTouchID() == -1) {
+            this.touch = null;
             return true;
+        }
+        if(this.touch != touch)
+            return true;
+
         rot.setY(rot.getY() + this.touch.getDelta(Touch.Pos_Flag.X)/10f);
         rot.setX(rot.getX() + this.touch.getDelta(Touch.Pos_Flag.Y)/10f);
 
@@ -53,6 +59,24 @@ public class Player extends GameObject implements Touchable{
         parts[1].getRot().setY(rot.getY());
         parts[1].getRot().setX(rot.getX());
         return through;
+    }
+
+    public void setBullte(GameObject bullet){
+        this.bullet = bullet;
+    }
+
+    public void attack(){
+        if(bullet == null)
+            return;
+        bullet.getPos().copy(pos);
+        bullet.getPhysicsObject().velocity.setX(l[0]);
+        bullet.getPhysicsObject().velocity.setY(l[1]);
+        bullet.getPhysicsObject().velocity.setZ(l[2]);
+        bullet.getPhysicsObject().velocity.sub(pos);
+        bullet.getPhysicsObject().velocity.normalize();
+        bullet.getPhysicsObject().velocity.scalarMult(50f);
+        bullet.getPhysicsObject().freeze = false;
+        bullet.getRenderMediator().isDraw = true;
     }
 
     @Override
@@ -69,14 +93,14 @@ public class Player extends GameObject implements Touchable{
         this.camera = camera;
     }
     public void proc(){
-        p[0] = pos.getX() + direct.getX()*radius;
-        p[1] = pos.getY() + direct.getY()*radius;
-        p[2] = pos.getZ() + direct.getZ()*radius;
+        p[0] = direct.getX()*radius;
+        p[1] = direct.getY()*radius;
+        p[2] = direct.getZ()*radius;
         p[3] = 1f;
 
-        l[0] = pos.getX();
-        l[1] = pos.getY() + direct.getY()*radius;
-        l[2] = pos.getZ();
+        l[0] = 0;
+        l[1] = 0;
+        l[2] = lookRadius - pos.getZ();
         l[3] = 1f;
 
         Matrix.setIdentityM(t,0);
@@ -85,6 +109,13 @@ public class Player extends GameObject implements Touchable{
 
         Matrix.multiplyMV(p,0,t,0,p,0);
         Matrix.multiplyMV(l,0,t,0,l,0);
+
+        l[0] += pos.getX();
+        l[1] += pos.getY();
+
+        p[0] += pos.getX();
+        p[1] += pos.getY();
+        p[2] += pos.getZ();
 
         camera.setPosition(p[0],p[1],p[2]);
         camera.setLookPosition(l[0],l[1],l[2]);

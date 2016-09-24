@@ -16,9 +16,9 @@ public class AABBCollider extends ACollider {
         this.depth = depth;
     }
 
+
     @Override
-    public void debugDraw(Shader shader, GameObject pos) {
+    public void debugDraw() {
 
     }
-
 }

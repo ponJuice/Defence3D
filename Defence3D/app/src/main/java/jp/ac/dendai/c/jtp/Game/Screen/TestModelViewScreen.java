@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
+import jp.ac.dendai.c.jtp.Game.Enemy.Inveder;
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Game.Player;
@@ -66,13 +67,19 @@ public class TestModelViewScreen extends Screenable {
         box = WavefrontObjConverter.createModel("untitled.obj");
         inveder = WavefrontObjConverter.createModel("inveder.obj");
 
-        ob1 = new GameObject();
+        PhysicsInfo info = new PhysicsInfo();
+        info.enabled = true;
+        info.gravity = new Vector3(0,-9.8f,0);
+        info.maxObject = 10;
+        physics = new Physics3D(info);
+
+        /*ob1 = new GameObject();
         ob1.setName("ob1");
-        ob1.getRenderMediator().mesh = box;//inveder;
+        ob1.getRenderMediator().mesh = inveder;
         ob1.getRenderMediator().isDraw = true;
         ob1.getPos().setZ(5f);
-        OBBCollider col = new OBBCollider(0,0,0,1,1,1);//(0,0.49273f,0,1.6282f/2f,0.7141f/2f,0.13568f/2f);
-        col.setNext(new OBBCollider(0,0,0,1,1,1));//(0,0.474895f,0,1.08548f/2f,0.94979f/2f,0.13568f/2f));
+        OBBCollider col = new OBBCollider(0,0.49273f,0,1.6282f/2f,0.7141f/2f,0.13568f/2f);
+        col.setNext(new OBBCollider(0,0.474895f,0,1.08548f/2f,0.94979f/2f,0.13568f/2f));
         col.setUseOBB(true);
         ob1.setCollider(col);
         ob1.setPhysicsObject(new PhysicsObject(ob1));
@@ -95,9 +102,36 @@ public class TestModelViewScreen extends Screenable {
                 Log.d("Collision!!",owner.getName()+" to "+col.getGameObject().getName());
             }
         });
-        ob1.getScl().setX(0.5f);
-        ob1.getScl().setY(0.5f);
-        ob1.getScl().setZ(0.5f);
+        ob1.getScl().setX(1f);
+        ob1.getScl().setY(1f);
+        ob1.getScl().setZ(1f);
+        ob1.setDebugDraw(true);*/
+        ob1 = new Inveder(physics);
+        ob1.setName("ob1");
+        ob1.getRenderMediator().mesh = inveder;
+        ob1.getRenderMediator().isDraw = true;
+        ob1.getPos().setZ(5f);
+        ob1.setCollisionListener(new CollisionListener() {
+            @Override
+            public void collEnter(ACollider col,GameObject owner) {
+                ob1.getRenderMediator().alpha = 0.5f;
+            }
+
+            @Override
+            public void collExit(ACollider col,GameObject owner) {
+                ob1.getRenderMediator().alpha = 1f;
+            }
+
+            @Override
+            public void collStay(ACollider col,GameObject owner) {
+                Log.d("Collision!!",owner.getName()+" to "+col.getGameObject().getName());
+            }
+        });
+        ob1.getScl().setX(1f);
+        ob1.getScl().setY(1f);
+        ob1.getScl().setZ(1f);
+        ob1.setDebugDraw(true);
+        ob1.useOBB(false);
 
 
         ob2 = new GameObject();
@@ -105,8 +139,8 @@ public class TestModelViewScreen extends Screenable {
         ob2.getRenderMediator().mesh = box;
         ob2.getRenderMediator().isDraw = true;
         ob2.getPos().setZ(5f);
-        ob2.getPos().setX(2.1f);
-        col = new OBBCollider(0,0,0,1,1,1);
+        ob2.getPos().setX(2.5f);
+        OBBCollider col = new OBBCollider(0,0,0,1,1,1);
         col.setUseOBB(true);
         ob2.setCollider(col);
         ob2.setPhysicsObject(new PhysicsObject(ob2));
@@ -131,13 +165,8 @@ public class TestModelViewScreen extends Screenable {
                 Log.d("Collision!!",owner.getName()+" to "+col.getGameObject().getName());
             }
         });
-
-        PhysicsInfo info = new PhysicsInfo();
-        info.enabled = true;
-        info.gravity = new Vector3(0,-9.8f,0);
-        info.maxObject = 10;
-        physics = new Physics3D(info);
-        physics.addObject(ob1.getPhysicsObject());
+        ob2.setDebugDraw(true);
+        ob2.useOBB(false);
         physics.addObject(ob2.getPhysicsObject());
 
         //スライダーの作成
@@ -296,6 +325,9 @@ public class TestModelViewScreen extends Screenable {
         Camera testCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,0,0,0, 1);
         testCamera.setFar(1000f);
         testCamera.setNear(0.01f);
+
+        Constant.setDebugModel(box);
+        Constant.setDebugCamera(testCamera);
     }
 
     @Override
@@ -318,6 +350,7 @@ public class TestModelViewScreen extends Screenable {
         testRenderer.drawAll();
         alphaRenderer.drawAll();
         uiRenderer.drawAll();
+        //Constant.debugDraw(0,0,0,1,1,1,0,0,0,1);
     }
 
     @Override

@@ -1,15 +1,19 @@
 package jp.ac.dendai.c.jtp.Game;
 
 import android.graphics.Bitmap;
+import android.opengl.GLES20;
 
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Camera.UiCamera;
+import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
+import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
 import jp.ac.dendai.c.jtp.defence3d.R;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
+import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by Goto on 2016/07/08.
@@ -36,9 +40,29 @@ public class Constant {
     protected static Camera activeUiCamera;
     protected static UiShader loadingShader;
     protected static Shader uiShader,diffuseShader;
+    protected static Mesh debugModel;
+    protected static Camera debugCamera;
 
     public static UiShader getLoadingShader(){
         return loadingShader;
+    }
+
+    public static void setDebugModel(Mesh mesh){
+        debugModel = mesh;
+    }
+
+    public static void setDebugCamera(Camera c){
+        debugCamera = c;
+    }
+
+    public static void debugDraw(float x,float y,float z,float lx,float ly,float lz,float dx,float dy,float dz,float alpha){
+        //GLES20.glDepthMask(false);
+        diffuseShader.useShader();
+        diffuseShader.updateCamera();
+        GLES20.glDepthMask(false);
+        diffuseShader.draw(debugModel,x,y,z,lx,ly,lz,dx,dy,dz,alpha, GLES20COMPOSITIONMODE.ALPHA);
+        GLES20.glDepthMask(true);
+        //GLES20.glDepthMask(true);
     }
 
     public static Camera getActiveUiCamera(){

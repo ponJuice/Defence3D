@@ -13,6 +13,11 @@ public abstract class Vector {
     public abstract float getZ();
     public abstract void add(Vector vec);
     public abstract void add(float scalar);
+    public void add(float[] scalar){
+        setX(getX() + scalar[0]);
+        setY(getY() + scalar[1]);
+        setZ(getZ() + scalar[2]);
+    }
     public abstract void sub(Vector vec);
     public abstract void sub(float scalar);
     public abstract void scalarMult(float scalar);

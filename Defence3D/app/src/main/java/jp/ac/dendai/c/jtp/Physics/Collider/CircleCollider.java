@@ -20,15 +20,7 @@ public class CircleCollider extends ACollider{
     }
 
     @Override
-    public void debugDraw(Shader shader, GameObject pos) {
-        shader.draw(debug
-                ,pos.getPos().getX()
-                ,pos.getPos().getY()
-                ,pos.getPos().getZ()
-                ,radius
-                ,radius
-                ,radius
-                ,0,0,0
-                ,0.5f, GLES20COMPOSITIONMODE.ALPHA);
+    public void debugDraw() {
+
     }
 }
