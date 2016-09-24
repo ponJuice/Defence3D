@@ -15,6 +15,7 @@ import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
  */
 public class Physics3D implements Physics {
     private String name;
+    protected float x,y,z;  //演算を行うバンディボックス（これを出たオブジェクトはfreezeされる）
     class PhysicsItem{
         public Physics3D owner;
         public PhysicsItem next,prev;
@@ -38,6 +39,9 @@ public class Physics3D implements Physics {
         buffer = new Vector3();
         ite = createRingBuffer();
         objects = new PhysicsItem[info.maxObject];
+        x = info.bx;
+        y = info.by;
+        z = info.bz;
         PhysicsItem temp = ite;
         for(int n = 0;n < info.maxObject;n++){
             objects[n] = temp;
@@ -114,20 +118,13 @@ public class Physics3D implements Physics {
     public void preparation(){
         PhysicsItem temp = ite;
         do{
-            if(temp.object != null &&!temp.object.freeze) {
+            if(temp.object != null && !temp.object.freeze) {
                 temp.object.bufferVelocity.zeroReset();
                 temp.object.bufferPos.zeroReset();
                 temp.object.bufferRot.zeroReset();
                 temp.object.bufferScl.zeroReset();
                 //OBBを回転させる
                 OBBCollider t = temp.object.gameObject.getCollider();
-                do{
-                    t.calcRotate();
-                    if(t.getDebugDraw()){
-                        t.debugDraw();
-                    }
-                    t = t.getNext();
-                }while(t != null);
             }
             temp = temp.prev;
         }while(temp != ite);
@@ -146,22 +143,56 @@ public class Physics3D implements Physics {
         }while(temp != ite);
     }
 
+    /**
+     * バウンディングボックスの中にあるかどうかを判定します
+     * @param po
+     * @return　入っている:true--入っていない:false
+     */
+    public boolean inBoundry(PhysicsObject po) {
+        if (-x > po.gameObject.getPos().getX() || po.gameObject.getPos().getX() > x) {
+            return false;
+        } else if (-y > po.gameObject.getPos().getY() || po.gameObject.getPos().getY() > y) {
+            return false;
+        }else if( -z > po.gameObject.getPos().getZ() || po.gameObject.getPos().getZ() > z){
+            return false;
+        }
+        return true;
+    }
+
+
     @Override
     public void physicsProc(float deltaTime) {
         //あたり判定のみ今は実装
+        int count = 0;
         for(int n = 0;n < info.maxObject;n++){
             for(int m = 1+n;m < info.maxObject;m++){
                 if(objects[n].object == null)
                     break;
                 if(objects[m].object == null)
                     continue;
+
                 PhysicsObject A = objects[n].object;
                 PhysicsObject B = objects[m].object;
 
+                if(A.freeze || B.freeze || ((B.mask & A.tag) == 0 && (A.mask & B.tag) == 0))
+                    break;
+
+                if(!inBoundry(objects[n].object)){
+                    objects[n].object.freeze = true;
+                    objects[n].object.gameObject.getRenderMediator().isDraw = false;
+                    break;
+                }
+                if(!inBoundry(objects[m].object)){
+                    objects[m].object.freeze = true;
+                    objects[m].object.gameObject.getRenderMediator().isDraw = false;
+                    continue;
+                }
+
                 //衝突判定
 
-                if(OBBCollider.isCollisionAABB(A.gameObject.getCollider(),B.gameObject.getCollider()) && OBBCollider.isCollision(A.gameObject.getCollider(),B.gameObject.getCollider())){
-                    if(!A.freeze && (A.mask & B.tag) >= 1) {
+                if(OBBCollider.isCollisionAABB(A.gameObject.getCollider(),B.gameObject.getCollider())
+                        && OBBCollider.isCollision(A.gameObject.getCollider(),B.gameObject.getCollider())){
+                    if((A.mask & B.tag) >= 1) {
                         if (A.collisionMode == PhysicsObject.COLLISION.NON) {
                             //始めて接触した→STAYに移行
                                 A.gameObject.collEnter(B.gameObject.getCollider(),A.gameObject);
@@ -171,7 +202,7 @@ public class Physics3D implements Physics {
                             A.gameObject.collStay(B.gameObject.getCollider(),A.gameObject);
                         }
                     }
-                    if(!B.freeze && (B.mask & A.tag) >= 1) {
+                    if((B.mask & A.tag) >= 1) {
                         if (B.collisionMode == PhysicsObject.COLLISION.NON) {
                             //始めて接触した→STAYに移行
                                 B.gameObject.collEnter(A.gameObject.getCollider(),B.gameObject);
@@ -193,8 +224,10 @@ public class Physics3D implements Physics {
                         B.collisionMode = PhysicsObject.COLLISION.NON;
                     }
                 }
+                count++;
             }
         }
+        //Log.d("Physics Object Count","count;"+count);
     }
 
     @Override
@@ -240,6 +273,6 @@ public class Physics3D implements Physics {
         float ph = (float)(physics_end - external_end)/1000f;
         float up = (float)(update_end - physics_end)/1000f;
 
-        Log.d("pipline","pre:"+pre+" ex:"+ex+" ph:"+ph+" up:"+up);
+        //Log.d("pipline","pre:"+pre+" ex:"+ex+" ph:"+ph+" up:"+up);
     }
 }

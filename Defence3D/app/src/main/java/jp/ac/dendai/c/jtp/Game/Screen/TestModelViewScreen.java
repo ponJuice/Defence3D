@@ -140,6 +140,7 @@ public class TestModelViewScreen extends Screenable {
         ob2.getRenderMediator().isDraw = true;
         ob2.getPos().setZ(5f);
         ob2.getPos().setX(2.5f);
+        ob2.getScl().setY(0.5f);
         OBBCollider col = new OBBCollider(0,0,0,1,1,1);
         col.setUseOBB(true);
         ob2.setCollider(col);
@@ -165,7 +166,7 @@ public class TestModelViewScreen extends Screenable {
                 Log.d("Collision!!",owner.getName()+" to "+col.getGameObject().getName());
             }
         });
-        ob2.setDebugDraw(true);
+        ob2.setDebugDraw(false);
         ob2.useOBB(false);
         physics.addObject(ob2.getPhysicsObject());
 

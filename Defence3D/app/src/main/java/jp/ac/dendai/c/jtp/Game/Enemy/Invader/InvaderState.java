@@ -19,6 +19,7 @@ public class InvaderState {
     private INVADERSTATE state;
     private InvaderLRMoveState lr_move;
     private InvaderFrontMoveState front_move;
+    private InvaderStopMoveState stop_move;
     private EnemysState now;
     private GameObject[] target;
     public InvaderState(GameObject[] t){
@@ -41,6 +42,7 @@ public class InvaderState {
                 now.init();
             }
         });
+        stop_move = new InvaderStopMoveState();
         now = lr_move;
     }
     public void changeState(INVADERSTATE state){

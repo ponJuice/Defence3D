@@ -1,15 +1,9 @@
 package jp.ac.dendai.c.jtp.Game;
 
-import android.util.Log;
-
 import jp.ac.dendai.c.jtp.Graphics.Renderer.RenderMediator;
-import jp.ac.dendai.c.jtp.Graphics.Renderer.Renderer;
-import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Math.Vector;
 import jp.ac.dendai.c.jtp.Math.Vector3;
-import jp.ac.dendai.c.jtp.Physics.Collider.AABBCollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
-import jp.ac.dendai.c.jtp.Physics.Collider.CircleCollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
@@ -30,6 +24,10 @@ public class GameObject implements FrameListener{
         rot = new Vector3();
         scl = new Vector3(1,1,1);
 
+        init();
+    }
+
+    protected void init(){
         //物理オブジェクト
         po = new PhysicsObject(this);
         po.mass = 1;
@@ -41,10 +39,18 @@ public class GameObject implements FrameListener{
         rm.gameObject = this;
         rm.alpha = 1.0f;
     }
+
     public void setDebugDraw(boolean flag){
+        if(collider == null)
+            return;
+        OBBCollider o = collider;
+        while(o != null){
+            o.setDebugDraw(flag);
+            o = o.getNext();
+        };
         debugDraw = flag;
     }
-    public boolean getDebugDraw(){
+    public boolean isDebugDraw(){
         return debugDraw;
     }
     public void useOBB(boolean flag){

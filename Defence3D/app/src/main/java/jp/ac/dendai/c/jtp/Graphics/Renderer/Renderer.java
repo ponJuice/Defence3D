@@ -96,7 +96,7 @@ public class Renderer extends ARenderer {
             if(temp.rm != null && temp.rm.isDraw) {
                 temp.rm.draw();
             }
-            if(temp.rm != null && temp.rm.gameObject.getDebugDraw()){
+            if(temp.rm != null && temp.rm.gameObject.isDebugDraw()){
                 if(temp.rm.gameObject.getCollider() != null){
                     OBBCollider o = temp.rm.gameObject.getCollider();
                     do{
@@ -108,6 +108,6 @@ public class Renderer extends ARenderer {
             temp = temp.prev;
         }while(temp != null && temp != ite);
         float t = (float)(System.currentTimeMillis() - start)/1000f;
-        Log.d("Renderer","rendering time:"+t);
+        //Log.d("Renderer","rendering time:"+t);
     }
 }

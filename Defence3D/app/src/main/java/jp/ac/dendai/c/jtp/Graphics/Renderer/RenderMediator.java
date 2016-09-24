@@ -2,6 +2,7 @@ package jp.ac.dendai.c.jtp.Graphics.Renderer;
 
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
+import jp.ac.dendai.c.jtp.Graphics.Renderer.ARenderer;
 import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 

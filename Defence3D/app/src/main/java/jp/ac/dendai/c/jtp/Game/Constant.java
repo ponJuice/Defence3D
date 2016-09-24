@@ -3,6 +3,9 @@ package jp.ac.dendai.c.jtp.Game;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
 
+import java.util.Random;
+
+import jp.ac.dendai.c.jtp.Game.Bullet.BulletTemplate;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Camera.UiCamera;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
@@ -11,6 +14,7 @@ import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
+import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsInfo;
 import jp.ac.dendai.c.jtp.defence3d.R;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
@@ -32,6 +36,10 @@ public class Constant {
     public static Bitmap tex_chash;
     public static final int COLLISION_PLAYERBULLET = 1;
     public static final int COLLISION_ENEMY = 2;
+    public static final int COLLISION_PLAYDER = 3;
+    public static final int COLLISION_ENEMYBULLET = 4;
+    private static PhysicsInfo pi;
+    private static Random ram;
     private static float sens = 1.0f;
     public static void setSens(float n){ sens = n;}
     public static float getSens(){return sens;}
@@ -42,6 +50,14 @@ public class Constant {
     protected static Shader uiShader,diffuseShader;
     protected static Mesh debugModel;
     protected static Camera debugCamera;
+
+    public static void setPhysicsInfo(PhysicsInfo _pi){
+        pi = _pi;
+    }
+
+    public static PhysicsInfo getPhysicsInfo(){
+        return pi;
+    }
 
     public static UiShader getLoadingShader(){
         return loadingShader;
@@ -65,6 +81,10 @@ public class Constant {
         //GLES20.glDepthMask(true);
     }
 
+    public static Random getRandom(){
+        return ram;
+    }
+
     public static Camera getActiveUiCamera(){
         return activeUiCamera;
     }
@@ -80,6 +100,8 @@ public class Constant {
             system_button = GLES20Util.loadBitmap(R.mipmap.button);
         if(black == null)
             black = GLES20Util.createBitmap(255,0,0,0);
+
+        ram = new Random();
 
         //カメラ
         activeUiCamera = new UiCamera();

@@ -65,5 +65,6 @@ public class InvaderLRMoveState extends EnemysState {
         }
         def_pos = def_pos + (count_clamp - moveCount/2) * 2f;
         enemy.getPos().setX(def_pos);
+        enemy.update();
     }
 }

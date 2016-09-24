@@ -11,9 +11,13 @@ public class PhysicsInfo {
     public Vector gravity;
     public int maxObject;
     public boolean enabled;
+    public float bx,by,bz;
     public PhysicsInfo(){
         gravity = new Vector3();
         maxObject = 10;
         enabled = true;
+        bx = 100;
+        by = 100;
+        bz = 100;
     }
 }

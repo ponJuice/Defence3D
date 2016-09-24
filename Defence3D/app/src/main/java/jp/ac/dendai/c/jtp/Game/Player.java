@@ -5,7 +5,10 @@ import android.opengl.Matrix;
 
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
+import jp.ac.dendai.c.jtp.Graphics.Renderer.PlayerRenderMediator;
 import jp.ac.dendai.c.jtp.Math.Vector3;
+import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
+import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 
 /**
@@ -23,15 +26,38 @@ public class Player extends GameObject implements Touchable{
     protected boolean through;
     protected Touch touch;
     protected Camera camera;
+    protected float speed = 10f;
 
     public Player(GameObject[] parts){
+        this.parts = parts;
         direct = new Vector3(0,1f,-5f);
         direct.normalize();
-        this.parts = parts;
         for(int n = 0;n < parts.length;n++){
             parts[n].pos = this.pos;
             parts[n].scl = this.scl;
         }
+
+        rm = new PlayerRenderMediator(this);
+        rm.gameObject = this;
+
+        po = new PhysicsObject(this);
+        po.useGravity = false;
+        po.tag = Constant.COLLISION_PLAYDER;
+        po.mask = Constant.COLLISION_ENEMYBULLET;
+        po.freeze = false;
+        setCollider(new OBBCollider(0 ,0.2706f ,0 ,0.5412f ,0.46234f,1.07303f));
+    }
+
+    @Override
+    protected void init(){
+    }
+
+    public GameObject[] getParts(){
+        return parts;
+    }
+
+    public void testSetBulletSpeed(float s){
+        speed = s;
     }
 
     public void setRadius(float r){
@@ -69,12 +95,13 @@ public class Player extends GameObject implements Touchable{
         if(bullet == null)
             return;
         bullet.getPos().copy(pos);
+        bullet.getRot().copy(rot);
         bullet.getPhysicsObject().velocity.setX(l[0]);
         bullet.getPhysicsObject().velocity.setY(l[1]);
         bullet.getPhysicsObject().velocity.setZ(l[2]);
         bullet.getPhysicsObject().velocity.sub(pos);
         bullet.getPhysicsObject().velocity.normalize();
-        bullet.getPhysicsObject().velocity.scalarMult(50f);
+        bullet.getPhysicsObject().velocity.scalarMult(speed);
         bullet.getPhysicsObject().freeze = false;
         bullet.getRenderMediator().isDraw = true;
     }

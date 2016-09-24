@@ -49,5 +49,6 @@ public class InvaderFrontMoveState extends EnemysState {
         float def_pos = def_z_pos - _n  * 5f - 5f * count;
 
         enemy.getPos().setZ(def_pos);
+        enemy.update();
     }
 }

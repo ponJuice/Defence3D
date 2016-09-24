@@ -93,22 +93,16 @@ public class OBBCollider extends ACollider{
         float a_to_b_y = Math.abs((A.gameObject.getPos().getY()+A.offset[1]) - (B.gameObject.getPos().getY()+B.offset[1]));
         float a_to_b_z = Math.abs((A.gameObject.getPos().getZ()+A.offset[2]) - (B.gameObject.getPos().getZ()+B.offset[2]));
 
-        Log.d("AABB","offset x:"+A.offset[0]+" y:"+A.offset[1]+" z:"+A.offset[2]);
+        //Log.d("AABB","offset x:"+A.offset[0]+" y:"+A.offset[1]+" z:"+A.offset[2]);
 
-        float width_mul_2_A = Math.abs(Vector.dot_axis(A.directs[0],1,0,0)) + Math.abs(Vector.dot_axis(A.directs[1],1,0,0)) + Math.abs(Vector.dot_axis(A.directs[2],1,0,0));
-        width_mul_2_A *= A.gameObject.getScl().getX() * A.base_length[0];
-        float width_mul_2_B = Math.abs(Vector.dot_axis(B.directs[0],1,0,0)) + Math.abs(Vector.dot_axis(B.directs[1],1,0,0)) + Math.abs(Vector.dot_axis(B.directs[2],1,0,0));
-        width_mul_2_B *= B.gameObject.getScl().getX() * B.base_length[0];
+        float width_mul_2_A = calcAABB(1,0,0,A);
+        float width_mul_2_B = calcAABB(1,0,0,B);
 
-        float height_mul_2_A = Math.abs(Vector.dot_axis(A.directs[0],0,1,0)) + Math.abs(Vector.dot_axis(A.directs[1],0,1,0)) + Math.abs(Vector.dot_axis(A.directs[2],0,1,0));
-        height_mul_2_A *= A.gameObject.getScl().getY() * A.base_length[1];
-        float height_mul_2_B = Math.abs(Vector.dot_axis(B.directs[0],0,1,0)) + Math.abs(Vector.dot_axis(B.directs[1],0,1,0)) + Math.abs(Vector.dot_axis(B.directs[2],0,1,0));
-        height_mul_2_B *= B.gameObject.getScl().getY() * B.base_length[1];
+        float height_mul_2_A = calcAABB(0,1,0,A);
+        float height_mul_2_B = calcAABB(0,1,0,B);
 
-        float depth_mul_2_A = Math.abs(Vector.dot_axis(A.directs[0],0,0,1)) + Math.abs(Vector.dot_axis(A.directs[1],0,0,1)) + Math.abs(Vector.dot_axis(A.directs[2],0,0,1));
-        depth_mul_2_A *= A.gameObject.getScl().getZ() * A.base_length[2];
-        float depth_mul_2_B = Math.abs(Vector.dot_axis(B.directs[0],0,0,1)) + Math.abs(Vector.dot_axis(B.directs[1],0,0,1)) + Math.abs(Vector.dot_axis(B.directs[2],0,0,1));
-        depth_mul_2_B *= B.gameObject.getScl().getZ() * B.base_length[2];
+        float depth_mul_2_A = calcAABB(0,0,1,A);
+        float depth_mul_2_B = calcAABB(0,0,1,B);
 
         boolean x_flag = (width_mul_2_A + width_mul_2_B) >= a_to_b_x;
         boolean y_flag = (height_mul_2_A + height_mul_2_B) >= a_to_b_y;
@@ -118,10 +112,41 @@ public class OBBCollider extends ACollider{
 
     @Override
     public void debugDraw(){
-        Constant.debugDraw(gameObject.getPos().getX() + offset[0],gameObject.getPos().getY() + offset[1],gameObject.getPos().getZ() + offset[2]
-                        ,base_length[0] * gameObject.getScl().getX(),base_length[1] * gameObject.getScl().getY(),base_length[2] * gameObject.getScl().getZ()
-                        ,gameObject.getRot().getX(),gameObject.getRot().getY(),gameObject.getRot().getZ()
-                        ,1);
+        if(!isDebugDraw)
+            return;
+        if(useOBB) {
+            Constant.debugDraw(gameObject.getPos().getX() + offset[0], gameObject.getPos().getY() + offset[1], gameObject.getPos().getZ() + offset[2]
+                    , base_length[0] * gameObject.getScl().getX(), base_length[1] * gameObject.getScl().getY(), base_length[2] * gameObject.getScl().getZ()
+                    , gameObject.getRot().getX(), gameObject.getRot().getY(), gameObject.getRot().getZ()
+                    , 1);
+        }else{
+
+            float width_mul_2_A = calcAABB(1,0,0,this);/*Math.abs(Vector.dot_axis(directs[0],1,0,0)) * gameObject.getScl().getX() * base_length[0]
+                    + Math.abs(Vector.dot_axis(directs[1],1,0,0)) * gameObject.getScl().getY() * base_length[1]
+                    + Math.abs(Vector.dot_axis(directs[2],1,0,0)) * gameObject.getScl().getZ() * base_length[2];*/
+
+            float height_mul_2_A = calcAABB(0,1,0,this);/*Math.abs(Vector.dot_axis(directs[0],0,1,0)) * gameObject.getScl().getX() * base_length[0]
+                    + Math.abs(Vector.dot_axis(directs[1],0,1,0)) * gameObject.getScl().getY() * base_length[1]
+                    + Math.abs(Vector.dot_axis(directs[2],0,1,0)) * gameObject.getScl().getZ() * base_length[2];*/
+
+            float depth_mul_2_A = calcAABB(0,0,1,this);/*Math.abs(Vector.dot_axis(directs[0],0,0,1)) * gameObject.getScl().getX() * base_length[0]
+                    + Math.abs(Vector.dot_axis(directs[1],0,0,1)) * gameObject.getScl().getY() * base_length[1]
+                    + Math.abs(Vector.dot_axis(directs[2],0,0,1)) * gameObject.getScl().getZ() * base_length[2];*/
+
+            Constant.debugDraw(gameObject.getPos().getX() + offset[0], gameObject.getPos().getY() + offset[1], gameObject.getPos().getZ() + offset[2]
+                    , width_mul_2_A, height_mul_2_A,depth_mul_2_A
+                    ,0,0,0
+                    , 0.5f);
+
+            /*Constant.debugDraw(gameObject.getPos().getX(),gameObject.getPos().getY(),gameObject.getPos().getZ(),
+                    1,1,1,0,0,0,1);*/
+        }
+    }
+
+    public static float calcAABB(float axis_x,float axis_y,float axis_z,OBBCollider col){
+        return Math.abs(Vector.dot_axis(col.directs[0],axis_x,axis_y,axis_z)) * col.gameObject.getScl().getX() * col.base_length[0]
+                + Math.abs(Vector.dot_axis(col.directs[1],axis_x,axis_y,axis_z)) * col.gameObject.getScl().getY() * col.base_length[1]
+                + Math.abs(Vector.dot_axis(col.directs[2],axis_x,axis_y,axis_z)) * col.gameObject.getScl().getZ() * col.base_length[2];
     }
 
     public float[] getOffset(){

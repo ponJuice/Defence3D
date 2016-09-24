@@ -1,6 +1,7 @@
 package jp.ac.dendai.c.jtp.Game.Screen;
 
 import android.graphics.Bitmap;
+import android.provider.Settings;
 import android.util.Log;
 
 import javax.microedition.khronos.opengles.GL;
@@ -28,15 +29,20 @@ import jp.ac.dendai.c.jtp.Graphics.UI.Button.ButtonListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.Slider;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.SliderChangeValueListener;
+import jp.ac.dendai.c.jtp.Graphics.UI.Text.NumberText;
+import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIObserver;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontMtlReader;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
+import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
+import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
 import jp.ac.dendai.c.jtp.Physics.Physics.Physics;
 import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsInfo;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
+import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsThread;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 import jp.ac.dendai.c.jtp.defence3d.R;
@@ -60,10 +66,14 @@ public class TestGameScreen extends Screenable {
     private EnemyObserver eo;
     private Player player;
     private Bitmap buttonImage;
-    private Slider angle;
+    private Slider angle,speedSlider;
     private Physics3D physics;
     private GameObject testBullet;
     private UIObserver uiObserver;
+    private NumberText speedText;
+    private StaticText attack;
+    private PhysicsThread physicsThread;
+    private GameObject bullet;
 
     public TestGameScreen(){
         mainCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,-5f,0,0,0);
@@ -78,7 +88,13 @@ public class TestGameScreen extends Screenable {
         pi.gravity.setY(-9.8f);
         pi.maxObject = 100;
         pi.enabled = true;
+        pi.bx = 100f;
+        pi.by = 100f;
+        pi.bz = 100f;
+        Constant.setPhysicsInfo(pi);
         physics = new Physics3D(pi);
+
+        physicsThread = new PhysicsThread(physics);
 
         inveder_model = WavefrontObjConverter.createModel("inveder.obj");
         houdai_model = WavefrontObjConverter.createModel("houdai.obj");
@@ -98,8 +114,14 @@ public class TestGameScreen extends Screenable {
         player.setCamera(mainCamera);
         player.getPos().setY(0.4f);
         player.setRadius(5f);
-        renderer.addItem(parts[0]);
-        renderer.addItem(parts[1]);
+        //player.setDebugDraw(true);
+        player.useOBB(false);
+
+        physics.addObject(player.getPhysicsObject());
+
+        renderer.addItem(player);
+        //renderer.addItem(parts[0]);
+        //renderer.addItem(parts[1]);
 
         uiObserver = new UIObserver();
 
@@ -113,31 +135,76 @@ public class TestGameScreen extends Screenable {
         testBullet.getRenderMediator().mesh = bullet_model;
         testBullet.getRenderMediator().isDraw = false;
         testBullet.setPhysicsObject(new PhysicsObject(testBullet));
-        testBullet.getPhysicsObject().mask = Constant.COLLISION_ENEMY;
-        testBullet.getPhysicsObject().tag = Constant.COLLISION_PLAYERBULLET;
         testBullet.getPhysicsObject().useGravity = true;
         testBullet.getPhysicsObject().freeze = true;
+        testBullet.getPhysicsObject().useGravity = true;
+        testBullet.getPhysicsObject().tag = Constant.COLLISION_PLAYERBULLET;
+        testBullet.getPhysicsObject().mask = Constant.COLLISION_ENEMY | Constant.COLLISION_ENEMYBULLET;
         testBullet.setCollider(new OBBCollider(0,0,0,1,1,1));
         testBullet.getScl().setX(0.1f);
         testBullet.getScl().setY(0.1f);
         testBullet.getScl().setZ(0.1f);
+        testBullet.setDebugDraw(false);
+        testBullet.useOBB(false);
         player.setBullte(testBullet);
-
         physics.addObject(testBullet.getPhysicsObject());
         renderer.addItem(testBullet);
 
-        BulletTemplate bt = new BulletTemplate(bullet_model,new OBBCollider(0,0,0,1,1,1),1f);
+        bullet= new GameObject();
+        bullet.getRenderMediator().mesh = bullet_model;
+        bullet.getRenderMediator().isDraw = false;
+        bullet.setPhysicsObject(new PhysicsObject(bullet));
+        bullet.getPhysicsObject().mask = Constant.COLLISION_PLAYDER | Constant.COLLISION_PLAYERBULLET;
+        bullet.getPhysicsObject().tag = Constant.COLLISION_ENEMYBULLET;
+        bullet.getPhysicsObject().useGravity = true;
+        bullet.getPhysicsObject().freeze = true;
+        bullet.getPhysicsObject().useGravity = true;
+        bullet.setCollider(new OBBCollider(0,0,0,1,1,1));
+        bullet.setDebugDraw(false);
+        bullet.useOBB(false);
+        bullet.getScl().setX(0.2f);
+        bullet.getScl().setY(0.2f);
+        bullet.getScl().setZ(0.2f);
+        physics.addObject(bullet.getPhysicsObject());
+        renderer.addItem(bullet);
 
-        inveders = new Inveder[55];
+        GameObject[] attackTarget = new GameObject[1];
+        attackTarget[0] = player;
+
+        int array_length = 55;
+        inveders = new Inveder[array_length];
         for(int n = 0;n < inveders.length;n++){
             inveders[n] = new Inveder(physics);
+            ((Inveder)inveders[n]).setBullets(bullet);
+            ((Inveder)inveders[n]).setTargetList(attackTarget);
             inveders[n].getRenderMediator().mesh = inveder_model;
             inveders[n].getRenderMediator().isDraw = true;
             inveders[n].getPos().setY(-5f);
             inveders[n].getPos().setZ(50f - (float)(n / 11) * 5f);
             inveders[n].getPos().setX((float)n % 11 * 2f - 11f);
+            inveders[n].getScl().setZ(2);
             inveders[n].setDebugDraw(false);
-            renderer.addItem(inveders[n]);
+            inveders[n].setCollisionListener(new CollisionListener() {
+                @Override
+                public void collEnter(ACollider col, GameObject owner) {
+                    Log.d(System.currentTimeMillis() + "collision","inveder damaged!!");
+                    attack.setAlpha(1);
+                    physics.removeObject(owner.getPhysicsObject());
+                    owner.getPhysicsObject().freeze = true;
+                    owner.getRenderMediator().isDraw = false;
+                }
+
+                @Override
+                public void collExit(ACollider col, GameObject owner) {
+
+                }
+
+                @Override
+                public void collStay(ACollider col, GameObject owner) {
+
+                }
+            });
+            //renderer.addItem(inveders[n]);
         }
 
         eo = new EnemyObserver(inveders);
@@ -243,6 +310,23 @@ public class TestGameScreen extends Screenable {
         });
         angle.setTouchThrough(false);
 
+        speedSlider = new Slider(0,0,0.025f,0.5f,0.1f,0.05f, Slider.SLIDER_ORIENT.portrait);
+        speedSlider.setHorizontal(UIAlign.Align.LEFT);
+        speedSlider.setVertical(UIAlign.Align.CENTOR);
+        speedSlider.setX(0);
+        speedSlider.setY(GLES20Util.getHeight_gl()/2f);
+        speedSlider.setMin(10f);
+        speedSlider.setMax(100f);
+        speedSlider.setValue(10f);
+        speedSlider.setChangeListener(new SliderChangeValueListener() {
+            @Override
+            public void changeValue(float value) {
+                player.testSetBulletSpeed(value);
+                speedText.setNumber((int)value);
+            }
+        });
+        speedSlider.setTouchThrough(false);
+
         attackButton = new Button(0,0,0.3f,0.1f,"Attack");
         attackButton.useAspect(true);
         attackButton.setCriteria(Button.CRITERIA.HEIGHT);
@@ -269,17 +353,41 @@ public class TestGameScreen extends Screenable {
         });
         attackButton.setTouchThrough(false);
 
+        speedText = new NumberText("メイリオ");
+        speedText.setHeight(0.15f);
+        speedText.setX(0.1f);
+        speedText.setVertical(UIAlign.Align.CENTOR);
+        speedText.setHorizontal(UIAlign.Align.LEFT);
+        speedText.setY(GLES20Util.getHeight_gl()/2f);
+
+        attack = new StaticText("Inveder Damaged!!");
+        attack.useAspect(true);
+        attack.setHorizontal(UIAlign.Align.CENTOR);
+        attack.setVertical(UIAlign.Align.TOP);
+        attack.setHeight(0.1f);
+        attack.setX(GLES20Util.getWidth_gl()/2f);
+        attack.setY(GLES20Util.getHeight_gl());
+        attack.setAlpha(0);
+
+
         uiRenderer.addItem(button);
         uiRenderer.addItem(attackButton);
         uiRenderer.addItem(angle);
         uiRenderer.addItem(leftButton);
         uiRenderer.addItem(rightButton);
+        uiRenderer.addItem(speedSlider);
+        uiRenderer.addItem(speedText);
+        uiRenderer.addItem(attack);
 
         uiObserver.addItem(button);
         uiObserver.addItem(attackButton);
         uiObserver.addItem(angle);
         uiObserver.addItem(leftButton);
         uiObserver.addItem(rightButton);
+        uiObserver.addItem(speedSlider);
+        uiObserver.addItem(speedText);
+        uiObserver.addItem(attack);
+
 
         Constant.setDebugModel(bullet_model);
         Constant.setDebugCamera(mainCamera);
@@ -289,23 +397,29 @@ public class TestGameScreen extends Screenable {
     public void Proc() {
         if(freeze)
             return;
+        if(!physicsThread.isRun())
+            physicsThread.start();
         player.proc();
         uiObserver.proc();
         for(int n = 0;n < inveders.length;n++){
-            //inveders[n].update();
+            inveders[n].update();
         }
         eo.procAll();
         button.proc();
         attackButton.proc();
-        //
-        //
-        physics.simulate();
+
+        bullet.getPos();
+
+        if(attack.getAlpha() > 0){
+            attack.setAlpha(attack.getAlpha() - 0.01f);
+        }
     }
 
     @Override
     public void Draw(float offsetX, float offsetY) {
         renderer.drawAll();
         uiRenderer.drawAll();
+        //Constant.debugDraw(0,0,0,1,1,1,0,0,0,1);
     }
 
     @Override
