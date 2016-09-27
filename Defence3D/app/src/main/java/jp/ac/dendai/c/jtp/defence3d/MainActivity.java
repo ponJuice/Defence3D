@@ -3,17 +3,22 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.app.Activity;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.inputmethod.InputMethod;
 
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.Screen.DebugScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.StageSelectScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestModelViewScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestUIScreen;
+import jp.ac.dendai.c.jtp.SlopeUtil.SlopeUtil;
 import jp.ac.dendai.c.jtp.Time;
 import jp.ac.dendai.c.jtp.openglesutil.Util.ImageReader;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
@@ -22,7 +27,7 @@ import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
 import jp.ac.dendai.c.jtp.openglesutil.Util.FpsController;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
-public class MainActivity extends Activity implements GLSurfaceView.Renderer{
+public class MainActivity extends Activity implements GLSurfaceView.Renderer,SensorEventListener {
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -108,7 +113,24 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         Input.setMaxTouch(1);
         Input.setOrientation(getResources().getConfiguration().orientation);
 
-        Log.d("onCreate", "onCreate finished");}
+        //傾きセンサーが使えるようにする
+        SlopeUtil.init(this);
+        SlopeUtil.onCreate();
+
+        Log.d("onCreate", "onCreate finished");
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        SlopeUtil.onResume(this);
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        SlopeUtil.onPause(this);
+    }
 
     @Override
     public void onDrawFrame(GL10 arg0) {
@@ -151,5 +173,15 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer{
         // 描画領域をクリアする
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         GameManager.draw();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        SlopeUtil.onSensorChanged(event);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }

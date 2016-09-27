@@ -13,6 +13,7 @@ import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
+import jp.ac.dendai.c.jtp.SlopeUtil.SlopeUtil;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 
 /**
@@ -104,21 +105,29 @@ public class Player extends GameObject implements Touchable{
     }
 
     public boolean touch(Touch touch){
-        if(this.touch == null)
+        /*if(this.touch == null)
             this.touch = touch;
         if(this.touch.getTouchID() == -1) {
             this.touch = null;
             return true;
         }
         if(this.touch != touch)
-            return true;
+            return true;*/
 
+        /*
         rot.setY(rot.getY() + this.touch.getDelta(Touch.Pos_Flag.X)/10f);
         rot.setX(rot.getX() + this.touch.getDelta(Touch.Pos_Flag.Y)/10f);
 
         parts[0].getRot().setY(rot.getY());
         parts[1].getRot().setY(rot.getY());
-        parts[1].getRot().setX(rot.getX());
+        parts[1].getRot().setX(rot.getX());*/
+
+        rot.setY(-SlopeUtil.getRotX(true));
+        rot.setX(SlopeUtil.getRotZ(true));
+        parts[0].getRot().setY(-SlopeUtil.getRotX(true));
+        parts[1].getRot().setY(-SlopeUtil.getRotX(true));
+        parts[1].getRot().setX(SlopeUtil.getRotZ(true));
+
         return through;
     }
 

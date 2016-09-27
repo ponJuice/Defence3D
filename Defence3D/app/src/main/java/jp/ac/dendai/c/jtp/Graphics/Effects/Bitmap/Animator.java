@@ -10,6 +10,11 @@ public class Animator {
     public boolean reverse = false;
     public int index = 0;
 
+    public Animator(Animator animator){
+        reverse = animator.reverse;
+        ab = animator.ab;
+    }
+
     public Animator(AnimationBitmap ab){
         this.ab = ab;
     }

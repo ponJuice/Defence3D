@@ -50,6 +50,7 @@ import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsInfo;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsThread;
+import jp.ac.dendai.c.jtp.SlopeUtil.SlopeUtil;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 import jp.ac.dendai.c.jtp.defence3d.R;
@@ -70,7 +71,7 @@ public class TestGameScreen extends Screenable {
     private Camera mainCamera;
     private GameObject[] inveders;
     private GameObject floor;
-    private Button button,attackButton,leftButton,rightButton;
+    private Button button,attackButton,leftButton,rightButton,rotateResetButton;
     private EnemyObserver eo;
     private Player player;
     private Bitmap buttonImage;
@@ -84,6 +85,7 @@ public class TestGameScreen extends Screenable {
     private PhysicsThread physicsThread;
     private GameObject bullet;
     private Plane p;
+    private float sens_x = 0.5f,sens_y = 0.5f,sens_z = 0.5f;
 
     public TestGameScreen(){
         mainCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,-5f,0,0,0);
@@ -95,6 +97,9 @@ public class TestGameScreen extends Screenable {
         alphaRenderer = new AlphaRenderer();
         alphaRenderer.setShader(shader);
         uiRenderer.setShader((UiShader)Constant.getShader(Constant.SHADER.ui));
+        SlopeUtil.setSensitivityX(sens_x);
+        SlopeUtil.setSensitivityY(sens_y);
+        SlopeUtil.setSensitivityZ(sens_z);
 
         PhysicsInfo pi = new PhysicsInfo();
         pi.gravity.setY(-9.8f);
@@ -208,7 +213,7 @@ public class TestGameScreen extends Screenable {
         GameObject[] attackTarget = new GameObject[1];
         attackTarget[0] = player;
 
-        Animator damageAnimator = new Animator(AnimationBitmap.createAnimation(R.mipmap.exp,256,64,8,2));
+        Animator damageAnimator = new Animator(AnimationBitmap.createAnimation(R.mipmap.exp_alpha,256,64,8,2));
 
         int array_length = 55;
         inveders = new Inveder[array_length];
@@ -316,18 +321,50 @@ public class TestGameScreen extends Screenable {
             }
         });
 
+        rotateResetButton = new Button(0,0,0.1f,0.1f,"ROT");
+        rotateResetButton.setBitmap(buttonImage);
+        rotateResetButton.setCriteria(Button.CRITERIA.HEIGHT);
+        rotateResetButton.setHorizontal(UIAlign.Align.LEFT);
+        rotateResetButton.setVertical(UIAlign.Align.BOTTOM);
+        rotateResetButton.setX(0);
+        rotateResetButton.setY(0);
+        rotateResetButton.setWidth(0.2f);
+        rotateResetButton.useAspect(true);
+        rotateResetButton.setTouchThrough(false);
+        rotateResetButton.setButtonListener(new ButtonListener() {
+            @Override
+            public void touchDown(Button button) {
+
+            }
+
+            @Override
+            public void touchHover(Button button) {
+
+            }
+
+            @Override
+            public void touchUp(Button button) {
+                SlopeUtil.correct();
+            }
+        });
+
+
         angle = new Slider(0,0,0.025f,0.5f,0.1f,0.05f, Slider.SLIDER_ORIENT.portrait);
         angle.setHorizontal(UIAlign.Align.RIGHT);
         angle.setVertical(UIAlign.Align.TOP);
         angle.setX(GLES20Util.getWidth_gl());
         angle.setY(GLES20Util.getHeight_gl());
-        angle.setMin(1);
-        angle.setMax(70);
+        angle.setMin(5);
+        angle.setMax(50);
         angle.setValue(40);
         angle.setChangeListener(new SliderChangeValueListener() {
             @Override
             public void changeValue(float value) {
+                value = 50f / value * 5f;
                 mainCamera.setAngleOfView(value);
+                SlopeUtil.setSensitivityX(sens_x  * value * 0.1f);
+                SlopeUtil.setSensitivityY(sens_y  * value * 0.1f);
+                SlopeUtil.setSensitivityZ(sens_z  * value * 0.1f);
             }
         });
         angle.setTouchThrough(false);
@@ -411,6 +448,7 @@ public class TestGameScreen extends Screenable {
         uiRenderer.addItem(speedText);
         uiRenderer.addItem(attack);
         uiRenderer.addItem(scoreText);
+        uiRenderer.addItem(rotateResetButton);
 
         uiObserver.addItem(button);
         uiObserver.addItem(attackButton);
@@ -421,6 +459,7 @@ public class TestGameScreen extends Screenable {
         uiObserver.addItem(speedText);
         uiObserver.addItem(attack);
         uiObserver.addItem(scoreText);
+        uiObserver.addItem(rotateResetButton);
 
 
         Constant.setDebugModel(bullet_model);

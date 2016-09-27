@@ -75,7 +75,7 @@ public class Inveder extends GameObject {
                 if(hp <= 0) {
                     state = STATE.DEAD_EFFECT;
                     effect.getPos().copy(pos);
-                    effect.getPos().setY(pos.getY() + 0.01f);
+                    effect.getPos().setY(pos.getY() + 1f);
                     effect.getRenderMediator().isDraw = true;
                     rm.isDraw = false;
                 }
@@ -99,9 +99,9 @@ public class Inveder extends GameObject {
         });
 
         effect = new GameObject();
-        //effect.getScl().setX(0.1f);
-        //effect.getScl().setY(0.1f);
-        //effect.getScl().setZ(0.1f);
+        effect.getScl().setX(3f);
+        effect.getScl().setY(3f);
+        effect.getScl().setZ(3f);
         p = new Plane();
         effect.getRot().setX(-90);
         effect.getRenderMediator().mesh = p;
@@ -117,7 +117,7 @@ public class Inveder extends GameObject {
     }
 
     public void setAnim(Animator anim){
-        this.anim = anim;
+        this.anim = new Animator(anim);
         p.setImage(anim.getBitmap(0));
     }
 
@@ -164,7 +164,7 @@ public class Inveder extends GameObject {
                 } else if (state == STATE.DAMAGE) {
                     state = STATE.NON;
                 }
-            }else if(damageTimeBuffer > (damageTimeBuffer/(float)anim.getBitmapCount()*(float)anim.getIndex())) {
+            }else if(damageTimeBuffer > (damageTime/(float)anim.getBitmapCount()*(float)anim.getIndex())) {
                 p.setImage(anim.getBitmap());
                 anim.next();
             }

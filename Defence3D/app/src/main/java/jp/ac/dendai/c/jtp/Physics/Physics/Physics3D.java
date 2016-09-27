@@ -15,6 +15,7 @@ import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
  */
 public class Physics3D implements Physics {
     private String name;
+    public Object lock;
     protected float x,y,z;  //演算を行うバンディボックス（これを出たオブジェクトはfreezeされる）
     class PhysicsItem{
         public Physics3D owner;
@@ -53,6 +54,7 @@ public class Physics3D implements Physics {
             objects[n] = temp;
             temp = temp.next;
         }
+        lock = new Object();
     }
     public void addObject(PhysicsObject object){
         if(objectCount >= info.maxObject) {
@@ -72,14 +74,16 @@ public class Physics3D implements Physics {
             return;
         if(object.regist.owner != this)
             return;
-        object.regist.prev.next = object.regist.next;
-        object.regist.next.prev = object.regist.prev;
-        object.regist.prev = ite;
-        object.regist.next = ite.next;
-        ite.next.prev = object.regist;
-        ite.next = object.regist;
-        object.regist.object = null;
-        object.regist = null;
+        synchronized (lock) {
+            object.regist.prev.next = object.regist.next;
+            object.regist.next.prev = object.regist.prev;
+            object.regist.prev = ite;
+            object.regist.next = ite.next;
+            ite.next.prev = object.regist;
+            ite.next = object.regist;
+            object.regist.object = null;
+            object.regist = null;
+        }
         objectCount--;
     }
     public void clearObjects(){
@@ -123,33 +127,37 @@ public class Physics3D implements Physics {
     @Override
     public void preparation(){
         PhysicsItem temp = ite;
-        do{
-            if(temp.object != null && !temp.object.freeze) {
-                temp.object.bufferVelocity.zeroReset();
-                temp.object.bufferPos.zeroReset();
-                temp.object.bufferRot.zeroReset();
-                temp.object.bufferScl.zeroReset();
-                //OBBを回転させる
-                OBBCollider t = temp.object.gameObject.getCollider();
-                while(t != null) {
-                    t.calcRotate();
-                    t = t.getNext();
+        do {
+            synchronized (lock) {
+                if (temp.object != null && !temp.object.freeze) {
+                    temp.object.bufferVelocity.zeroReset();
+                    temp.object.bufferPos.zeroReset();
+                    temp.object.bufferRot.zeroReset();
+                    temp.object.bufferScl.zeroReset();
+                    //OBBを回転させる
+                    OBBCollider t = temp.object.gameObject.getCollider();
+                    while (t != null) {
+                        t.calcRotate();
+                        t = t.getNext();
+                    }
                 }
+                temp = temp.prev;
             }
-            temp = temp.prev;
-        }while(temp != ite);
+        }while (temp != ite) ;
     }
     @Override
     public void externalForceProc(float deltaTime) {
         //重力
         PhysicsItem temp = ite;
         do{
-            if(temp.object != null && temp.object.useGravity && !temp.object.freeze) {
-                buffer.copy(info.gravity);
-                buffer.scalarMult(deltaTime);
-                temp.object.bufferVelocity.add(buffer);
+            synchronized (lock) {
+                if (temp.object != null && temp.object.useGravity && !temp.object.freeze) {
+                    buffer.copy(info.gravity);
+                    buffer.scalarMult(deltaTime);
+                    temp.object.bufferVelocity.add(buffer);
+                }
+                temp = temp.next;
             }
-            temp = temp.next;
         }while(temp != ite);
     }
 
