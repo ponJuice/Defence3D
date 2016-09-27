@@ -36,8 +36,8 @@ public class Constant {
     public static Bitmap tex_chash;
     public static final int COLLISION_PLAYERBULLET = 1;
     public static final int COLLISION_ENEMY = 2;
-    public static final int COLLISION_PLAYDER = 3;
-    public static final int COLLISION_ENEMYBULLET = 4;
+    public static final int COLLISION_PLAYDER = 4;
+    public static final int COLLISION_ENEMYBULLET = 8;
     private static PhysicsInfo pi;
     private static Random ram;
     private static float sens = 1.0f;

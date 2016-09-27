@@ -44,6 +44,14 @@ public class PhysicsObject {
         freeze = false;
     }
 
+    public void reset(){
+        velocity.zeroReset();
+        bufferPos.zeroReset();
+        bufferRot.zeroReset();
+        bufferScl.zeroReset();
+        bufferVelocity.zeroReset();
+    }
+
     public boolean isRegist(){
         return regist != null;
     }
@@ -51,7 +59,11 @@ public class PhysicsObject {
     public Vector getBufferVelocity(){
         return bufferVelocity;
     }
-
+    public Physics3D getPhysics3D(){
+        if(isRegist())
+            return regist.owner;
+        return null;
+    }
     public String getName(){
         return name;
     }
@@ -60,5 +72,12 @@ public class PhysicsObject {
     }
     public String getRegistInfo(){
         return "object name:"+name+" regist"+regist+"\n regist info:"+regist.getInfo();
+    }
+    public String toInfo(){
+        return "owner name:"+gameObject.getName()+" freeze:"+freeze;
+    }
+    @Override
+    public String toString(){
+        return "name:["+gameObject.getName()+"]";
     }
 }

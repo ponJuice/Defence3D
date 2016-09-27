@@ -39,6 +39,25 @@ public class Inveder extends GameObject {
         po.tag = Constant.COLLISION_ENEMY;
         po.mask = Constant.COLLISION_PLAYERBULLET;
 
+        this.setCollisionListener(new CollisionListener() {
+            @Override
+            public void collEnter(ACollider col, GameObject owner) {
+                owner.getPhysicsObject().getPhysics3D().removeObject(owner.getPhysicsObject());
+                owner.getPhysicsObject().freeze = true;
+                owner.getRenderMediator().isDraw = false;
+            }
+
+            @Override
+            public void collExit(ACollider col, GameObject owner) {
+
+            }
+
+            @Override
+            public void collStay(ACollider col, GameObject owner) {
+
+            }
+        });
+
         physics.addObject(po);
     }
 
@@ -56,18 +75,18 @@ public class Inveder extends GameObject {
             return;
         if(timeBuffer >= 5){
             timeBuffer = 0;
-            Log.d("String", "attack!");
             if(Constant.getRandom().nextInt(100) % 80 == 0){
                 float time = 2;
-                float max_y = 5;
+                float max_y = Math.abs(getPos().getY()) + Math.abs(targetList[0].getPos().getY());
                 bullet.getPos().copy(this.getPos());
-                bullet.getPhysicsObject().velocity.setX(0);
+                bullet.getPhysicsObject().velocity.setX((targetList[0].getPos().getX() - getPos().getX())/time);
                 float g = -Constant.getPhysicsInfo().gravity.getY();
                 bullet.getPhysicsObject().velocity.setY(0.5f*g*time
                         + max_y/time);
                 bullet.getPhysicsObject().velocity.setZ((targetList[0].getPos().getZ() - pos.getZ())/time);
                 bullet.getPhysicsObject().freeze = false;
                 bullet.getRenderMediator().isDraw = true;
+                Log.d("String", "attack!");
             }
         }
         timeBuffer += Time.getDeltaTime();

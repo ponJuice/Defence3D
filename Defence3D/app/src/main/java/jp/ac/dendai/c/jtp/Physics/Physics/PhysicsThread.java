@@ -31,7 +31,7 @@ public class PhysicsThread extends Thread {
             start = System.nanoTime();
             physics.simulate();
             diff = (float)(System.nanoTime()- start)/1000000000f;
-            Log.d("Physics Thread"," time : "+diff);
+            //Log.d("Physics Thread",String.format(" time : [%f.5]",diff));
         }
     }
 }

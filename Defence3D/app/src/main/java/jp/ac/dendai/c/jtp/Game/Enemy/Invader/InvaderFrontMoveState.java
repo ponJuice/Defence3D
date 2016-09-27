@@ -45,8 +45,11 @@ public class InvaderFrontMoveState extends EnemysState {
     }
 
     public void proc(GameObject enemy,int n){
-        float _n = (float)(n / column_size) + Clamp.clamp(0f,1f,moveTime,buffer);
-        float def_pos = def_z_pos - _n  * 5f - 5f * count;
+        float _n = Clamp.clamp(0f,1f,moveTime,buffer);//(float)(n / column_size) + ;
+        float temp = 50f + (float)(n / 11) * 15f - count * 5f;
+        float def_pos = temp - _n  * 5f;
+
+        //float def_pos = enemy.getPos().getZ() - _n;
 
         enemy.getPos().setZ(def_pos);
         enemy.update();

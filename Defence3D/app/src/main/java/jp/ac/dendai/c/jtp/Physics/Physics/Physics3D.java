@@ -23,7 +23,13 @@ public class Physics3D implements Physics {
         public String getInfo(){
             return "owner name:"+owner.name+"\n"+
                     "next:"+next+" prev:"+prev+"\n"+
-                    "object name:"+object.getName()+"\n";
+                    "object name:"+object.gameObject.getName()+"\n";
+        }
+        @Override
+        public String toString(){
+            if(object == null)
+                return "null";
+            return "name:["+object.gameObject.getName()+"]";
         }
     }
     private PhysicsItem ite;
@@ -125,6 +131,10 @@ public class Physics3D implements Physics {
                 temp.object.bufferScl.zeroReset();
                 //OBBを回転させる
                 OBBCollider t = temp.object.gameObject.getCollider();
+                while(t != null) {
+                    t.calcRotate();
+                    t = t.getNext();
+                }
             }
             temp = temp.prev;
         }while(temp != ite);
@@ -174,13 +184,37 @@ public class Physics3D implements Physics {
                 PhysicsObject A = objects[n].object;
                 PhysicsObject B = objects[m].object;
 
-                if(A.freeze || B.freeze || ((B.mask & A.tag) == 0 && (A.mask & B.tag) == 0))
-                    break;
+                /*if((A.gameObject.getName().equals("Player") && B.gameObject.getName().equals("Enemy Bullet"))
+                        || (B.gameObject.getName().equals("Player") && A.gameObject.getName().equals("Enemy Bullet"))){
+                    Log.d("Player collision","player");
+                }
+
+                if(A.gameObject.getName().equals("Enemy Bullet")){
+                    Log.d("Enemy Bullet","A :"+A.toInfo());
+                }else if(B.gameObject.getName().equals("Enemy Bullet")){
+                    Log.d("Enemy Bullet","B :"+B.toInfo());
+                }*/
+
+                /*Log.d("Collision","A:["
+                        +A.gameObject.getName()
+                        +"] B:["
+                        +B.gameObject.getName()
+                        +"] flag A to B: ["
+                        +((B.mask & A.tag) == 0)
+                        + "] B to A: ["
+                        +((A.mask & B.tag) == 0)
+                        +"]");*/
+
+                if((B.mask & A.tag) == 0 && (A.mask & B.tag) == 0)
+                    continue;
+
+                if(B.freeze || A.freeze)
+                    continue;
 
                 if(!inBoundry(objects[n].object)){
                     objects[n].object.freeze = true;
                     objects[n].object.gameObject.getRenderMediator().isDraw = false;
-                    break;
+                    continue;
                 }
                 if(!inBoundry(objects[m].object)){
                     objects[m].object.freeze = true;
@@ -192,7 +226,7 @@ public class Physics3D implements Physics {
 
                 if(OBBCollider.isCollisionAABB(A.gameObject.getCollider(),B.gameObject.getCollider())
                         && OBBCollider.isCollision(A.gameObject.getCollider(),B.gameObject.getCollider())){
-                    if((A.mask & B.tag) >= 1) {
+                    if((A.mask & B.tag) != 0) {
                         if (A.collisionMode == PhysicsObject.COLLISION.NON) {
                             //始めて接触した→STAYに移行
                                 A.gameObject.collEnter(B.gameObject.getCollider(),A.gameObject);
@@ -202,7 +236,7 @@ public class Physics3D implements Physics {
                             A.gameObject.collStay(B.gameObject.getCollider(),A.gameObject);
                         }
                     }
-                    if((B.mask & A.tag) >= 1) {
+                    if((B.mask & A.tag) != 0) {
                         if (B.collisionMode == PhysicsObject.COLLISION.NON) {
                             //始めて接触した→STAYに移行
                                 B.gameObject.collEnter(A.gameObject.getCollider(),B.gameObject);
@@ -258,20 +292,20 @@ public class Physics3D implements Physics {
         currentTime = (timeBuffer - startTime)/1000f;
         time = timeBuffer;
         deltaTimeSum += deltaTime;
-        start = System.currentTimeMillis();
+        //start = System.currentTimeMillis();
         preparation();
-        preparetion_end = System.currentTimeMillis();
+        //preparetion_end = System.currentTimeMillis();
         externalForceProc(deltaTime);
-        external_end = System.currentTimeMillis();
+        //external_end = System.currentTimeMillis();
         physicsProc(deltaTime);
-        physics_end = System.currentTimeMillis();
+        //physics_end = System.currentTimeMillis();
         updatePosProc(deltaTime);
-        update_end = System.currentTimeMillis();
+        //update_end = System.currentTimeMillis();
 
-        float pre = (float)(preparetion_end - start) /1000f;
-        float ex = (float)(external_end - preparetion_end) /1000f;
-        float ph = (float)(physics_end - external_end)/1000f;
-        float up = (float)(update_end - physics_end)/1000f;
+        //float pre = (float)(preparetion_end - start) /1000f;
+        //float ex = (float)(external_end - preparetion_end) /1000f;
+        //float ph = (float)(physics_end - external_end)/1000f;
+        //float up = (float)(update_end - physics_end)/1000f;
 
         //Log.d("pipline","pre:"+pre+" ex:"+ex+" ph:"+ph+" up:"+up);
     }

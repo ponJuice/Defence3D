@@ -2,12 +2,16 @@ package jp.ac.dendai.c.jtp.Game;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
 
+import jp.ac.dendai.c.jtp.Game.Bullet.Battery;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.PlayerRenderMediator;
 import jp.ac.dendai.c.jtp.Math.Vector3;
+import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
+import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 
@@ -15,8 +19,10 @@ import jp.ac.dendai.c.jtp.TouchUtil.Touch;
  * Created by テツヤ on 2016/09/04.
  */
 public class Player extends GameObject implements Touchable{
+    protected Battery battery;
     protected GameObject[] parts;
     protected Vector3 direct;
+    protected Vector3 velocity;
     protected GameObject bullet;
     protected float radius = 1f;
     protected float lookRadius = 10f;
@@ -29,9 +35,13 @@ public class Player extends GameObject implements Touchable{
     protected float speed = 10f;
 
     public Player(GameObject[] parts){
+        this.name = "Player";
         this.parts = parts;
         direct = new Vector3(0,1f,-5f);
         direct.normalize();
+
+        velocity = new Vector3();
+
         for(int n = 0;n < parts.length;n++){
             parts[n].pos = this.pos;
             parts[n].scl = this.scl;
@@ -45,7 +55,32 @@ public class Player extends GameObject implements Touchable{
         po.tag = Constant.COLLISION_PLAYDER;
         po.mask = Constant.COLLISION_ENEMYBULLET;
         po.freeze = false;
-        setCollider(new OBBCollider(0 ,0.2706f ,0 ,0.5412f ,0.46234f,1.07303f));
+        setCollider(new OBBCollider(0 ,0 ,0 ,0.5412f/2f ,0.46234f/2f,1.07303f/2f));
+
+        setCollisionListener(new CollisionListener() {
+            @Override
+            public void collEnter(ACollider col, GameObject owner) {
+                Log.d("Player","Player Damaged!!");
+            }
+
+            @Override
+            public void collExit(ACollider col, GameObject owner) {
+
+            }
+
+            @Override
+            public void collStay(ACollider col, GameObject owner) {
+
+            }
+        });
+    }
+
+    public void setBattery(Battery battery){
+        this.battery = battery;
+    }
+
+    public Battery getBattery(){
+        return battery;
     }
 
     @Override
@@ -92,18 +127,30 @@ public class Player extends GameObject implements Touchable{
     }
 
     public void attack(){
-        if(bullet == null)
+        /*if(bullet == null)
             return;
         bullet.getPos().copy(pos);
         bullet.getRot().copy(rot);
+        bullet.getPhysicsObject().reset();
         bullet.getPhysicsObject().velocity.setX(l[0]);
         bullet.getPhysicsObject().velocity.setY(l[1]);
         bullet.getPhysicsObject().velocity.setZ(l[2]);
         bullet.getPhysicsObject().velocity.sub(pos);
         bullet.getPhysicsObject().velocity.normalize();
         bullet.getPhysicsObject().velocity.scalarMult(speed);
+
+        bullet.getPos().setX(0);
+        bullet.getPos().setY(10);
+        bullet.getPos().setZ(10);
         bullet.getPhysicsObject().freeze = false;
-        bullet.getRenderMediator().isDraw = true;
+        bullet.getRenderMediator().isDraw = true;*/
+        if(battery.isLoad())
+            return;
+        velocity.setX(l[0]);
+        velocity.setY(l[1]);
+        velocity.setZ(l[2]);
+        velocity.sub(pos);
+        battery.attack(this, velocity.getX(), velocity.getY(), velocity.getZ());
     }
 
     @Override

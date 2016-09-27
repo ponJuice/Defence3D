@@ -1,6 +1,7 @@
 package jp.ac.dendai.c.jtp.Game.Enemy;
 
 import jp.ac.dendai.c.jtp.Game.GameObject;
+import jp.ac.dendai.c.jtp.Graphics.Effects.Bitmap.Animator;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.Renderer;
 import jp.ac.dendai.c.jtp.Physics.Collider.CircleCollider;
@@ -10,12 +11,15 @@ import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
  * Created by wark on 2016/09/11.
  */
 public class Enemy extends GameObject{
+    protected float hp = 100;
     protected Physics3D physics;
     protected GameObject bullet;
     protected Renderer renderer;
     protected float timeBuffer = 0;
-    public Enemy(Physics3D physics,Renderer renderer,Mesh bulletMesh){
+    protected Animator anim;
+    public Enemy(Physics3D physics,Renderer renderer,Mesh bulletMesh,Animator anim){
         super();
+        this.anim = anim;
         this.renderer = renderer;
         po.velocity.setZ(0.05f);
         this.physics = physics;

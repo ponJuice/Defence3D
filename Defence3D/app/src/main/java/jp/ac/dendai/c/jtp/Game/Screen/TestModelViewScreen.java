@@ -166,7 +166,7 @@ public class TestModelViewScreen extends Screenable {
                 Log.d("Collision!!",owner.getName()+" to "+col.getGameObject().getName());
             }
         });
-        ob2.setDebugDraw(false);
+        ob2.setDebugDraw(true);
         ob2.useOBB(false);
         physics.addObject(ob2.getPhysicsObject());
 

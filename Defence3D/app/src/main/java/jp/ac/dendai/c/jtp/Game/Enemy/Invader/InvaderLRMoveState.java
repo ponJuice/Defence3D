@@ -56,7 +56,7 @@ public class InvaderLRMoveState extends EnemysState {
     }
 
     private void proc(GameObject enemy,int n){
-        float def_pos = (float)n % 11 * 2f - 11f;
+        float def_pos = (float)n % 11 * 3f - 11f;
         float count_clamp = count;
         if(sign > 0){
             count_clamp = (float)count - Clamp.clamp(1f,0f,0.5f,buffer);
