@@ -10,12 +10,12 @@ import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
  */
 
 public class TestBattery extends Battery {
-    public TestBattery(Physics3D p, Renderer renderer, Mesh model, int tag, int mask) {
+    public TestBattery(int damage,Physics3D p, Renderer renderer, Mesh model, int tag, int mask) {
         super(p,renderer);
         turrets = new Turret[1];
         Bullet[] b = new Bullet[3];
         for(int n = 0;n < b.length;n++){
-            b[n] = new Bullet(tag,mask);
+            b[n] = new Bullet(tag,mask,damage);
             b[n].setName("PlayerBullet");
             b[n].getPhysicsObject().freeze = true;
             b[n].getPhysicsObject().useGravity = true;

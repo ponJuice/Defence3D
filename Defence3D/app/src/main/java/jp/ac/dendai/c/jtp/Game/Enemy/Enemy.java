@@ -11,7 +11,8 @@ import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
  * Created by wark on 2016/09/11.
  */
 public class Enemy extends GameObject{
-    protected float hp = 100;
+    protected int hp = 100;
+    protected int score;
     protected Physics3D physics;
     protected GameObject bullet;
     protected Renderer renderer;

@@ -3,6 +3,7 @@ package jp.ac.dendai.c.jtp.Game.Screen;
 import android.graphics.Bitmap;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.animation.Animation;
 
 import javax.microedition.khronos.opengles.GL;
 
@@ -15,11 +16,15 @@ import jp.ac.dendai.c.jtp.Game.Enemy.Inveder;
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Game.Player;
+import jp.ac.dendai.c.jtp.Game.ScoreManager;
 import jp.ac.dendai.c.jtp.Game.Transition.LoadingTransition.LoadingTransition;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
+import jp.ac.dendai.c.jtp.Graphics.Effects.Bitmap.AnimationBitmap;
+import jp.ac.dendai.c.jtp.Graphics.Effects.Bitmap.Animator;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
 import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
+import jp.ac.dendai.c.jtp.Graphics.Renderer.AlphaRenderer;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.Renderer;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.UiRenderer;
 import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
@@ -30,6 +35,7 @@ import jp.ac.dendai.c.jtp.Graphics.UI.Button.ButtonListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.Slider;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.SliderChangeValueListener;
+import jp.ac.dendai.c.jtp.Graphics.UI.Text.DynamicNumberText;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.NumberText;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
@@ -58,6 +64,7 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
 public class TestGameScreen extends Screenable {
     private Mesh inveder_model,houdai_model,yuka_model,daiza_model,bullet_model;
     private Renderer renderer;
+    private AlphaRenderer alphaRenderer;
     private UiRenderer uiRenderer;
     private Shader shader;
     private Camera mainCamera;
@@ -72,9 +79,11 @@ public class TestGameScreen extends Screenable {
     private GameObject testBullet;
     private UIObserver uiObserver;
     private NumberText speedText;
+    private DynamicNumberText scoreText;
     private StaticText attack;
     private PhysicsThread physicsThread;
     private GameObject bullet;
+    private Plane p;
 
     public TestGameScreen(){
         mainCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,-5f,0,0,0);
@@ -83,6 +92,8 @@ public class TestGameScreen extends Screenable {
         renderer = new Renderer();
         uiRenderer = new UiRenderer();
         renderer.setShader(shader);
+        alphaRenderer = new AlphaRenderer();
+        alphaRenderer.setShader(shader);
         uiRenderer.setShader((UiShader)Constant.getShader(Constant.SHADER.ui));
 
         PhysicsInfo pi = new PhysicsInfo();
@@ -102,6 +113,7 @@ public class TestGameScreen extends Screenable {
         yuka_model = WavefrontObjConverter.createModel("yuka.obj");
         daiza_model = WavefrontObjConverter.createModel("daiza.obj");
         bullet_model = WavefrontObjConverter.createModel("untitled.obj");
+        p = new Plane();
 
         final GameObject[] parts = new GameObject[2];
         parts[0] = new GameObject();
@@ -120,7 +132,7 @@ public class TestGameScreen extends Screenable {
         player.setDebugDraw(false);
         player.useOBB(false);
 
-        TestBattery tb = new TestBattery(physics,renderer,bullet_model,Constant.COLLISION_PLAYERBULLET,Constant.COLLISION_ENEMY | Constant.COLLISION_ENEMYBULLET);
+        TestBattery tb = new TestBattery(100,physics,renderer,bullet_model,Constant.COLLISION_PLAYERBULLET,Constant.COLLISION_ENEMY | Constant.COLLISION_ENEMYBULLET);
         player.setBattery(tb);
 
         physics.addObject(player.getPhysicsObject());
@@ -196,10 +208,14 @@ public class TestGameScreen extends Screenable {
         GameObject[] attackTarget = new GameObject[1];
         attackTarget[0] = player;
 
+        Animator damageAnimator = new Animator(AnimationBitmap.createAnimation(R.mipmap.exp,256,64,8,2));
+
         int array_length = 55;
         inveders = new Inveder[array_length];
         for(int n = 0;n < inveders.length;n++){
             inveders[n] = new Inveder(physics);
+            ((Inveder)inveders[n]).setAlphaRenderer(alphaRenderer);
+            ((Inveder)inveders[n]).setAnim(damageAnimator);
             ((Inveder)inveders[n]).setBullets(bullet);
             ((Inveder)inveders[n]).setTargetList(attackTarget);
             inveders[n].getRenderMediator().mesh = inveder_model;
@@ -367,6 +383,15 @@ public class TestGameScreen extends Screenable {
         speedText.setHorizontal(UIAlign.Align.LEFT);
         speedText.setY(GLES20Util.getHeight_gl()/2f);
 
+        scoreText = new DynamicNumberText("メイリオ",1);
+        scoreText.setHeight(0.15f);
+        scoreText.setVertical(UIAlign.Align.TOP);
+        scoreText.setHorizontal(UIAlign.Align.CENTOR);
+        scoreText.setY(GLES20Util.getHeight_gl());
+        scoreText.setX(GLES20Util.getWidth_gl()/2f);
+        scoreText.setNumber(0);
+
+
         attack = new StaticText("Inveder Damaged!!");
         attack.useAspect(true);
         attack.setHorizontal(UIAlign.Align.CENTOR);
@@ -385,6 +410,7 @@ public class TestGameScreen extends Screenable {
         uiRenderer.addItem(speedSlider);
         uiRenderer.addItem(speedText);
         uiRenderer.addItem(attack);
+        uiRenderer.addItem(scoreText);
 
         uiObserver.addItem(button);
         uiObserver.addItem(attackButton);
@@ -394,6 +420,7 @@ public class TestGameScreen extends Screenable {
         uiObserver.addItem(speedSlider);
         uiObserver.addItem(speedText);
         uiObserver.addItem(attack);
+        uiObserver.addItem(scoreText);
 
 
         Constant.setDebugModel(bullet_model);
@@ -410,6 +437,9 @@ public class TestGameScreen extends Screenable {
             physicsThread.start();
         player.proc();
         uiObserver.proc();
+        scoreText.setNumber(ScoreManager.getScore());
+        //ScoreManager.animation(scoreText,1);
+        scoreText.proc();
         eo.procAll();
         button.proc();
         attackButton.proc();
@@ -425,6 +455,7 @@ public class TestGameScreen extends Screenable {
     public void Draw(float offsetX, float offsetY) {
         renderer.drawAll();
         uiRenderer.drawAll();
+        alphaRenderer.drawAll();
         //Constant.debugDraw(0,0,0,1,1,1,0,0,0,1);
     }
 
@@ -451,6 +482,7 @@ public class TestGameScreen extends Screenable {
         daiza_model.deleteBufferObject();
         yuka_model.deleteBufferObject();
         bullet_model.deleteBufferObject();
+        p.deleteBufferObject();
     }
 
     @Override
@@ -460,5 +492,8 @@ public class TestGameScreen extends Screenable {
         daiza_model.useBufferObject();
         yuka_model.useBufferObject();
         bullet_model.useBufferObject();
+        p.useBufferObject();
+
+        ScoreManager.init(0);
     }
 }

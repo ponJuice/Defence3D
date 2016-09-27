@@ -23,6 +23,14 @@ public class Animator {
         clampIndex();
     }
 
+    public int getIndex(){
+        return index;
+    }
+
+    public int getBitmapCount(){
+        return ab.animation.length;
+    }
+
     private void clampIndex(){
         if(index < 0)
             index = ab.animation.length + index;

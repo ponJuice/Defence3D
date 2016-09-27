@@ -1,6 +1,7 @@
 package jp.ac.dendai.c.jtp.Game.Screen;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
+import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.NumberText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
@@ -12,6 +13,7 @@ import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
  */
 public class DebugScreen extends Screenable {
     protected NumberText nt;
+    protected UiShader shader;
 
     public DebugScreen(){
         nt = new NumberText("メイリオ");
@@ -21,6 +23,8 @@ public class DebugScreen extends Screenable {
         nt.setHorizontal(UIAlign.Align.RIGHT);
         nt.setVertical(UIAlign.Align.TOP);
         nt.setAlpha(0.8f);
+
+        shader = (UiShader)Constant.getShader(Constant.SHADER.ui);
     }
 
     @Override
@@ -30,8 +34,9 @@ public class DebugScreen extends Screenable {
 
     @Override
     public void Draw(float offsetX, float offsetY) {
-        Constant.getShader(Constant.SHADER.ui).useShader();
-        nt.draw((UiShader) Constant.getShader(Constant.SHADER.ui));
+        shader.useShader();
+        //Constant.getShader(Constant.SHADER.ui).useShader();
+        nt.draw(shader);
     }
 
     @Override

@@ -46,10 +46,12 @@ public class NumberText extends Image {
             number = numberFont.get(fontName);
         }else{
             //まだ登録されていない
-            number = new StringBitmap[10];
+            number = new StringBitmap[11];
             for(int n = 0;n < 10;n++){
                 number[n] = GLES20Util.stringToStringBitmap(String.valueOf(n),fontName,50,255,255,255);
             }
+            //マイナス記号の作成
+            number[10] = GLES20Util.stringToStringBitmap("-",fontName,50,255,255,255);
             numberFont.put(fontName,number);
         }
         //aspect = (float)number[0].bitmap.getWidth() / (float)(-number[0].fm.ascent+number[0].fm.descent);
@@ -101,6 +103,8 @@ public class NumberText extends Image {
     @Override
     public void setWidth(float width){
         float numDigit = (float) getNumOfDigit(num);
+        if(num < 0)
+            numDigit++;
         if(orientation == ORIENTATION.horizontal) {
             this.width = width / numDigit;
         }else{
@@ -121,6 +125,8 @@ public class NumberText extends Image {
     @Override
     public void setHeight(float height){
         float numDigit = (float) getNumOfDigit(num);
+        if(num < 0)
+            numDigit++;
         if(orientation == ORIENTATION.horizontal) {
             this.height = height * numDigit;
         }else{
@@ -146,11 +152,17 @@ public class NumberText extends Image {
 
     @Override
     public void draw(UiShader shader) {
+        boolean flag = num < 0;
         int l = getNumOfDigit(num);
+        if(flag)
+            l++;
         float _x = x + offset_x;
         float _y = y + offset_y;
         for(int n = 0;n < l;n++){
-            bitmap = number[getDigit(num,l-n)].bitmap;
+            if(flag && n == 0)
+                bitmap = number[11].bitmap;
+            else
+                bitmap = number[getDigit(num,l-n)].bitmap;
             shader.drawUi(this,_x,_y,width,height,0,alpha);
             if(orientation == ORIENTATION.horizontal) {
                 _x += width;
@@ -199,6 +211,7 @@ public class NumberText extends Image {
     }
 
     protected int getNumOfDigit(int num){
+        num = Math.abs(num);
         if(num <= 0){
             return 1;
         }
@@ -212,6 +225,8 @@ public class NumberText extends Image {
 
     protected void updatePosition(){
         int digit = getNumOfDigit(num);
+        if(num < 0)
+            num++;
         offset_y = base_margin * height;
         offset_x = 0;
         if(orientation == ORIENTATION.horizontal) {
