@@ -290,7 +290,9 @@ public class MainScreen extends Screenable {
 
         uiCamera.setPosition(GLES20Util.getAspect() / 2f, 0.5f, 0);
 
-        enemy = new Enemy(physics,testRenderer,box);
+
+
+        //enemy = new Enemy(physics,testRenderer,box);
         enemy.getPos().setZ(-50f);
         enemy.getPos().setY(-4f);
         enemy.getRenderMediator().mesh = box;

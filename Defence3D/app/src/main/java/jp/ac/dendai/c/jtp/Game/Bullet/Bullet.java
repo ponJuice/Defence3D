@@ -11,12 +11,14 @@ import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
  */
 
 public class Bullet extends GameObject{
+    protected int damage = 1;
     protected boolean settled = false;
     protected float range_coefficient = 1;
-    public Bullet(int tag,int mask){
+    public Bullet(int tag,int mask,int damage){
         super();
         po.tag = tag;
         po.mask = mask;
+        this.damage = damage;
         cl = new CollisionListener() {
             @Override
             public void collEnter(ACollider col, GameObject owner) {
@@ -40,6 +42,10 @@ public class Bullet extends GameObject{
 
     public boolean isSettled(){
         return settled;
+    }
+
+    public int getDamage(){
+        return damage;
     }
 
     //x,y,z : 発射する方向 range : 射程

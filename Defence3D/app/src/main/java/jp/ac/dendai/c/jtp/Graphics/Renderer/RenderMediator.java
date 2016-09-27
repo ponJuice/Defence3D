@@ -10,6 +10,7 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
  * Created by テツヤ on 2016/09/03.
  */
 public class RenderMediator {
+    public RenderMediatorListener rml;
     public float alpha;
     public GLES20COMPOSITIONMODE mode = GLES20COMPOSITIONMODE.ALPHA;
     public Mesh mesh;
@@ -25,5 +26,7 @@ public class RenderMediator {
                 ,gameObject.getScl().getX(),gameObject.getScl().getY(),gameObject.getScl().getZ()
                 ,gameObject.getRot().getX(),gameObject.getRot().getY(),gameObject.getRot().getZ()
                 ,alpha,mode);
+        if(rml != null)
+            rml.draw(renderer.shader);
     }
 }

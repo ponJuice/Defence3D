@@ -1,6 +1,6 @@
 package jp.ac.dendai.c.jtp.Graphics.Effects;
 
-import jp.ac.dendai.c.jtp.UIs.Effects.Bitmap.Animator;
+import jp.ac.dendai.c.jtp.Graphics.Effects.Bitmap.Animator;
 
 /**
  * Created by Goto on 2016/09/16.
