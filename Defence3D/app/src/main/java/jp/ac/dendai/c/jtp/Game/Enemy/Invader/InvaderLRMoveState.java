@@ -22,6 +22,10 @@ public class InvaderLRMoveState extends EnemysState {
         this.moveCount = moveCount;
         this.moveTime = moveTime;
     }
+    @Override
+    public void setMoveTime(float time){
+        this.moveTime = time;
+    }
     public void setStateListener(StateListener sl){
         this.sl = sl;
     }
@@ -51,6 +55,7 @@ public class InvaderLRMoveState extends EnemysState {
         return moveCount;
     }
 
+    @Override
     public float getMoveTime(){
         return moveTime;
     }

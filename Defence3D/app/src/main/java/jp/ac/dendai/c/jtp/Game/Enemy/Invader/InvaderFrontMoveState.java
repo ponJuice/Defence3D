@@ -28,6 +28,17 @@ public class InvaderFrontMoveState extends EnemysState {
     public void init(){
         buffer = 0;
     }
+
+    @Override
+    public void setMoveTime(float time) {
+        moveTime = time;
+    }
+
+    @Override
+    public float getMoveTime() {
+        return moveTime;
+    }
+
     @Override
     public void procAll(GameObject[] enemys) {
         if(buffer >= moveTime){

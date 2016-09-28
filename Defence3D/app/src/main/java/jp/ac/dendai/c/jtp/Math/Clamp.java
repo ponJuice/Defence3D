@@ -18,11 +18,18 @@ public class Clamp {
             return end;
         return (end - start)*time/lengthTime+start;
     }
-   public static float clamp(float start,float end,float value){
+    public static float clamp(float start,float end,float value){
        if(value <= start)
            return start;
        else if( value >= end)
            return end;
        return value;
    }
+    public static float clamp(float start,float end,float intervalTime,float lengthTime,float time){
+        if(time < 0)
+            return start;
+        else if(time >= lengthTime-intervalTime)
+            return end;
+        return (end - start)/(lengthTime-intervalTime)*time+start;
+    }
 }

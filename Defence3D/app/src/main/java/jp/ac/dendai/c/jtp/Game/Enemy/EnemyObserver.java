@@ -10,13 +10,27 @@ import jp.ac.dendai.c.jtp.Time;
  */
 
 public class EnemyObserver {
+    protected boolean pause = false;
     private GameObject[] enemys;
     private InvaderState is;
     public EnemyObserver(GameObject[] list){
         this.enemys = list;
         is = new InvaderState(list);
     }
+    public InvaderState getState(){
+        return is;
+    }
+    public void setInvaderState(InvaderState is){
+        this.is = is;
+    }
+    public void setPause(boolean flag){
+        pause = flag;
+    }
+    public boolean getPause(){
+        return pause;
+    }
     public void procAll(){
-        is.proc();
+        if(!pause)
+            is.proc();
     }
 }

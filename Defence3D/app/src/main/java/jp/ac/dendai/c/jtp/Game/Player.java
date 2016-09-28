@@ -103,22 +103,6 @@ public class Player extends GameObject implements Touchable{
     }
 
     public boolean touch(Touch touch){
-        /*if(this.touch == null)
-            this.touch = touch;
-        if(this.touch.getTouchID() == -1) {
-            this.touch = null;
-            return true;
-        }
-        if(this.touch != touch)
-            return true;*/
-
-        /*
-        rot.setY(rot.getY() + this.touch.getDelta(Touch.Pos_Flag.X)/10f);
-        rot.setX(rot.getX() + this.touch.getDelta(Touch.Pos_Flag.Y)/10f);
-
-        parts[0].getRot().setY(rot.getY());
-        parts[1].getRot().setY(rot.getY());
-        parts[1].getRot().setX(rot.getX());*/
 
         rot.setY(SlopeUtil.getRotZ(true));
         rot.setX(SlopeUtil.getRotY(true));
@@ -134,23 +118,6 @@ public class Player extends GameObject implements Touchable{
     }
 
     public void attack(){
-        /*if(bullet == null)
-            return;
-        bullet.getPos().copy(pos);
-        bullet.getRot().copy(rot);
-        bullet.getPhysicsObject().reset();
-        bullet.getPhysicsObject().velocity.setX(l[0]);
-        bullet.getPhysicsObject().velocity.setY(l[1]);
-        bullet.getPhysicsObject().velocity.setZ(l[2]);
-        bullet.getPhysicsObject().velocity.sub(pos);
-        bullet.getPhysicsObject().velocity.normalize();
-        bullet.getPhysicsObject().velocity.scalarMult(speed);
-
-        bullet.getPos().setX(0);
-        bullet.getPos().setY(10);
-        bullet.getPos().setZ(10);
-        bullet.getPhysicsObject().freeze = false;
-        bullet.getRenderMediator().isDraw = true;*/
         if(battery.isLoad())
             return;
         velocity.setX(l[0]);

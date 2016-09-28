@@ -54,4 +54,10 @@ public class InvaderState {
     public void proc(){
         now.procAll(target);
     }
+    public EnemysState getState(){
+        return now;
+    }
+    public void setState(EnemysState es){
+        now = es;
+    }
 }

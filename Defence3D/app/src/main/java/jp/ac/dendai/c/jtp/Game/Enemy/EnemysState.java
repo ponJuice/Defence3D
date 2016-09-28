@@ -7,6 +7,9 @@ import jp.ac.dendai.c.jtp.Game.GameObject;
  */
 
 public abstract class EnemysState {
+    protected float motionTime;
     public abstract void procAll(GameObject[] enemys);
     public abstract void init();
+    public abstract void setMoveTime(float time);
+    public abstract float getMoveTime();
 }

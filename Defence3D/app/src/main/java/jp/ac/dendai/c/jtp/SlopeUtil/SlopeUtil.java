@@ -27,6 +27,7 @@ public class SlopeUtil {
     protected static float[] attitude = new float[3];
     protected static float[] correct_rot = new float[3];
     protected static float[] sensitivity = new float[3];
+    protected static boolean enabled = true;
 
     public static void init(Activity act){
         _act = act;
@@ -76,7 +77,8 @@ public class SlopeUtil {
                 gravity_ave[2] *= sensitivity[2];
                 break;
             case Sensor.TYPE_GAME_ROTATION_VECTOR:
-                attitude = event.values.clone();
+                if(enabled)
+                    attitude = event.values.clone();
                 break;
         } if(geomagnetic != null && gravity != null){
             //calcAve(geomagnetic,geomagnetic_ave);
@@ -95,6 +97,14 @@ public class SlopeUtil {
             //movingAve(attitude_buff,attitude);
 
         }
+    }
+
+    public static boolean isEnabled(){
+        return enabled;
+    }
+
+    public static void enabled(boolean flag){
+        enabled = flag;
     }
 
     public static void movingAve(float[][] in,float[] out){

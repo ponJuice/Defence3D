@@ -156,6 +156,7 @@ public class Inveder extends GameObject {
                     if (alphaRenderer != null)
                         alphaRenderer.removeItem(effect);
                     po.getPhysics3D().removeObject(po);
+                    po.freeze = true;
                     rm.renderer.removeItem(this);
                     state = STATE.DEAD;
                 } else if (state == STATE.DAMAGE) {

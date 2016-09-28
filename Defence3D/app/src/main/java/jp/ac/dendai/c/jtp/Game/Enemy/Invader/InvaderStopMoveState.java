@@ -19,4 +19,14 @@ public class InvaderStopMoveState extends EnemysState {
     public void init() {
 
     }
+
+    @Override
+    public void setMoveTime(float time) {
+
+    }
+
+    @Override
+    public float getMoveTime() {
+        return 0;
+    }
 }

@@ -9,6 +9,7 @@ import android.util.Log;
 public class PhysicsThread extends Thread {
     protected volatile Physics3D physics;
     protected boolean isRun = false;
+    protected boolean pause = false;
     protected boolean end = false;
     public boolean isRun(){
         return isRun;
@@ -22,16 +23,20 @@ public class PhysicsThread extends Thread {
     public boolean getEnd(){
         return end;
     }
+    public boolean getPause(){
+        return pause;
+    }
+    public void setPause(boolean flag){
+        pause = flag;
+    }
     @Override
     public void run() {
         long start;
         float diff;
         isRun = true;
         while(!end) {
-            start = System.nanoTime();
-            physics.simulate();
-            diff = (float)(System.nanoTime()- start)/1000000000f;
-            //Log.d("Physics Thread",String.format(" time : [%f.5]",diff));
+            if(!pause)
+                physics.simulate();
         }
     }
 }
