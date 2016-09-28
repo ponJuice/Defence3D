@@ -5,7 +5,6 @@ import android.opengl.GLES20;
 
 import java.util.Random;
 
-import jp.ac.dendai.c.jtp.Game.Bullet.BulletTemplate;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Camera.UiCamera;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
@@ -13,7 +12,6 @@ import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
-import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsInfo;
 import jp.ac.dendai.c.jtp.defence3d.R;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
@@ -60,7 +58,7 @@ public class Constant {
     }
 
     public static UiShader getLoadingShader(){
-        return loadingShader;
+        return (UiShader) uiShader;
     }
 
     public static void setDebugModel(Mesh mesh){
@@ -111,6 +109,7 @@ public class Constant {
 
         diffuseShader = new DiffuseShader();
         uiShader = new UiShader();
+        uiShader.setCamera(getActiveUiCamera());
 
         //UIを使えるようにする
         UI.init();

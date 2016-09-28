@@ -18,6 +18,12 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
  * Created by テツヤ on 2016/08/29.
  */
 public class DiffuseShader extends Shader{
+    protected int u_fog;
+    protected int u_fog_color;
+    protected boolean fog_dist_update = true;
+    protected boolean fog_color_update = true;
+    protected float[] fog_dist = {100f,80f};     //フォグの強度 0:かかり終わり　1:かかり始め
+    protected float[] fog_color = {0.5f,0.5f,0.5f};    //フォグの色
     public DiffuseShader(){
         super(FileManager.readTextFile("DiffuseShaderVertex.txt")
                 ,FileManager.readTextFile("DiffuseShaderFragment.txt"));
@@ -33,11 +39,30 @@ public class DiffuseShader extends Shader{
     @Override
     void loadShaderVariable() {
         u_Sampler = GLES20Util.getUniformLocation(program,"u_Sampler");
+        u_fog = GLES20Util.getUniformLocation(program,"u_fog");
+        u_fog_color = GLES20Util.getUniformLocation(program,"u_fog_color");
     }
 
     @Override
     void setMaterial(Face face) {
         setOnTexture(face.matelial.tex_diffuse, u_Sampler);
+    }
+
+    public void setFogDist(float start,float end){
+        if(fog_dist[0] == end && fog_dist[1] == start)
+            return;
+        fog_dist[0] = end;
+        fog_dist[1] = start;
+        fog_dist_update = true;
+    }
+
+    public void setFogColor(float r,float g,float b){
+        if(fog_color[0] == r && fog_color[1] == g && fog_color[2] == b)
+            return;
+        fog_color[0] = r;
+        fog_color[1] = g;
+        fog_color[2] = b;
+        fog_color_update = true;
     }
 
     @Override
@@ -110,6 +135,10 @@ public class DiffuseShader extends Shader{
 
         setMaterial(mesh.getFaces()[0]);
         GLES20.glUniform1f(u_alpha,alpha);
+        if(fog_dist_update)
+            GLES20.glUniform2fv(u_fog,1,fog_dist,0);
+        if(fog_color_update)
+            GLES20.glUniform3fv(u_fog_color,1,fog_color,0);
 
         GLES20.glDrawElements(GLES20.GL_TRIANGLES, mesh.getFaces()[0].end - mesh.getFaces()[0].offset + 1, GLES20.GL_UNSIGNED_INT, GLES20Util.ISIZE * mesh.getFaces()[0].offset);
 

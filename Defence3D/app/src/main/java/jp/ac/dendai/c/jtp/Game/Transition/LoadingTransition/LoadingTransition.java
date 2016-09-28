@@ -6,6 +6,7 @@ import jp.ac.dendai.c.jtp.Game.Transition.Transitionable;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
+import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Math.Clamp;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
@@ -101,6 +102,8 @@ public class LoadingTransition implements Transitionable {
 			}
 		}else if(state == LOAD_STATE.END){
 			GameManager.nowScreen.Draw(0, 0);
+			//Constant.getLoadingShader().updateCamera();
+			Constant.getLoadingShader().useShader();
 			float a = Clamp.clamp(1f, 0f, 60f, (float) count);
 			image.setAlpha(a);
 			image.draw(Constant.getLoadingShader());

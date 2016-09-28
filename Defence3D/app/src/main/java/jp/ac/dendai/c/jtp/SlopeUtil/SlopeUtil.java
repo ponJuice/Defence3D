@@ -53,9 +53,11 @@ public class SlopeUtil {
     public static void onResume(SensorEventListener sel){
         // Listenerの登録
         manager.registerListener(sel,manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-        SensorManager.SENSOR_DELAY_GAME);
+                SensorManager.SENSOR_DELAY_GAME);
         manager.registerListener(sel,manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-        SensorManager.SENSOR_DELAY_GAME);
+                SensorManager.SENSOR_DELAY_GAME);
+        manager.registerListener(sel,manager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+                SensorManager.SENSOR_DELAY_GAME);
     }
 
     public static void onSensorChanged(SensorEvent event){
@@ -73,16 +75,19 @@ public class SlopeUtil {
                 gravity_ave[1] *= sensitivity[1];
                 gravity_ave[2] *= sensitivity[2];
                 break;
+            case Sensor.TYPE_GAME_ROTATION_VECTOR:
+                attitude = event.values.clone();
+                break;
         } if(geomagnetic != null && gravity != null){
             //calcAve(geomagnetic,geomagnetic_ave);
             //calcAve(gravity,gravity_ave);
             //RCFilter(geomagnetic,geomagnetic_ave);
             //RCFilter(gravity,gravity_ave);
-            SensorManager.getRotationMatrix( rotationMatrix, null, gravity_ave, geomagnetic_ave);
-            SensorManager.getOrientation( rotationMatrix, attitude_buff[0]);
+            //SensorManager.getRotationMatrix( rotationMatrix, null, gravity_ave, geomagnetic_ave);
+            //SensorManager.getOrientation( rotationMatrix, attitude_buff[0]);
             //RCFilter5(attitude_buff,attitude_buff_2[0]);
             //median(attitude_buff,attitude_buff_2[0]);
-            median(attitude_buff,attitude);
+            //median(attitude_buff,attitude);
             //movingAve(attitude_buff_2,attitude);
             //movingAve(attitude_buff,attitude);
            // median(attitude_buff,attitude_buff_2[0]);

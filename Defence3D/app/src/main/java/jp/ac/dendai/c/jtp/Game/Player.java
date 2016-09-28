@@ -1,12 +1,10 @@
 package jp.ac.dendai.c.jtp.Game;
 
-import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import jp.ac.dendai.c.jtp.Game.Bullet.Battery;
+import jp.ac.dendai.c.jtp.Game.Weapons.Battery.Battery;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
-import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.PlayerRenderMediator;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
@@ -122,11 +120,11 @@ public class Player extends GameObject implements Touchable{
         parts[1].getRot().setY(rot.getY());
         parts[1].getRot().setX(rot.getX());*/
 
-        rot.setY(-SlopeUtil.getRotX(true));
-        rot.setX(SlopeUtil.getRotZ(true));
-        parts[0].getRot().setY(-SlopeUtil.getRotX(true));
-        parts[1].getRot().setY(-SlopeUtil.getRotX(true));
-        parts[1].getRot().setX(SlopeUtil.getRotZ(true));
+        rot.setY(SlopeUtil.getRotZ(true));
+        rot.setX(SlopeUtil.getRotY(true));
+        parts[0].getRot().setY(SlopeUtil.getRotZ(true));
+        parts[1].getRot().setY(SlopeUtil.getRotZ(true));
+        parts[1].getRot().setX(SlopeUtil.getRotY(true));
 
         return through;
     }
@@ -176,6 +174,8 @@ public class Player extends GameObject implements Touchable{
         this.camera = camera;
     }
     public void proc(){
+        battery.proc();
+
         p[0] = direct.getX()*radius;
         p[1] = direct.getY()*radius;
         p[2] = direct.getZ()*radius;

@@ -2,22 +2,13 @@ package jp.ac.dendai.c.jtp.Game.Enemy;
 
 import android.util.Log;
 
-import java.lang.annotation.Target;
-import java.sql.ParameterMetaData;
-
-import jp.ac.dendai.c.jtp.Game.Bullet.Bullet;
-import jp.ac.dendai.c.jtp.Game.Bullet.BulletTemplate;
+import jp.ac.dendai.c.jtp.Game.Weapons.Bullet.Bullet;
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Game.ScoreManager;
 import jp.ac.dendai.c.jtp.Graphics.Effects.Bitmap.Animator;
 import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
-import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
-import jp.ac.dendai.c.jtp.Graphics.Renderer.AlphaRenderer;
-import jp.ac.dendai.c.jtp.Graphics.Renderer.RenderMediatorListener;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.Renderer;
-import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
-import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
@@ -49,9 +40,9 @@ public class Inveder extends GameObject {
     private GameObject bullet;
     private Animator anim;
     public Inveder(Physics3D physics){
-        OBBCollider col = new OBBCollider(0,0.49273f,0,1.6282f/2f,0.7141f/2f,0.13568f/2f);
+        OBBCollider col = new OBBCollider(0,3.5f,0   ,9f/2f ,5f/2f ,0.5f);
         col.setUseOBB(false);
-        OBBCollider col2 = new OBBCollider(0,0.474895f,0,1.08548f/2f,0.94979f/2f,0.13568f/2f);
+        OBBCollider col2 = new OBBCollider(0,3.5f,0  ,2.5f  ,7f/2f ,0.5f);
         col2.setUseOBB(false);
 
         damageTime = 1;
@@ -63,6 +54,12 @@ public class Inveder extends GameObject {
         po.useGravity = false;
         po.tag = Constant.COLLISION_ENEMY;
         po.mask = Constant.COLLISION_PLAYERBULLET;
+
+        scl.setX(0.1f);
+        scl.setY(0.1f);
+        scl.setZ(0.1f);
+
+        //rot.setY(90f);
 
         this.setCollisionListener(new CollisionListener() {
             @Override

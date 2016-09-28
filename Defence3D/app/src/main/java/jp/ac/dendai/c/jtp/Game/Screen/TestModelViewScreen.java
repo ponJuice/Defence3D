@@ -65,7 +65,7 @@ public class TestModelViewScreen extends Screenable {
 
         //オブジェクトファイルの読み込み
         box = WavefrontObjConverter.createModel("untitled.obj");
-        inveder = WavefrontObjConverter.createModel("inveder.obj");
+        inveder = WavefrontObjConverter.createModel("crab.obj");
 
         PhysicsInfo info = new PhysicsInfo();
         info.enabled = true;
@@ -127,9 +127,9 @@ public class TestModelViewScreen extends Screenable {
                 Log.d("Collision!!",owner.getName()+" to "+col.getGameObject().getName());
             }
         });
-        ob1.getScl().setX(1f);
-        ob1.getScl().setY(1f);
-        ob1.getScl().setZ(1f);
+        ob1.getScl().setX(0.1f);
+        ob1.getScl().setY(0.1f);
+        ob1.getScl().setZ(0.1f);
         ob1.setDebugDraw(true);
         ob1.useOBB(false);
 

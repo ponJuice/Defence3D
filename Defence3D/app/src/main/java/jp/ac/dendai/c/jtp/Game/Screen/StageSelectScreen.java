@@ -121,7 +121,6 @@ public class StageSelectScreen extends Screenable {
         });
 
         uiShader = (UiShader) Constant.getShader(Constant.SHADER.ui);
-        uiShader.setCamera(Constant.getActiveUiCamera());
 
         uiRenderer = new UiRenderer();
         uiRenderer.setShader(uiShader);

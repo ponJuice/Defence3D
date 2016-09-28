@@ -1,38 +1,32 @@
 package jp.ac.dendai.c.jtp.Game.Screen;
 
 import android.graphics.Bitmap;
-import android.provider.Settings;
 import android.util.Log;
-import android.view.animation.Animation;
 
-import javax.microedition.khronos.opengles.GL;
-
-import jp.ac.dendai.c.jtp.Game.Bullet.BulletTemplate;
-import jp.ac.dendai.c.jtp.Game.Bullet.TestBattery;
+import jp.ac.dendai.c.jtp.Game.Weapons.Battery.Battery;
+import jp.ac.dendai.c.jtp.Game.Weapons.Battery.SoSlowBattery;
+import jp.ac.dendai.c.jtp.Game.Weapons.Battery.TestBattery;
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.Enemy.EnemyObserver;
-import jp.ac.dendai.c.jtp.Game.Enemy.Invader.InvaderFrontMoveState;
 import jp.ac.dendai.c.jtp.Game.Enemy.Inveder;
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Game.Player;
 import jp.ac.dendai.c.jtp.Game.ScoreManager;
 import jp.ac.dendai.c.jtp.Game.Transition.LoadingTransition.LoadingTransition;
+import jp.ac.dendai.c.jtp.Game.Weapons.Bullet.BulletTemplate;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Effects.Bitmap.AnimationBitmap;
 import jp.ac.dendai.c.jtp.Graphics.Effects.Bitmap.Animator;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
-import jp.ac.dendai.c.jtp.Graphics.Model.Texture;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.AlphaRenderer;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.Renderer;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.UiRenderer;
-import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.Button;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.ButtonListener;
-import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.Slider;
 import jp.ac.dendai.c.jtp.Graphics.UI.Slider.SliderChangeValueListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.DynamicNumberText;
@@ -40,24 +34,18 @@ import jp.ac.dendai.c.jtp.Graphics.UI.Text.NumberText;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIObserver;
-import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontMtlReader;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
-import jp.ac.dendai.c.jtp.Physics.Physics.Physics;
 import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsInfo;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsThread;
 import jp.ac.dendai.c.jtp.SlopeUtil.SlopeUtil;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
-import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 import jp.ac.dendai.c.jtp.defence3d.R;
-import jp.ac.dendai.c.jtp.openglesutil.Util.FileManager;
-import jp.ac.dendai.c.jtp.openglesutil.Util.ImageReader;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
-import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by wark on 2016/09/21.
@@ -113,7 +101,7 @@ public class TestGameScreen extends Screenable {
 
         physicsThread = new PhysicsThread(physics);
 
-        inveder_model = WavefrontObjConverter.createModel("inveder.obj");
+        inveder_model = WavefrontObjConverter.createModel("crab.obj");
         houdai_model = WavefrontObjConverter.createModel("houdai.obj");
         yuka_model = WavefrontObjConverter.createModel("yuka.obj");
         daiza_model = WavefrontObjConverter.createModel("daiza.obj");
@@ -136,9 +124,14 @@ public class TestGameScreen extends Screenable {
         player.setRadius(5f);
         player.setDebugDraw(false);
         player.useOBB(false);
-
-        TestBattery tb = new TestBattery(100,physics,renderer,bullet_model,Constant.COLLISION_PLAYERBULLET,Constant.COLLISION_ENEMY | Constant.COLLISION_ENEMYBULLET);
-        player.setBattery(tb);
+        BulletTemplate bt = new BulletTemplate(bullet_model,new OBBCollider(0,0,0,1,1,1));
+        bt.damage = 100;
+        bt.tag = Constant.COLLISION_PLAYERBULLET;
+        bt.mask = Constant.COLLISION_ENEMY | Constant.COLLISION_ENEMYBULLET;
+        bt.scale_x = 0.3f;
+        bt.scale_y = 0.3f;
+        bt.scale_z = 0.3f;
+        player.setBattery(new SoSlowBattery(physics,renderer,bt));
 
         physics.addObject(player.getPhysicsObject());
 
@@ -163,9 +156,9 @@ public class TestGameScreen extends Screenable {
         testBullet.getPhysicsObject().tag = Constant.COLLISION_PLAYERBULLET;
         testBullet.getPhysicsObject().mask = Constant.COLLISION_ENEMY | Constant.COLLISION_ENEMYBULLET;
         testBullet.setCollider(new OBBCollider(0,0,0,1,1,1));
-        testBullet.getScl().setX(1f);
-        testBullet.getScl().setY(1f);
-        testBullet.getScl().setZ(1f);
+        testBullet.getScl().setX(0.1f);
+        testBullet.getScl().setY(0.1f);
+        testBullet.getScl().setZ(0.1f);
         testBullet.setDebugDraw(false);
         testBullet.useOBB(false);
         testBullet.setName("Player Bullet");
@@ -228,7 +221,6 @@ public class TestGameScreen extends Screenable {
             inveders[n].getPos().setY(-5f);
             inveders[n].getPos().setZ(50f + (float)(n / 11) * 15f);
             inveders[n].getPos().setX((float)n % 11 * 3f - 11f);
-            inveders[n].getScl().setZ(2);
             inveders[n].setDebugDraw(false);
             inveders[n].setName("Inveder");
             renderer.addItem(inveders[n]);

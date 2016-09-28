@@ -21,6 +21,7 @@ public class OBBCollider extends ACollider{
     protected float[][] directs = new float[3][4];      //0:x 1:y 2:z
     protected float[] base_length = new float[3];
     protected float[] rotate_chash = new float[3];
+    protected float[] scale_chash = {1,1,1};
     protected static Vector3 interval = new Vector3();
     protected static Vector3 crossBuffer = new Vector3();
     protected static float[] rotateMatrix = new float[16];
@@ -59,7 +60,10 @@ public class OBBCollider extends ACollider{
     public void calcRotate(){
         if(gameObject.getRot().getX() == rotate_chash[0]
                 && gameObject.getRot().getY() == rotate_chash[1]
-                && gameObject.getRot().getZ() == rotate_chash[2]) {
+                && gameObject.getRot().getZ() == rotate_chash[2]
+                && gameObject.getScl().getX() == scale_chash[0]
+                && gameObject.getScl().getY() == scale_chash[1]
+                && gameObject.getScl().getZ() == scale_chash[2]){
             return;
         }
 
@@ -70,6 +74,8 @@ public class OBBCollider extends ACollider{
             Matrix.rotateM(rotateMatrix, 0, gameObject.getRot().getY(), 0, 1, 0);
         if(gameObject.getRot().getX() != 0)
             Matrix.rotateM(rotateMatrix, 0, gameObject.getRot().getX(), 1, 0, 0);
+
+
 
         directs[0][0] = 1;
         directs[0][1] = 0;
@@ -84,11 +90,32 @@ public class OBBCollider extends ACollider{
         directs[2][2] = 1;
         Matrix.multiplyMV(directs[2], 0, rotateMatrix, 0, directs[2], 0);
 
-        Matrix.multiplyMV(offset,0,rotateMatrix,0,base_offset,0);
+        offset[0] = base_offset[0] * gameObject.getScl().getX();
+        offset[1] = base_offset[1] * gameObject.getScl().getY();
+        offset[2] = base_offset[2] * gameObject.getScl().getZ();
+
+        Matrix.multiplyMV(offset,0,rotateMatrix,0,offset,0);
 
     }
 
     public static boolean isCollisionAABB(OBBCollider A,OBBCollider B){
+        boolean flag = recursionAABB(A,B);
+        while(!flag && A.next != null) {
+            A = A.next;
+            flag = recursionAABB(A, B);
+        }
+        return flag;
+    }
+
+    public static boolean recursionAABB(OBBCollider A,OBBCollider B){
+        boolean flag;
+        flag = _isCollisionAABB(A,B);
+        if(!flag && B.next != null)
+            flag = recursionAABB(A,B.next);
+        return flag;
+    }
+
+    private static boolean _isCollisionAABB(OBBCollider A,OBBCollider B){
         float a_to_b_x = Math.abs((A.gameObject.getPos().getX()+A.offset[0]) - (B.gameObject.getPos().getX()+B.offset[0]));
         float a_to_b_y = Math.abs((A.gameObject.getPos().getY()+A.offset[1]) - (B.gameObject.getPos().getY()+B.offset[1]));
         float a_to_b_z = Math.abs((A.gameObject.getPos().getZ()+A.offset[2]) - (B.gameObject.getPos().getZ()+B.offset[2]));
@@ -107,6 +134,7 @@ public class OBBCollider extends ACollider{
         boolean x_flag = (width_mul_2_A + width_mul_2_B) >= a_to_b_x;
         boolean y_flag = (height_mul_2_A + height_mul_2_B) >= a_to_b_y;
         boolean z_flag = (depth_mul_2_A + depth_mul_2_B) > a_to_b_z;
+
         return x_flag && y_flag & z_flag;
     }
 

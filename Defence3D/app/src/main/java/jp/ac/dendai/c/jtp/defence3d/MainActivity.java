@@ -147,7 +147,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer,Sen
 
         GameManager.init(this);
         GameManager.debugScreen = new DebugScreen();
-        GameManager.debug = true;
+        GameManager.debug = false;
         GameManager.nowScreen = new StageSelectScreen();
         GameManager.nowScreen.init();
         GameManager.nowScreen.unFreeze();
