@@ -45,6 +45,15 @@ public abstract class UI implements TextureInfo,MaskInfo,Touchable {
     protected GLES20COMPOSITIONMODE mode = GLES20COMPOSITIONMODE.ALPHA;
     protected float r = 0.5f,g = 0.5f,b = 0.5f;
     protected boolean through = true;
+    protected boolean enabled = true;
+
+    public void setEnabled(boolean flag){
+        enabled = flag;
+    }
+
+    public boolean getEnabled(){
+        return enabled;
+    }
 
     public void copy(UI ui) {
         horizontal = ui.horizontal;

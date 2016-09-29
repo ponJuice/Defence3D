@@ -45,10 +45,10 @@ public class EndlessModeState extends GameState{
         }
         if(clear_flag && getState() != GAME_STATE.PAUSE)
             changeState(GAME_STATE.PAUSE);
-        if(deadCount > enemys.length/4){
+        if(deadCount > enemys.length / 4 * 3){
             motionController.setSpeedCoefficient(speed2);
         }else if(deadCount > enemys.length/2) {
-            motionController.setSpeedCoefficient(speed2);
+            motionController.setSpeedCoefficient(speed1);
         }
     }
 }

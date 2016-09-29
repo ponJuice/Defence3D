@@ -41,7 +41,9 @@ public class UiRenderer{
         shader.useShader();
         shader.updateCamera();
         for(int n = 0;n < uis.size();n++){
-            uis.get(n).draw(shader);
+            UI ui = uis.get(n);
+            if(ui.getEnabled())
+                ui.draw(shader);
         }
     }
 }

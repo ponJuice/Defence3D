@@ -1,7 +1,11 @@
-package jp.ac.dendai.c.jtp.Game;
+package jp.ac.dendai.c.jtp.Graphics.UI.Panel;
 
 import android.graphics.Bitmap;
 
+import jp.ac.dendai.c.jtp.Game.Constant;
+import jp.ac.dendai.c.jtp.Game.GameManager;
+import jp.ac.dendai.c.jtp.Game.Player;
+import jp.ac.dendai.c.jtp.Game.ScoreManager;
 import jp.ac.dendai.c.jtp.Game.Screen.StageSelectScreen;
 import jp.ac.dendai.c.jtp.Game.Transition.LoadingTransition.LoadingTransition;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
@@ -43,7 +47,7 @@ public class UIPanel {
         this.mainCamera = camera;
 
         uiRenderer = new UiRenderer();
-        uiRenderer.setShader((UiShader)Constant.getShader(Constant.SHADER.ui));
+        uiRenderer.setShader((UiShader) Constant.getShader(Constant.SHADER.ui));
 
         buttonImage = GLES20Util.loadBitmap(R.mipmap.button);
 
@@ -266,5 +270,9 @@ public class UIPanel {
     }
     public void draw(){
         uiRenderer.drawAll();
+    }
+
+    public UiRenderer getUiRenderer(){
+        return uiRenderer;
     }
 }

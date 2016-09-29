@@ -32,4 +32,19 @@ public class Clamp {
             return end;
         return (end - start)/(lengthTime-intervalTime)*time+start;
     }
+    public static float bezier2Trajectory(float start,float end,float control,float time){
+        if(time >= 1)
+            return end;
+        else if(time <= 0)
+            return start;
+        return (1f-time)*(1-time)*start + 2f*(1f-time)*time*control+ time*time*end;
+    }
+    public static float bezier3Trajectory(float start,float end,float control1,float control2,float time){
+        if(time >= 1)
+            return end;
+        else if(time <= 0)
+            return start;
+        return (1f-time)*(1f-time)*(1f-time)*start + 3f*(1f-time)*(1f-time)*time*control1 + 3f*(1-time)*time*time*control2 + time*time*time*end;
+
+    }
 }

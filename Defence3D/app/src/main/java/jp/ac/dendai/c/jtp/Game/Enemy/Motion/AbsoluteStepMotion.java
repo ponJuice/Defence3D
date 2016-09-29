@@ -11,17 +11,19 @@ import jp.ac.dendai.c.jtp.Time;
 
 public class AbsoluteStepMotion extends Motion{
     public float offset_x = 0,offset_y = 0,offset_z = 0;
-    public int step_x = 5,step_y = 0,step_z = 0;
+    public int step_x = 5,step_y = 0,step_z = 50;
     public boolean x_reverse = true,y_reverse = false,z_reverse = false;
-    public float moveTime_x = 5f,moveTime_y = -1f,moveTime_z = 0f;
-    public float interval_x = 1f,interval_y = 0f,interval_z = 0f;
-    public float min_x = 0,max_x = 30f,min_y = 0,max_y = 0f,min_z = 0,max_z = 50f;
+    public float moveTime_x = 1f,moveTime_y = -1f,moveTime_z = 1f;
+    public float interval_x = 0.5f,interval_y = 0f,interval_z = 0.5f;
+    public float min_x = 0,max_x = 30f,min_y = 0,max_y = 0f,min_z = 0,max_z = 10f;
     public int x = 11, z = 5, y = 1;
     protected float timeBuffer_x,timeBuffer_y,timeBuffer_z;
     protected int stepCount_x,stepCount_y,stepCount_z;
     protected boolean x_r = false,y_r = false,z_r = false;
-    protected float clamp_x_s = 1,clamp_x_e = 0,clamp_y_s = 1,clamp_y_e = 0,clamp_z_s = 1,clamp_z_e = 0;
-    protected void init(){
+    protected float clamp_x_s = 1,clamp_x_e = 0,clamp_y_s = 1,clamp_y_e = 0,clamp_z_s = 0,clamp_z_e = 1;
+
+    @Override
+    protected void init(Motion motion){
         stepCount_x = 0;
         stepCount_y = 0;
         stepCount_z = 0;
@@ -49,25 +51,56 @@ public class AbsoluteStepMotion extends Motion{
                 float t = clamp_x_e;
                 clamp_x_e = clamp_x_s;
                 clamp_x_s = t;
+                if(stepCount_x == 0) {
+                    Log.d("Motion","step");
+                    motionController.nextMotion();
+                }
             }
         }
 
-        if(getMoveTime_y() <= 0){
-        }
-        else if(timeBuffer_y >= getMoveTime_y() && stepCount_y < step_y){
-            timeBuffer_y = 0;
-            stepCount_y++;
-        }
+        /*if(getMoveTime_y() <= 0){
 
-        if(getMoveTime_z() <= 0){
-            timeBuffer_z = 0;
-            clamp_z_e = 0;
-            clamp_z_s = 0;
         }
-        else if(timeBuffer_z >= getMoveTime_z() && stepCount_z < step_z){
-            timeBuffer_z = 0;
-            stepCount_z++;
+        else if(timeBuffer_y >= getMoveTime_x() && (y_reverse || (stepCount_y >= 0 && stepCount_y < step_y))) {
+            timeBuffer_y = 0;
+            if(y_r)
+                stepCount_y--;
+            else
+                stepCount_y++;
+
+            if(stepCount_y < 0 || stepCount_y >= step_y){
+                if(y_r)
+                    stepCount_y++;
+                else
+                    stepCount_y--;
+                y_r = !y_r;
+                float t = clamp_y_e;
+                clamp_y_e = clamp_y_s;
+                clamp_y_s = t;
+            }
+        }*/
+
+        /*if(getMoveTime_z() <= 0){
+
         }
+        else if(timeBuffer_z >= getMoveTime_z() && (z_reverse || (stepCount_z >= 0 && stepCount_z < step_z))) {
+            timeBuffer_z = 0;
+            if(z_r)
+                stepCount_z--;
+            else
+                stepCount_z++;
+
+            if(stepCount_z < 0 || stepCount_z >= step_z){
+                if(z_r)
+                    stepCount_z++;
+                else
+                    stepCount_z--;
+                z_r = !z_r;
+                float t = clamp_z_e;
+                clamp_z_e = clamp_z_s;
+                clamp_z_s = t;
+            }
+        }*/
 
 
         for(int i = stepCount_z; i < z +stepCount_z; i++){
