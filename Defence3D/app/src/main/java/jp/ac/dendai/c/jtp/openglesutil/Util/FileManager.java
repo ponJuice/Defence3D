@@ -1,8 +1,13 @@
 package jp.ac.dendai.c.jtp.openglesutil.Util;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 
 import android.app.Activity;
 import android.content.res.AssetManager;
@@ -47,4 +52,18 @@ public class FileManager {
             return "読み込み失敗";
         }
 	}
+
+    public static void writeTextFile(String fileName,String data,int mode){
+        OutputStream out;
+        try{
+            out = _act.openFileOutput(fileName,mode);
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(out,"UTF-8"));
+
+            writer.append(data);
+            writer.close();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
 }

@@ -14,7 +14,7 @@ import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
 import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
-import jp.ac.dendai.c.jtp.Time;
+import jp.ac.dendai.c.jtp.Time.Time;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**

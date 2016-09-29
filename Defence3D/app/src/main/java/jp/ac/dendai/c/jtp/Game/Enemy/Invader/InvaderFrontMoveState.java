@@ -3,7 +3,7 @@ package jp.ac.dendai.c.jtp.Game.Enemy.Invader;
 import jp.ac.dendai.c.jtp.Game.Enemy.EnemysState;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Math.Clamp;
-import jp.ac.dendai.c.jtp.Time;
+import jp.ac.dendai.c.jtp.Time.Time;
 
 /**
  * Created by Goto on 2016/09/22.

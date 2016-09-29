@@ -11,15 +11,12 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.inputmethod.InputMethod;
 
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.Screen.DebugScreen;
-import jp.ac.dendai.c.jtp.Game.Screen.StageSelectScreen;
-import jp.ac.dendai.c.jtp.Game.Screen.TestModelViewScreen;
-import jp.ac.dendai.c.jtp.Game.Screen.TestUIScreen;
+import jp.ac.dendai.c.jtp.Game.Screen.StartScreen;
 import jp.ac.dendai.c.jtp.SlopeUtil.SlopeUtil;
-import jp.ac.dendai.c.jtp.Time;
+import jp.ac.dendai.c.jtp.Time.Time;
 import jp.ac.dendai.c.jtp.openglesutil.Util.ImageReader;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
@@ -114,8 +111,8 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer,Sen
         Input.setOrientation(getResources().getConfiguration().orientation);
 
         //傾きセンサーが使えるようにする
-        SlopeUtil.init(this);
-        SlopeUtil.onCreate();
+        //SlopeUtil.init(this);
+        //SlopeUtil.onCreate();
 
         Log.d("onCreate", "onCreate finished");
     }
@@ -123,13 +120,13 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer,Sen
     @Override
     public void onResume(){
         super.onResume();
-        SlopeUtil.onResume(this);
+        //SlopeUtil.onResume(this);
     }
 
     @Override
     public void onPause(){
         super.onPause();
-        SlopeUtil.onPause(this);
+        //SlopeUtil.onPause(this);
     }
 
     @Override
@@ -148,7 +145,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer,Sen
         GameManager.init(this);
         GameManager.debugScreen = new DebugScreen();
         GameManager.debug = false;
-        GameManager.nowScreen = new StageSelectScreen();
+        GameManager.nowScreen = new StartScreen();
         GameManager.nowScreen.init();
         GameManager.nowScreen.unFreeze();
 
@@ -160,8 +157,6 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer,Sen
     @Override
     public void onSurfaceCreated(GL10 arg0, EGLConfig arg1) {
 
-
-        GLES20.glClearColor(0.5f, 0.5f, 0.5f, 1.0f); // 画面をクリアする色を設定する
     }
     private void process(){
         FpsController.updateFps();

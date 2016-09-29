@@ -3,7 +3,7 @@ package jp.ac.dendai.c.jtp.Game.Weapons.Turret;
 import jp.ac.dendai.c.jtp.Game.Weapons.Bullet.Bullet;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
-import jp.ac.dendai.c.jtp.Time;
+import jp.ac.dendai.c.jtp.Time.Time;
 
 /**
  * Created by テツヤ on 2016/09/25.

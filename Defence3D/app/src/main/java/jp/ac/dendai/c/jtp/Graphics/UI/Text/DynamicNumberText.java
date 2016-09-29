@@ -3,11 +3,10 @@ package jp.ac.dendai.c.jtp.Graphics.UI.Text;
 import android.graphics.Bitmap;
 
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
-import jp.ac.dendai.c.jtp.Graphics.UI.Textrue.TextureInfo;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Math.Clamp;
-import jp.ac.dendai.c.jtp.Time;
+import jp.ac.dendai.c.jtp.Time.Time;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 
 /**

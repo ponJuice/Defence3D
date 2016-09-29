@@ -1,4 +1,4 @@
-package jp.ac.dendai.c.jtp;
+package jp.ac.dendai.c.jtp.Time;
 
 /**
  * Created by Goto on 2016/09/22.
@@ -21,5 +21,17 @@ public class Time {
     }
     public static float getDeltaTime(){
         return deltaTime;
+    }
+
+    public static long getHour(long millisecond){
+        return (millisecond / (1000*60*60));
+    }
+
+    public static long getMinute(long millisecond){
+        return millisecond / (1000*60) - getHour(millisecond) * 60;
+    }
+
+    public static long getSecond(long millisecond){
+        return millisecond / 1000 - getMinute(millisecond) * 60 - getHour(millisecond) * 60 * 60;
     }
 }
