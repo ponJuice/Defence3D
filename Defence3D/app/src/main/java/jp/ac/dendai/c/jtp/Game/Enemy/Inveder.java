@@ -2,10 +2,10 @@ package jp.ac.dendai.c.jtp.Game.Enemy;
 
 import android.util.Log;
 
+import jp.ac.dendai.c.jtp.Game.Score.ScoreManager;
 import jp.ac.dendai.c.jtp.Game.Weapons.Bullet.Bullet;
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.GameObject;
-import jp.ac.dendai.c.jtp.Game.ScoreManager;
 import jp.ac.dendai.c.jtp.Graphics.Effects.Bitmap.Animator;
 import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.Renderer;

@@ -36,6 +36,7 @@ public class NumberText extends Image {
     protected float top_margin,bottom_margin,base_margin;
     //width,height は　一文字の横,縦の長さ aspectは一文字のアスペクト比
     protected int num;
+    protected int dig = 1;
     protected float mask_alpha = 1f;
     protected UIAlign.Align align_h = UIAlign.Align.CENTOR,align_v = UIAlign.Align.CENTOR;
     public NumberText(String fontName){
@@ -103,6 +104,8 @@ public class NumberText extends Image {
     @Override
     public void setWidth(float width){
         float numDigit = (float) getNumOfDigit(num);
+        if(numDigit < dig)
+            numDigit = dig;
         if(num < 0)
             numDigit++;
         if(orientation == ORIENTATION.horizontal) {
@@ -125,6 +128,8 @@ public class NumberText extends Image {
     @Override
     public void setHeight(float height){
         float numDigit = (float) getNumOfDigit(num);
+        if(numDigit < dig)
+            numDigit = dig;
         if(num < 0)
             numDigit++;
         if(orientation == ORIENTATION.horizontal) {
@@ -149,20 +154,35 @@ public class NumberText extends Image {
         useAspect = flag;
     }
 
+    public void setStuffing(int n){
+        dig = n;
+        updatePosition();
+    }
+    public int getStuffing(){
+        return dig;
+    }
 
     @Override
     public void draw(UiShader shader) {
         boolean flag = num < 0;
         int l = getNumOfDigit(num);
-        if(flag)
-            l++;
+        if(l < dig)
+            l = dig;
+        //if(flag)
+        //    l++;
         float _x = x + offset_x;
         float _y = y + offset_y;
         for(int n = 0;n < l;n++){
-            if(flag && n == 0)
-                bitmap = number[11].bitmap;
-            else
-                bitmap = number[getDigit(num,l-n)].bitmap;
+            if(flag && n == 0) {
+                bitmap = number[10].bitmap;
+                shader.drawUi(this,_x,_y,width,height,0,alpha);
+                if(orientation == ORIENTATION.horizontal) {
+                    _x += width;
+                }else {
+                    _y -= height;
+                }
+            }
+            bitmap = number[getDigit(num,l-n)].bitmap;
             shader.drawUi(this,_x,_y,width,height,0,alpha);
             if(orientation == ORIENTATION.horizontal) {
                 _x += width;
@@ -200,8 +220,10 @@ public class NumberText extends Image {
     }
 
     protected  int getDigit(int num, int digit){
+        digit = Math.abs(digit);
         if (digit <= 0)
             return 0;
+        num = Math.abs(num);
         int c = pow(10, digit - 1);
         int d = pow(10, digit);
         int a = num / c;
@@ -225,8 +247,10 @@ public class NumberText extends Image {
 
     protected void updatePosition(){
         int digit = getNumOfDigit(num);
-        if(num < 0)
-            num++;
+        if(digit < dig)
+            digit = dig;
+        if(num < 0 )
+            digit++;
         offset_y = base_margin * height;
         offset_x = 0;
         if(orientation == ORIENTATION.horizontal) {

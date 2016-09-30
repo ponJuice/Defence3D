@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.Player;
-import jp.ac.dendai.c.jtp.Game.ScoreManager;
+import jp.ac.dendai.c.jtp.Game.Score.ScoreManager;
 import jp.ac.dendai.c.jtp.Game.Screen.StageSelectScreen;
 import jp.ac.dendai.c.jtp.Game.Transition.LoadingTransition.LoadingTransition;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
@@ -21,7 +21,6 @@ import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIObserver;
 import jp.ac.dendai.c.jtp.SlopeUtil.SlopeUtil;
-import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 import jp.ac.dendai.c.jtp.defence3d.R;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
@@ -30,7 +29,7 @@ import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
  * Created by wark on 2016/09/28.
  */
 
-public class UIPanel {
+public class UIPanel extends Panel{
     protected UiRenderer uiRenderer;
     private Button button,attackButton,leftButton,rightButton,rotateResetButton;
     private Slider angle;
@@ -269,7 +268,8 @@ public class UIPanel {
         return flag;
     }
     public void draw(){
-        uiRenderer.drawAll();
+        if(enabled)
+            uiRenderer.drawAll();
     }
 
     public UiRenderer getUiRenderer(){

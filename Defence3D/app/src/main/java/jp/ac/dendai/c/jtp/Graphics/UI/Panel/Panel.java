@@ -1,6 +1,5 @@
 package jp.ac.dendai.c.jtp.Graphics.UI.Panel;
 
-import jp.ac.dendai.c.jtp.Game.ScoreManager;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.UiRenderer;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 

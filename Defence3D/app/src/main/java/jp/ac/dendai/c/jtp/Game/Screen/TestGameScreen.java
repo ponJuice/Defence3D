@@ -8,7 +8,9 @@ import jp.ac.dendai.c.jtp.Game.Enemy.Motion.MotionController;
 import jp.ac.dendai.c.jtp.Game.GameState.EndlessModeState;
 import jp.ac.dendai.c.jtp.Game.GameState.GameState;
 import jp.ac.dendai.c.jtp.Game.GameState.StateChangeListener;
+import jp.ac.dendai.c.jtp.Game.Score.ScoreManager;
 import jp.ac.dendai.c.jtp.Graphics.UI.Panel.GameOverPanel;
+import jp.ac.dendai.c.jtp.Graphics.UI.Panel.TimePanel;
 import jp.ac.dendai.c.jtp.Graphics.UI.Panel.UIPanel;
 import jp.ac.dendai.c.jtp.Game.Weapons.Battery.CuickBattery;
 import jp.ac.dendai.c.jtp.Game.Constant;
@@ -16,7 +18,6 @@ import jp.ac.dendai.c.jtp.Game.Enemy.EnemyObserver;
 import jp.ac.dendai.c.jtp.Game.Enemy.Inveder;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Game.Player;
-import jp.ac.dendai.c.jtp.Game.ScoreManager;
 import jp.ac.dendai.c.jtp.Game.Weapons.Bullet.BulletTemplate;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Effects.Bitmap.AnimationBitmap;
@@ -57,7 +58,9 @@ public class TestGameScreen extends Screenable {
     private Player player;
     private UIPanel panel;
     private GameOverPanel g_panel;
+    private TimePanel t_panel;
     private Image whiteOut;
+    private float playTime;
 
     private float cby,cbx;
 
@@ -236,7 +239,9 @@ public class TestGameScreen extends Screenable {
         Constant.setDebugModel(bullet_model);
         Constant.setDebugCamera(mainCamera);
 
-        g_panel = new GameOverPanel();
+        t_panel = new TimePanel();
+
+        g_panel = new GameOverPanel(t_panel);
         g_panel.setEnabled(false);
 
         panel = new UIPanel(player,mainCamera);
@@ -272,6 +277,8 @@ public class TestGameScreen extends Screenable {
             bullet.getPos();
 
             state.proc();
+            t_panel.setTime(playTime);
+            playTime += Time.getDeltaTime();
         }else if(state.getState() == GameState.GAME_STATE.GAMEOVER){
             whiteOut.setEnabled(true);
             float a = Clamp.bezier2Trajectory(0,1,1f,whiteBuffer/3f);
@@ -282,10 +289,13 @@ public class TestGameScreen extends Screenable {
 
             whiteBuffer += Time.getDeltaTime();
             if(whiteBuffer >= 3){
+                if(!ScoreManager.isSaved()) {
+                    ScoreManager.addScore("ENDLESS", ScoreManager.getScore(), (long) (playTime * 1000f));
+                    ScoreManager.saveScore();
+                }
                 //ゲームオーバー画面の表示
                 g_panel.setEnabled(true);
                 g_panel.proc();
-                g_panel.alpha = 1;
             }
         }
     }
@@ -293,7 +303,11 @@ public class TestGameScreen extends Screenable {
     @Override
     public void Draw(float offsetX, float offsetY) {
         renderer.drawAll();
+        if(!g_panel.getEnabled())
+            t_panel.draw();
         panel.draw();
+        if(g_panel.getEnabled())
+            t_panel.draw();
         g_panel.draw();
         alphaRenderer.drawAll();
         //Constant.debugDraw(0,0,0,1,1,1,0,0,0,1);
