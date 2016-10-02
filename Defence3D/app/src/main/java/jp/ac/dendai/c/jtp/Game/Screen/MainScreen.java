@@ -71,6 +71,17 @@ public class MainScreen extends Screenable {
         plane2.useBufferObject();
         tex.setBufferObject();
     }
+
+    @Override
+    public void onPause() {
+
+    }
+
+    @Override
+    public void onResume() {
+
+    }
+
     public MainScreen(){
         //シェーダの作成
         testShader = (DiffuseShader) Constant.getShader(Constant.SHADER.diffuse);

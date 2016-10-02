@@ -171,4 +171,14 @@ public class StageSelectScreen extends Screenable {
     public void init() {
 
     }
+
+    @Override
+    public void onPause() {
+
+    }
+
+    @Override
+    public void onResume() {
+
+    }
 }

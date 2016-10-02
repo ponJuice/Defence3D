@@ -13,16 +13,27 @@ import jp.ac.dendai.c.jtp.Game.Player;
  */
 
 public class EndlessModeState extends GameState{
+    public enum BORDER_STATE{
+        NON,
+        CAUTION,
+        DANGER
+    }
+    protected BORDER_STATE border_state = BORDER_STATE.NON;
     protected GameObject[] enemys;
     protected Player player;
     protected float border_line = 5f;
+    protected float caution_line = 10f;
     protected MotionController motionController;
     protected float speed1 = 0.5f,speed2 = 0.1f;
     public EndlessModeState(MotionController mo,Player player){
         super(GAME_STATE.PLAYING);
         motionController = mo;
-        motionController.setSpeedCoefficient(0);
+        //motionController.setSpeedCoefficient(0);
         this.player = player;
+    }
+
+    public BORDER_STATE getBorderState(){
+        return border_state;
     }
 
     public void setEnemys(GameObject[] es){
@@ -40,11 +51,15 @@ public class EndlessModeState extends GameState{
         //敵が全員いなくなる
         boolean clear_flag = true;
         int deadCount = 0;
+        border_state = BORDER_STATE.NON;
         for(int n = 0;n < enemys.length;n++) {
             if(!enemys[n].getPhysicsObject().freeze) {
                 clear_flag = false;
                 if (enemys[n].getPos().getZ() <= border_line && getState() != GAME_STATE.GAMEOVER) {
                     changeState(GAME_STATE.GAMEOVER);
+                }
+                if(enemys[n].getPos().getZ() <= caution_line && getState() != GAME_STATE.GAMEOVER){
+                    border_state = BORDER_STATE.CAUTION;
                 }
             }else if(enemys[n].getPhysicsObject().freeze)
                 deadCount++;

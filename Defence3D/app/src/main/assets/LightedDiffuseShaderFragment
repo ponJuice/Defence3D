@@ -1,0 +1,26 @@
+//UTF-8N 改行コードCR+LFで保存すること
+#ifdef GL_ES
+precision mediump float;
+#endif
+uniform sampler2D u_Sampler;	//図形に貼るテクスチャ
+uniform float u_alpha;
+uniform vec2 u_fog;
+uniform vec3 u_fog_color;
+uniform vec3 u_LightColor;
+varying vec2 v_TexCoord;	//頂点シェーダからテクスチャ座標を受け取る
+varying float v_Dist;       //視点からの距離
+varying float v_nDotL;
+void main() {
+  vec4 texColor = texture2D(u_Sampler,v_TexCoord);
+  //gl_FragColor = texColor;
+  //gl_FragColor.a *= u_alpha;
+
+  vec3 color = u_LightColor * texColor.rgb * v_nDotL;
+
+  //フォグ
+  float fogFactor = clamp((u_fog.x - v_Dist) / (u_fog.x - u_fog.y) , 0.0 , 1.0);
+  color = mix(u_fog_color,color,fogFactor);
+  gl_FragColor = vec4(color,texColor.w * u_alpha);
+
+  //gl_FragColor = vec4(0.0, 1.0, 0.0, 1);
+}

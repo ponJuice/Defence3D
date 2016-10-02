@@ -1,7 +1,12 @@
 package jp.ac.dendai.c.jtp.Graphics.UI.Panel;
 
+import android.media.SoundPool;
+
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.GameManager;
+import jp.ac.dendai.c.jtp.Game.Score.ScoreManager;
+import jp.ac.dendai.c.jtp.Game.Score.ScorePacage;
+import jp.ac.dendai.c.jtp.Game.Screen.StartScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestGameScreen;
 import jp.ac.dendai.c.jtp.Game.Transition.LoadingTransition.LoadingTransition;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.UiRenderer;
@@ -32,6 +37,8 @@ public class GameOverPanel extends Panel{
     protected float timeBuffer = 0;
     protected Button backToTitle,retry;
     public float alpha = 0;
+    protected SoundPool sp;
+    protected int button_sound;
     public GameOverPanel(TimePanel panel){
         t_panel = panel;
         renderer = new UiRenderer();
@@ -96,6 +103,27 @@ public class GameOverPanel extends Panel{
         backToTitle.setX(0);
         backToTitle.setY(0);
         backToTitle.setAlpha(0);
+        backToTitle.setButtonListener(new ButtonListener() {
+            @Override
+            public void touchDown(Button button) {
+
+            }
+
+            @Override
+            public void touchHover(Button button) {
+
+            }
+
+            @Override
+            public void touchUp(Button button) {
+                sp.play(button_sound,1,1,0,0,1);
+                ScoreManager.saveScore();
+                LoadingTransition lt = LoadingTransition.getInstance();
+                lt.initTransition(StartScreen.class);
+                GameManager.transition = lt;
+                GameManager.isTransition = true;
+            }
+        });
 
         retry = new Button(0,0,1,1,"RETRY");
         retry.setBitmap(Constant.getBitmap(Constant.BITMAP.system_button));
@@ -120,6 +148,8 @@ public class GameOverPanel extends Panel{
 
             @Override
             public void touchUp(Button button) {
+                sp.play(button_sound,1,1,0,0,1);
+                ScoreManager.saveScore();
                 LoadingTransition lt = LoadingTransition.getInstance();
                 lt.initTransition(TestGameScreen.class);
                 GameManager.transition = lt;
@@ -135,10 +165,16 @@ public class GameOverPanel extends Panel{
         renderer.addItem(backToTitle);
     }
 
+    public void setSoundPool(SoundPool sp,int button){
+        this.sp = sp;
+        button_sound = button;
+    }
+
     @Override
     public void proc() {
         if(first && enabled){
             first = false;
+            score.setNumber(ScoreManager.getScore());
             t_panel.changeResult();
         }
 

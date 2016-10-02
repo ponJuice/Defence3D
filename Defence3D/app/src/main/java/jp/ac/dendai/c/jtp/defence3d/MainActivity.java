@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethod;
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.Screen.DebugScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.StageSelectScreen;
+import jp.ac.dendai.c.jtp.Game.Screen.StartScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestModelViewScreen;
 import jp.ac.dendai.c.jtp.Game.Screen.TestUIScreen;
 import jp.ac.dendai.c.jtp.SlopeUtil.SlopeUtil;
@@ -124,12 +125,14 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer,Sen
     public void onResume(){
         super.onResume();
         SlopeUtil.onResume(this);
+        GameManager.onResume();
     }
 
     @Override
     public void onPause(){
         super.onPause();
         SlopeUtil.onPause(this);
+        GameManager.onPause();
     }
 
     @Override
@@ -148,7 +151,7 @@ public class MainActivity extends Activity implements GLSurfaceView.Renderer,Sen
         GameManager.init(this);
         GameManager.debugScreen = new DebugScreen();
         GameManager.debug = false;
-        GameManager.nowScreen = new StageSelectScreen();
+        GameManager.nowScreen = new StartScreen();//StageSelectScreen();
         GameManager.nowScreen.init();
         GameManager.nowScreen.unFreeze();
 

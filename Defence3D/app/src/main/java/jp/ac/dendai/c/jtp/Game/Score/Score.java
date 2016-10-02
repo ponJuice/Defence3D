@@ -51,6 +51,10 @@ public class Score implements Comparable{
         }
     }
 
+    public String getFormatString(){
+        return String.format("%04d/%02d/%02d %02d:%02d:%02d %d",year,month,day,Time.getHour(time),Time.getMinute(time),Time.getSecond(time),score);
+    }
+
     @Override
     public String toString(){
         return year+","+month+","+day+","+score+","+time;

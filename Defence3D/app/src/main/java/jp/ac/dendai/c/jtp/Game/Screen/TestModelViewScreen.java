@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
+import jp.ac.dendai.c.jtp.Game.Enemy.EnemyController;
 import jp.ac.dendai.c.jtp.Game.Enemy.Inveder;
 import jp.ac.dendai.c.jtp.Game.GameManager;
 import jp.ac.dendai.c.jtp.Game.GameObject;
@@ -106,7 +107,7 @@ public class TestModelViewScreen extends Screenable {
         ob1.getScl().setY(1f);
         ob1.getScl().setZ(1f);
         ob1.setDebugDraw(true);*/
-        ob1 = new Inveder(physics);
+        ob1 = new Inveder(physics,new EnemyController());
         ob1.setName("ob1");
         ob1.getRenderMediator().mesh = inveder;
         ob1.getRenderMediator().isDraw = true;
@@ -392,5 +393,15 @@ public class TestModelViewScreen extends Screenable {
         //バッファオブジェクトを使用する
         box.useBufferObject();
         inveder.useBufferObject();
+    }
+
+    @Override
+    public void onPause() {
+
+    }
+
+    @Override
+    public void onResume() {
+
     }
 }

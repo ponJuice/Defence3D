@@ -9,6 +9,8 @@ public abstract class Screenable {
 	public abstract void Touch();
 	public abstract void death();
 	public abstract void init();
+	public abstract void onPause();
+	public abstract void onResume();
 	public void freeze(){freeze = true;};
 	public void unFreeze(){freeze = false;};
 }

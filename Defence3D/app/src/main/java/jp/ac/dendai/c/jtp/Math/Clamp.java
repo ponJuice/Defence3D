@@ -47,4 +47,20 @@ public class Clamp {
         return (1f-time)*(1f-time)*(1f-time)*start + 3f*(1f-time)*(1f-time)*time*control1 + 3f*(1-time)*time*time*control2 + time*time*time*end;
 
     }
+    public static void bezier2Trajectory(Vector3 targetPosition, Vector3 start, Vector3 end, Vector3 control, float time){
+        targetPosition.setX((1f-time)*(1-time)*start.getX() + 2f*(1f-time)*time*control.getX() + time*time*end.getX());
+        targetPosition.setY((1f-time)*(1-time)*start.getY() + 2f*(1f-time)*time*control.getY() + time*time*end.getY());
+        targetPosition.setZ((1f-time)*(1-time)*start.getZ() + 2f*(1f-time)*time*control.getZ() + time*time*end.getZ());
+    }
+    public static void bezier3Trajectory(Vector3 targetPosition,Vector3 start,Vector3 end,Vector3 control1,Vector3 control2,float time){
+        targetPosition.setX(
+                (1f-time)*(1f-time)*(1f-time)*start.getX() + 3f*(1f-time)*(1f-time)*time*control1.getX() + 3f*(1-time)*time*time*control2.getX() + time*time*time*end.getX()
+        );
+        targetPosition.setY(
+                (1f-time)*(1f-time)*(1f-time)*start.getY() + 3f*(1f-time)*(1f-time)*time*control1.getY() + 3f*(1-time)*time*time*control2.getY() + time*time*time*end.getY()
+        );
+        targetPosition.setZ(
+                (1f-time)*(1f-time)*(1f-time)*start.getZ() + 3f*(1f-time)*(1f-time)*time*control1.getZ() + 3f*(1-time)*time*time*control2.getZ() + time*time*time*end.getZ()
+        );
+    }
 }

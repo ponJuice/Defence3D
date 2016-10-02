@@ -1,5 +1,6 @@
 package jp.ac.dendai.c.jtp.Game;
 
+import android.media.SoundPool;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -16,6 +17,9 @@ import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 import jp.ac.dendai.c.jtp.SlopeUtil.SlopeUtil;
 import jp.ac.dendai.c.jtp.Time;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
+import jp.ac.dendai.c.jtp.defence3d.R;
+
+import static android.media.AudioManager.STREAM_MUSIC;
 
 /**
  * Created by テツヤ on 2016/09/04.
@@ -39,6 +43,8 @@ public class Player extends GameObject implements Touchable{
     protected boolean damaged = false;
     protected float damageTime = 1f;
     protected float timeBuffer = 0;
+    protected SoundPool sp;
+    protected int cannon_id,damage_id;
 
     public Player(GameObject[] parts){
         this.name = "Player";
@@ -69,6 +75,7 @@ public class Player extends GameObject implements Touchable{
                 hp--;
                 damaged = true;
                 timeBuffer = 0;
+                sp.play(damage_id,1,1,0,0,1);
                 Log.d("Player","Player Damaged!! HP : "+hp);
             }
 
@@ -82,6 +89,19 @@ public class Player extends GameObject implements Touchable{
 
             }
         });
+    }
+
+    public void initSoundPool(){
+        if(sp == null)
+            sp = new SoundPool(5,STREAM_MUSIC,0);
+        cannon_id = sp.load(GameManager.getAct(), R.raw.cannon2,0);
+        damage_id = sp.load(GameManager.getAct(),R.raw.destruction1,0);
+    }
+
+    public void releaseSoundPool(){
+        if(sp == null)
+            return;
+        sp.release();
     }
 
     public int getHp(){return hp;}
@@ -136,7 +156,10 @@ public class Player extends GameObject implements Touchable{
         velocity.setY(l[1]);
         velocity.setZ(l[2]);
         velocity.sub(pos);
+        if(sp != null)
+            sp.play(cannon_id,1,1,0,0,1);
         battery.attack(this, velocity.getX(), velocity.getY(), velocity.getZ());
+
     }
 
     @Override

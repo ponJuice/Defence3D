@@ -21,10 +21,12 @@ public class ScoreManager {
     private static HashMap<String,ScorePacage> map = new HashMap<>();
     public static void loadScore(){
         String str = FileManager.readTextFile("score.dat");
+        Log.d("Loat file [score.dat]",str);
         String[] lines = str.split("\n");
         String modeName = "";
         for(int line = 0;line < lines.length;line++){
             String[] sep = lines[line].split(",");
+            Log.d("Load Score","line : "+sep.length);
             if(sep.length != 5 && sep.length != 1) {
                 throw new RuntimeException("スコアファイルが破損している可能性があります");
             }

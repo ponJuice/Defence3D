@@ -38,6 +38,8 @@ public abstract class Mesh {
     }
     public void deleteBufferObject(){
         GLES20.glDeleteBuffers(2,new int[]{getVBO(),getIBO()},0);
+        setIBO(-1);
+        setVBO(-1);
     }
     public abstract Face[] getFaces();
     public static FloatBuffer makeFloatBuffer(float[] array) {

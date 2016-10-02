@@ -197,4 +197,11 @@ public class Vector3 extends Vector {
     public String toString(){
         return "("+value[0]+","+value[1]+","+value[2]+")";
     }
+
+    public static void normalize(float[] vec){
+        double temp = Math.sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]);
+        vec[0] /= temp;
+        vec[1] /= temp;
+        vec[2] /= temp;
+    }
 }

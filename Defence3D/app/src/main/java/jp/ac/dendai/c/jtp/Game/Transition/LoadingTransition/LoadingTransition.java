@@ -25,7 +25,7 @@ public class LoadingTransition implements Transitionable {
 	private Class<?> nextScreenClass;
 	private Image image;
 	private StaticText loading;
-	private int r = 0,g = 255, b = 0;
+	private int r = 0,g = 0, b = 0;
 	private LoadingThread thread;
 	private Object lock;
 	private float timeBuffer = 0;

@@ -67,7 +67,7 @@ public class EffectObject extends GameObject {
                 }
             }
             timeBuffer += Time.getDeltaTime();
-            Log.d("Effect Object","Effect!! count : "+ effectCount);
+            //Log.d("Effect Object","Effect!! count : "+ effectCount);
         }
     }
 }

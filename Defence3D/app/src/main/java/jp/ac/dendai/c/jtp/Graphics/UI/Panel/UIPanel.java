@@ -40,6 +40,7 @@ public class UIPanel extends Panel{
     private Player player;
     private Camera mainCamera;
     private UIObserver uiObserver;
+    private NumberText hp_text;
 
     public UIPanel(Player p,Camera camera){
         this.player = p;
@@ -82,12 +83,12 @@ public class UIPanel extends Panel{
         });
         button.setTouchThrough(false);
 
-        leftButton = new Button(0,0,0.1f,0.1f,"<");
+        leftButton = new Button(0,0,0.1f,0.2f,"<");
         leftButton.setBitmap(buttonImage);
         leftButton.setCriteria(Button.CRITERIA.HEIGHT);
         leftButton.setHorizontal(UIAlign.Align.RIGHT);
         leftButton.setVertical(UIAlign.Align.BOTTOM);
-        leftButton.setX(GLES20Util.getWidth_gl() - 0.205f);
+        leftButton.setX(GLES20Util.getWidth_gl() - 0.25f);
         leftButton.setY(0);
         leftButton.setWidth(0.2f);
         leftButton.useAspect(true);
@@ -108,7 +109,7 @@ public class UIPanel extends Panel{
             }
         });
 
-        rightButton = new Button(0,0,0.1f,0.1f,">");
+        rightButton = new Button(0,0,0.1f,0.2f,">");
         rightButton.setBitmap(buttonImage);
         rightButton.setCriteria(Button.CRITERIA.HEIGHT);
         rightButton.setHorizontal(UIAlign.Align.RIGHT);
@@ -141,7 +142,7 @@ public class UIPanel extends Panel{
         rotateResetButton.setHorizontal(UIAlign.Align.LEFT);
         rotateResetButton.setVertical(UIAlign.Align.BOTTOM);
         rotateResetButton.setX(0);
-        rotateResetButton.setY(0);
+        rotateResetButton.setY(0.25f);
         rotateResetButton.setWidth(0.2f);
         rotateResetButton.useAspect(true);
         rotateResetButton.setTouchThrough(false);
@@ -180,13 +181,13 @@ public class UIPanel extends Panel{
         });
         angle.setTouchThrough(false);
 
-        attackButton = new Button(0,0,0.3f,0.1f,"Attack");
+        attackButton = new Button(0,0,0.4f,0.2f,"ATK");
         attackButton.useAspect(true);
         attackButton.setCriteria(Button.CRITERIA.HEIGHT);
         attackButton.setHorizontal(UIAlign.Align.LEFT);
         attackButton.setVertical(UIAlign.Align.BOTTOM);
         attackButton.setX(0);
-        attackButton.setY(0.1f);
+        attackButton.setY(0);
         attackButton.setBitmap(buttonImage);
         attackButton.setButtonListener(new ButtonListener() {
             @Override
@@ -231,6 +232,14 @@ public class UIPanel extends Panel{
         attack.setY(GLES20Util.getHeight_gl());
         attack.setAlpha(0);
 
+        hp_text = new NumberText("メイリオ");
+        hp_text.setNumber(0);
+        hp_text.setHorizontal(UIAlign.Align.CENTOR);
+        hp_text.setVertical(UIAlign.Align.CENTOR);
+        hp_text.setHeight(0.1f);
+        hp_text.setX(GLES20Util.getWidth_gl()/2f + 0.3f);
+        hp_text.setY(GLES20Util.getHeight_gl() - 0.135f);
+
 
         uiRenderer.addItem(button);
         uiRenderer.addItem(attackButton);
@@ -241,6 +250,7 @@ public class UIPanel extends Panel{
         uiRenderer.addItem(attack);
         uiRenderer.addItem(scoreText);
         uiRenderer.addItem(rotateResetButton);
+        uiRenderer.addItem(hp_text);
 
         uiObserver.addItem(button);
         uiObserver.addItem(attackButton);
@@ -251,11 +261,18 @@ public class UIPanel extends Panel{
         uiObserver.addItem(attack);
         uiObserver.addItem(scoreText);
         uiObserver.addItem(rotateResetButton);
+        uiObserver.addItem(hp_text);
     }
     public void proc() {
         scoreText.setNumber(ScoreManager.getScore());
         scoreText.proc();
         button.proc();
+        hp_text.setNumber(player.getHp());
+        if(player.getHp() < 100/10){
+            hp_text.setR(1f);
+            hp_text.setG(0.8f);
+            hp_text.setB(0);
+        }
         attackButton.proc();
         uiObserver.proc();
 

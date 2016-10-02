@@ -1,5 +1,6 @@
 package jp.ac.dendai.c.jtp.Game.Enemy;
 
+import android.media.SoundPool;
 import android.util.Log;
 
 import jp.ac.dendai.c.jtp.Game.GameState.GameState;
@@ -42,14 +43,19 @@ public class Inveder extends GameObject {
     protected int score = 100;
     protected float damageTime = 1.5f,damageTimeBuffer=0;
     protected float scoreTime = 1f,scoreTimeBuffer = 0;
+    protected float attack_coffi = 100;
+    protected float attack_interval_time = 5;
     private GameObject[] targetList;
     private EnemyBulletList bullet;
     private Animator anim;
-    public Inveder(Physics3D physics){
+    protected EnemyController ec;
+    public Inveder(Physics3D physics,EnemyController _ec){
         OBBCollider col = new OBBCollider(0,3.5f,0   ,9f/2f ,5f/2f ,0.5f);
         col.setUseOBB(false);
         OBBCollider col2 = new OBBCollider(0,3.5f,0  ,2.5f  ,7f/2f ,0.5f);
         col2.setUseOBB(false);
+
+        this.ec = _ec;
 
         col.setNext(col2);
 
@@ -82,6 +88,8 @@ public class Inveder extends GameObject {
                     rm.isDraw = false;
                     scor_object.getPos().copy(pos);
                     scor_object.getRenderMediator().isDraw = true;
+                    if(ec != null)
+                        ec.startExplode(1f,1f,0,1);
                 }
                 else {
                     state = STATE.DAMAGE;
@@ -123,6 +131,8 @@ public class Inveder extends GameObject {
         scor_object.getScl().setX(2f*aspect);
         scor_object.getRot().setX(-90);
         scor_object.getRot().setZ(180);
+
+        attack_interval_time = Constant.getRandom().nextFloat() * attack_coffi + 5f;
 
         physics.addObject(po);
     }
@@ -168,10 +178,11 @@ public class Inveder extends GameObject {
         if(po.freeze || GameState.getState() != GameState.GAME_STATE.PLAYING)
             return;
         if(state == STATE.NON) {
-            if (timeBuffer >= 5) {
+            if (timeBuffer >= attack_interval_time) {
                 timeBuffer = 0;
-                if (Constant.getRandom().nextInt(50) == 0) {
-                    GameObject b = bullet.get();
+                attack_interval_time = Constant.getRandom().nextFloat() * attack_coffi;
+                GameObject b = bullet.get();
+                if(b != null) {
                     float time = 2;
                     float max_y = Math.abs(getPos().getY()) + Math.abs(targetList[0].getPos().getY());
                     b.getPos().copy(this.getPos());
@@ -182,6 +193,7 @@ public class Inveder extends GameObject {
                     b.getPhysicsObject().velocity.setZ((targetList[0].getPos().getZ() - pos.getZ()) / time);
                     b.getPhysicsObject().freeze = false;
                     b.getRenderMediator().isDraw = true;
+                    ec.startCannon(1,1,0,1);
                     Log.d("String", "attack!");
                 }
             }

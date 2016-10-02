@@ -9,6 +9,7 @@ import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
 import jp.ac.dendai.c.jtp.Graphics.Camera.UiCamera;
 import jp.ac.dendai.c.jtp.Graphics.Model.Mesh;
 import jp.ac.dendai.c.jtp.Graphics.Shader.DiffuseShader;
+import jp.ac.dendai.c.jtp.Graphics.Shader.LightedDiffuseShader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
@@ -23,7 +24,8 @@ import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMO
 public class Constant {
     public enum SHADER{
         ui,
-        diffuse
+        diffuse,
+        lightedDiffuse
     }
     public enum BITMAP{
         white,
@@ -46,7 +48,7 @@ public class Constant {
     protected static Camera activeUiCamera;
     protected static UiShader loadingShader;
     protected static UiCamera loadingCamera;
-    protected static Shader uiShader,diffuseShader;
+    protected static Shader uiShader,diffuseShader,lightedDiffuseShader;
     protected static Mesh debugModel;
     protected static Camera debugCamera;
 
@@ -114,8 +116,13 @@ public class Constant {
         loadingShader.setCamera(loadingCamera);
 
         diffuseShader = new DiffuseShader();
+
         uiShader = new UiShader();
+
         uiShader.setCamera(getActiveUiCamera());
+
+        lightedDiffuseShader = new LightedDiffuseShader();
+
 
         //UIを使えるようにする
         UI.init();
@@ -137,6 +144,8 @@ public class Constant {
             return uiShader;
         else if(type == SHADER.diffuse)
             return diffuseShader;
+        else if(type == SHADER.lightedDiffuse)
+            return lightedDiffuseShader;
         else
             return null;
     }
