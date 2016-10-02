@@ -18,7 +18,9 @@ public class AlphaRenderer extends Renderer {
         shader.updateCamera();
         RenderItem temp = ite;
         do{
-            if(temp.rm != null && temp.rm.isDraw) {
+            if(temp.rm != null)
+                temp.rm.gameObject.update();
+            if(temp.rm.isDraw) {
                 temp.rm.draw();
             }
             temp = temp.prev;

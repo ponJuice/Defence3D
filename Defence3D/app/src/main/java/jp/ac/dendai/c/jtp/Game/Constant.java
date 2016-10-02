@@ -45,6 +45,7 @@ public class Constant {
     protected static Bitmap text_effect_white,text_effect_mask,system_button,black;
     protected static Camera activeUiCamera;
     protected static UiShader loadingShader;
+    protected static UiCamera loadingCamera;
     protected static Shader uiShader,diffuseShader;
     protected static Mesh debugModel;
     protected static Camera debugCamera;
@@ -58,7 +59,7 @@ public class Constant {
     }
 
     public static UiShader getLoadingShader(){
-        return (UiShader) uiShader;
+        return loadingShader;
     }
 
     public static void setDebugModel(Mesh mesh){
@@ -77,6 +78,10 @@ public class Constant {
         diffuseShader.draw(debugModel,x,y,z,lx,ly,lz,dx,dy,dz,alpha, GLES20COMPOSITIONMODE.ALPHA);
         GLES20.glDepthMask(true);
         //GLES20.glDepthMask(true);
+    }
+
+    public static UiCamera getLoadingCamera(){
+        return loadingCamera;
     }
 
     public static Random getRandom(){
@@ -103,9 +108,10 @@ public class Constant {
 
         //カメラ
         activeUiCamera = new UiCamera();
+        loadingCamera = new UiCamera();
 
         loadingShader = new UiShader();
-        loadingShader.setCamera(activeUiCamera);
+        loadingShader.setCamera(loadingCamera);
 
         diffuseShader = new DiffuseShader();
         uiShader = new UiShader();

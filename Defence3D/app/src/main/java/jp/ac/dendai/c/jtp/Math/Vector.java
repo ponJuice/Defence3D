@@ -43,6 +43,7 @@ public abstract class Vector {
     public abstract void normalize();
     public abstract Vector copy();
     public abstract void copy(Vector vec);
+    public abstract float[] getRawValue();
     public void copy(float[] a){
         setX(a[0]);
         setY(a[1]);

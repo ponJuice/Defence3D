@@ -4,7 +4,9 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import jp.ac.dendai.c.jtp.Game.Weapons.Battery.Battery;
+import jp.ac.dendai.c.jtp.Graphics.Bitmap.Animator;
 import jp.ac.dendai.c.jtp.Graphics.Camera.Camera;
+import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.PlayerRenderMediator;
 import jp.ac.dendai.c.jtp.Math.Vector3;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
@@ -12,6 +14,7 @@ import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 import jp.ac.dendai.c.jtp.SlopeUtil.SlopeUtil;
+import jp.ac.dendai.c.jtp.Time;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
 
 /**
@@ -32,6 +35,10 @@ public class Player extends GameObject implements Touchable{
     protected Touch touch;
     protected Camera camera;
     protected float speed = 10f;
+    protected int hp = 100;
+    protected boolean damaged = false;
+    protected float damageTime = 1f;
+    protected float timeBuffer = 0;
 
     public Player(GameObject[] parts){
         this.name = "Player";
@@ -59,7 +66,10 @@ public class Player extends GameObject implements Touchable{
         setCollisionListener(new CollisionListener() {
             @Override
             public void collEnter(ACollider col, GameObject owner) {
-                Log.d("Player","Player Damaged!!");
+                hp--;
+                damaged = true;
+                timeBuffer = 0;
+                Log.d("Player","Player Damaged!! HP : "+hp);
             }
 
             @Override
@@ -73,6 +83,8 @@ public class Player extends GameObject implements Touchable{
             }
         });
     }
+
+    public int getHp(){return hp;}
 
     public void setBattery(Battery battery){
         this.battery = battery;
@@ -141,6 +153,16 @@ public class Player extends GameObject implements Touchable{
         this.camera = camera;
     }
     public void proc(){
+        if(damaged){
+            if(timeBuffer >= damageTime){
+                damaged = false;
+            }else{
+                rot.setX(rot.getX() + 0.1f-Constant.getRandom().nextFloat()-0.05f);
+                rot.setY(rot.getY() + 0.1f-Constant.getRandom().nextFloat()-0.05f);
+                timeBuffer += Time.getDeltaTime();
+            }
+        }
+
         battery.proc();
 
         p[0] = direct.getX()*radius;

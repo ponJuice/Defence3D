@@ -152,7 +152,8 @@ public class Camera {
             if (camera.getPersUpdate())
                 setPerspectiveM(camera.getCameraMatrix(), 0, camera.getAngleOfView(), (double) GLES20Util.getWidth() / GLES20Util.getHight(), camera.getNear(), camera.getmFar());
             if (camera.getPosUpdate())
-                Matrix.setLookAtM(camera.getTransformMatrix(), 0, camera.getPosition(Camera.POSITION.X),
+                Matrix.setLookAtM(camera.getTransformMatrix(), 0,
+                        camera.getPosition(Camera.POSITION.X),
                         camera.getPosition(Camera.POSITION.Y),
                         camera.getPosition(Camera.POSITION.Z),
                         camera.getLookPosition(Camera.POSITION.X),

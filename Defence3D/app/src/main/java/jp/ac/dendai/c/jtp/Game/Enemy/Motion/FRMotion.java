@@ -12,7 +12,7 @@ import jp.ac.dendai.c.jtp.Time;
 public class FRMotion extends Motion{
     public int step = 1;
     public int step_count = -1;
-    public float delta_x = 5f,delta_y = 0,delta_z = 5f;
+    public float delta_x = 5f,delta_y = 0,delta_z = 10f;
     public float moveTime = 1;
     public float interval = 0.5f;
     public boolean reverse = false,x_r = false;

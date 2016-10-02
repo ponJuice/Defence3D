@@ -2,19 +2,24 @@ package jp.ac.dendai.c.jtp.Game.Enemy;
 
 import android.util.Log;
 
+import jp.ac.dendai.c.jtp.Game.GameState.GameState;
 import jp.ac.dendai.c.jtp.Game.Score.ScoreManager;
+import jp.ac.dendai.c.jtp.Game.Screen.TestGameScreen;
 import jp.ac.dendai.c.jtp.Game.Weapons.Bullet.Bullet;
 import jp.ac.dendai.c.jtp.Game.Constant;
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Graphics.Effects.Bitmap.Animator;
 import jp.ac.dendai.c.jtp.Graphics.Model.Primitive.Plane;
+import jp.ac.dendai.c.jtp.Graphics.Renderer.RenderMediator;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.Renderer;
+import jp.ac.dendai.c.jtp.Math.Clamp;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
 import jp.ac.dendai.c.jtp.Physics.Collider.OBBCollider;
 import jp.ac.dendai.c.jtp.Physics.Listener.CollisionListener;
 import jp.ac.dendai.c.jtp.Physics.Physics.Physics3D;
 import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 import jp.ac.dendai.c.jtp.Time;
+import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
@@ -31,13 +36,14 @@ public class Inveder extends GameObject {
     protected STATE state = STATE.NON;
     private float timeBuffer = 0;
     protected Renderer alphaRenderer;
-    protected GameObject effect;
-    protected Plane p;
+    protected GameObject effect,scor_object;
+    protected Plane p,s;
     protected int hp = 100;
     protected int score = 100;
-    protected float damageTime=0,damageTimeBuffer=0;
+    protected float damageTime = 1.5f,damageTimeBuffer=0;
+    protected float scoreTime = 1f,scoreTimeBuffer = 0;
     private GameObject[] targetList;
-    private GameObject bullet;
+    private EnemyBulletList bullet;
     private Animator anim;
     public Inveder(Physics3D physics){
         OBBCollider col = new OBBCollider(0,3.5f,0   ,9f/2f ,5f/2f ,0.5f);
@@ -45,12 +51,11 @@ public class Inveder extends GameObject {
         OBBCollider col2 = new OBBCollider(0,3.5f,0  ,2.5f  ,7f/2f ,0.5f);
         col2.setUseOBB(false);
 
-        damageTime = 1;
-
         col.setNext(col2);
 
         setCollider(col);
-        setPhysicsObject(new PhysicsObject(this));
+        super.init();
+        init();
         po.useGravity = false;
         po.tag = Constant.COLLISION_ENEMY;
         po.mask = Constant.COLLISION_PLAYERBULLET;
@@ -75,6 +80,8 @@ public class Inveder extends GameObject {
                     effect.getPos().setY(pos.getY() + 1f);
                     effect.getRenderMediator().isDraw = true;
                     rm.isDraw = false;
+                    scor_object.getPos().copy(pos);
+                    scor_object.getRenderMediator().isDraw = true;
                 }
                 else {
                     state = STATE.DAMAGE;
@@ -97,7 +104,7 @@ public class Inveder extends GameObject {
 
         effect = new GameObject();
         effect.getScl().setX(3f);
-        effect.getScl().setY(3f);
+        //effect.getScl().setY(3f);
         effect.getScl().setZ(3f);
         p = new Plane();
         effect.getRot().setX(-90);
@@ -105,12 +112,42 @@ public class Inveder extends GameObject {
         effect.getRenderMediator().isDraw = false;
         effect.getRenderMediator().mode = GLES20COMPOSITIONMODE.ADD;
 
+        s = new Plane();
+        s.setImage(GLES20Util.stringToBitmap("+"+String.valueOf(score),25,255,255,255));
+        scor_object = new GameObject();
+        scor_object.getRenderMediator().mesh = s;
+        scor_object.getRenderMediator().isDraw = false;
+        scor_object.getRenderMediator().mode = GLES20COMPOSITIONMODE.ALPHA;
+        float aspect = (float)s.getFaces()[0].matelial.tex_diffuse.getWidth() / (float)s.getFaces()[0].matelial.tex_diffuse.getHeight();
+        scor_object.getScl().setZ(2f);
+        scor_object.getScl().setX(2f*aspect);
+        scor_object.getRot().setX(-90);
+        scor_object.getRot().setZ(180);
+
         physics.addObject(po);
+    }
+
+    public void setHp(int h){
+        hp = h;
+    }
+
+    @Override
+    public void init(){
+        hp = 100;
+        damageTime = 1.5f;
+        damageTimeBuffer = 0;
+        scoreTime = 1f;
+        scoreTimeBuffer = 0;
+        timeBuffer = 0;
+        state = STATE.NON;
+        if(anim != null)
+            anim.index = 0;
     }
 
     public void setAlphaRenderer(Renderer a){
         alphaRenderer = a;
         alphaRenderer.addItem(effect);
+        alphaRenderer.addItem(scor_object);
     }
 
     public void setAnim(Animator anim){
@@ -118,7 +155,7 @@ public class Inveder extends GameObject {
         p.setImage(anim.getBitmap(0));
     }
 
-    public void setBullets(GameObject bullet){
+    public void setBullets(EnemyBulletList bullet){
         this.bullet = bullet;
     }
 
@@ -128,22 +165,23 @@ public class Inveder extends GameObject {
 
     @Override
     public void update(){
-        if(po.freeze)
+        if(po.freeze || GameState.getState() != GameState.GAME_STATE.PLAYING)
             return;
         if(state == STATE.NON) {
             if (timeBuffer >= 5) {
                 timeBuffer = 0;
-                if (Constant.getRandom().nextInt(100) % 80 == 0) {
+                if (Constant.getRandom().nextInt(50) == 0) {
+                    GameObject b = bullet.get();
                     float time = 2;
                     float max_y = Math.abs(getPos().getY()) + Math.abs(targetList[0].getPos().getY());
-                    bullet.getPos().copy(this.getPos());
-                    bullet.getPhysicsObject().velocity.setX((targetList[0].getPos().getX() - getPos().getX()) / time);
+                    b.getPos().copy(this.getPos());
+                    b.getPhysicsObject().velocity.setX((targetList[0].getPos().getX() - getPos().getX()) / time);
                     float g = -Constant.getPhysicsInfo().gravity.getY();
-                    bullet.getPhysicsObject().velocity.setY(0.5f * g * time
+                    b.getPhysicsObject().velocity.setY(0.5f * g * time
                             + max_y / time);
-                    bullet.getPhysicsObject().velocity.setZ((targetList[0].getPos().getZ() - pos.getZ()) / time);
-                    bullet.getPhysicsObject().freeze = false;
-                    bullet.getRenderMediator().isDraw = true;
+                    b.getPhysicsObject().velocity.setZ((targetList[0].getPos().getZ() - pos.getZ()) / time);
+                    b.getPhysicsObject().freeze = false;
+                    b.getRenderMediator().isDraw = true;
                     Log.d("String", "attack!");
                 }
             }
@@ -153,11 +191,15 @@ public class Inveder extends GameObject {
             if(damageTimeBuffer > damageTime) {
                 effect.getRenderMediator().isDraw = false;
                 if (state == STATE.DEAD_EFFECT) {
-                    if (alphaRenderer != null)
-                        alphaRenderer.removeItem(effect);
-                    po.getPhysics3D().removeObject(po);
+                    if (alphaRenderer != null) {
+                        //alphaRenderer.removeItem(effect);
+                        //alphaRenderer.removeItem(scor_object);
+                        effect.getRenderMediator().isDraw = false;
+                        scor_object.getRenderMediator().isDraw = false;
+                    }
+                    //po.getPhysics3D().removeObject(po);
                     po.freeze = true;
-                    rm.renderer.removeItem(this);
+                    //rm.renderer.removeItem(this);
                     state = STATE.DEAD;
                 } else if (state == STATE.DAMAGE) {
                     state = STATE.NON;
@@ -167,6 +209,12 @@ public class Inveder extends GameObject {
                 anim.next();
             }
             damageTimeBuffer += Time.getDeltaTime();
+        }
+        if(state == STATE.DEAD_EFFECT){
+            float clamp = Clamp.clamp(0,1,scoreTimeBuffer/scoreTime);
+            scor_object.getRenderMediator().alpha = 1f - clamp;
+            scor_object.getPos().setY(pos.getY() + 0.5f +  clamp);
+            scoreTimeBuffer += Time.getDeltaTime();
         }
     }
 }

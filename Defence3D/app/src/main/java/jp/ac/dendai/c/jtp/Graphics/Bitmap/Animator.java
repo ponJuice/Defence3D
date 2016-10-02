@@ -18,6 +18,23 @@ public class Animator {
         mesh = target;
     }
 
+    public Animator(Animator animator){
+        reverse = animator.reverse;
+        ab = animator.ab;
+        this.mesh = animator.mesh;
+    }
+
+    public void setMesh(Mesh mesh){
+        this.mesh = mesh;
+        this.mesh.getFaces()[0].matelial.tex_diffuse = getBitmap(0);
+    }
+
+    public void setIndex(int index){
+        index = Math.abs(index) % ab.animation.length;
+        this.index = index;
+        mesh.getFaces()[0].matelial.tex_diffuse = ab.animation[index];
+    }
+
     public void next(){
         mesh.getFaces()[0].matelial.tex_diffuse = getBitmapNext();
     }
@@ -33,6 +50,10 @@ public class Animator {
         else if(index >= ab.animation.length)
             index = 0;
         return temp;
+    }
+
+    public int getAnimationLength(){
+        return ab.animation.length;
     }
 
     public Bitmap getBitmap(int num){

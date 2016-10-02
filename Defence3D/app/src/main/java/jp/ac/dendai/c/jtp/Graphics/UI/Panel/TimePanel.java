@@ -122,14 +122,12 @@ public class TimePanel extends Panel{
         minute.setG(0);
         minute.setB(0);
         minute.setStuffing(2);
-        minute.setNumber(59);
 
         second.setHorizontal(UIAlign.Align.LEFT);
         second.setVertical(UIAlign.Align.CENTOR);
         second.setX(minute.getX() + minute.getWidth() + 0.06f);
         second.setY(GLES20Util.getHeight_gl() - 0.92f);
         second.setHeight(0.1f);
-        second.setNumber(20);
         second.setR(0);
         second.setG(0);
         second.setB(0);

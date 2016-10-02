@@ -12,7 +12,7 @@ import jp.ac.dendai.c.jtp.Time;
 public class LRMotion extends Motion{
     public int step = 5;
     public int step_count = 0;
-    public float delta_x = 5f,delta_y = 0,delta_z = 5f;
+    public float delta_x = 5f,delta_y = 0,delta_z = 10f;
     public float moveTime = 1;
     public float interval = 0.5f;
     public boolean reverse = true,x_r = false;
@@ -79,7 +79,7 @@ public class LRMotion extends Motion{
 
                     //Log.d("LRMotion","x,y,z"+_x+" : "+_y+" : "+_z);
 
-                    motionController.objects[count].update();
+                    //motionController.objects[count].update();
 
                     count++;
                 }

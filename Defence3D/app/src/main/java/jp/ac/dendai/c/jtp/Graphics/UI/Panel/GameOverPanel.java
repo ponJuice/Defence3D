@@ -1,12 +1,17 @@
 package jp.ac.dendai.c.jtp.Graphics.UI.Panel;
 
 import jp.ac.dendai.c.jtp.Game.Constant;
+import jp.ac.dendai.c.jtp.Game.GameManager;
+import jp.ac.dendai.c.jtp.Game.Screen.TestGameScreen;
+import jp.ac.dendai.c.jtp.Game.Transition.LoadingTransition.LoadingTransition;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.UiRenderer;
 import jp.ac.dendai.c.jtp.Graphics.Shader.UiShader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Button.Button;
+import jp.ac.dendai.c.jtp.Graphics.UI.Button.ButtonListener;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.NumberText;
 import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
+import jp.ac.dendai.c.jtp.Graphics.UI.UIObserver;
 import jp.ac.dendai.c.jtp.Math.Clamp;
 import jp.ac.dendai.c.jtp.Time;
 import jp.ac.dendai.c.jtp.TouchUtil.Touch;
@@ -21,6 +26,7 @@ public class GameOverPanel extends Panel{
     protected NumberText score;
     protected NumberText hour,minute,second;
     protected UiRenderer renderer;
+    protected UIObserver uiObserver;
     protected TimePanel t_panel;
     protected boolean first = true;
     protected float timeBuffer = 0;
@@ -86,11 +92,46 @@ public class GameOverPanel extends Panel{
         backToTitle.setCriteria(Button.CRITERIA.HEIGHT);
         backToTitle.setHorizontal(UIAlign.Align.LEFT);
         backToTitle.setVertical(UIAlign.Align.BOTTOM);
-        backToTitle.setWidth(0.2f);
+        backToTitle.setWidth(0.4f);
         backToTitle.setX(0);
         backToTitle.setY(0);
         backToTitle.setAlpha(0);
 
+        retry = new Button(0,0,1,1,"RETRY");
+        retry.setBitmap(Constant.getBitmap(Constant.BITMAP.system_button));
+        retry.useAspect(true);
+        retry.setCriteria(Button.CRITERIA.HEIGHT);
+        retry.setHorizontal(UIAlign.Align.RIGHT);
+        retry.setVertical(UIAlign.Align.BOTTOM);
+        retry.setWidth(0.4f);
+        retry.setX(GLES20Util.getWidth_gl());
+        retry.setY(0);
+        retry.setAlpha(0);
+        retry.setButtonListener(new ButtonListener() {
+            @Override
+            public void touchDown(Button button) {
+
+            }
+
+            @Override
+            public void touchHover(Button button) {
+
+            }
+
+            @Override
+            public void touchUp(Button button) {
+                LoadingTransition lt = LoadingTransition.getInstance();
+                lt.initTransition(TestGameScreen.class);
+                GameManager.transition = lt;
+                GameManager.isTransition = true;
+            }
+        });
+
+        uiObserver = new UIObserver();
+        uiObserver.addItem(backToTitle);
+        uiObserver.addItem(retry);
+
+        renderer.addItem(retry);
         renderer.addItem(backToTitle);
     }
 
@@ -124,15 +165,19 @@ public class GameOverPanel extends Panel{
 
         clamp = Clamp.clamp(0,1,(timeBuffer-0.6f)/0.2f);
         backToTitle.setAlpha(clamp);
-        //hour.setAlpha(alpha);
-        //minute.setAlpha(alpha);
-        //second.setAlpha(alpha);
+        retry.setAlpha(clamp);
+
+        if(timeBuffer >= 0.6f){
+            uiObserver.proc();
+        }
 
         timeBuffer += Time.getDeltaTime();
     }
 
     @Override
     public boolean touch(boolean flag, Touch touch) {
+        if(timeBuffer >= 0.6f)
+            uiObserver.touch(touch,flag);
         return flag;
     }
 

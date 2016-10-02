@@ -9,6 +9,7 @@ import jp.ac.dendai.c.jtp.Graphics.UI.Text.StaticText;
 import jp.ac.dendai.c.jtp.Graphics.UI.UI;
 import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Math.Clamp;
+import jp.ac.dendai.c.jtp.Time;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
 
 public class LoadingTransition implements Transitionable {
@@ -27,7 +28,7 @@ public class LoadingTransition implements Transitionable {
 	private int r = 0,g = 255, b = 0;
 	private LoadingThread thread;
 	private Object lock;
-	private int count = 0;
+	private float timeBuffer = 0;
 	public static LoadingTransition getInstance(){
 		if(instance == null)
 			instance = new LoadingTransition();
@@ -54,7 +55,7 @@ public class LoadingTransition implements Transitionable {
 	public void initTransition(Class<?> nextScreenClass){
 		thread = new LoadingThread(lock);
 		thread.initThread(nextScreenClass);
-		count = 0;
+		timeBuffer = 0;
 		loading.init();
 		state = LOAD_STATE.START;
 	}
@@ -64,19 +65,23 @@ public class LoadingTransition implements Transitionable {
 		if(state == LOAD_STATE.START){
 			GameManager.nowScreen.freeze();
 			GameManager.nowScreen.Draw(0,0);
+			Constant.getLoadingShader().useShader();
+			Constant.getLoadingShader().updateCamera();
 			//ロードの開始
 			//ロード画面のトランジョン
-			float a = Clamp.clamp(0f, 1f, 60f, (float) count);
+			float a = Clamp.clamp(0f, 1f, 1f, timeBuffer);
 			//Constant.getLoadingShader().useShader();
 			image.setAlpha(a);
 			image.draw(Constant.getLoadingShader());
 			loading.setAlpha(a);
 			loading.draw(Constant.getLoadingShader());
-			if(count >= 60) {
+			if(timeBuffer >= 1) {
 				state = LOAD_STATE.LOAD_START;
-				count = 0;
+				timeBuffer = 0;
 			}
 		}else if(state == LOAD_STATE.LOAD_START){
+			Constant.getLoadingShader().useShader();
+			Constant.getLoadingShader().updateCamera();
 			image.setAlpha(1);
 			image.draw(Constant.getLoadingShader());
 			loading.setAlpha(1);
@@ -85,11 +90,13 @@ public class LoadingTransition implements Transitionable {
 			GameManager.nowScreen.death();
 			state = LOAD_STATE.LOAD_STAY;
 		}else if(state == LOAD_STATE.LOAD_STAY){
+			Constant.getLoadingShader().useShader();
+			Constant.getLoadingShader().updateCamera();
 			image.setAlpha(1);
 			image.draw(Constant.getLoadingShader());
 			loading.setAlpha(1);
 			loading.draw(Constant.getLoadingShader());
-			if(count > 120) {
+			if(timeBuffer > 2f) {
 				//ロード中
 				if (thread.isEnd()) {
 					GameManager.nowScreen = thread.getScreen();
@@ -97,27 +104,27 @@ public class LoadingTransition implements Transitionable {
 					GameManager.nowScreen.freeze();
 					thread = null;
 					state = LOAD_STATE.END;
-					count = 0;
+					timeBuffer = 0;
 				}
 			}
 		}else if(state == LOAD_STATE.END){
 			GameManager.nowScreen.Draw(0, 0);
-			//Constant.getLoadingShader().updateCamera();
 			Constant.getLoadingShader().useShader();
-			float a = Clamp.clamp(1f, 0f, 60f, (float) count);
+			Constant.getLoadingShader().updateCamera();
+			float a = Clamp.clamp(1f, 0f, 1f, timeBuffer);
 			image.setAlpha(a);
 			image.draw(Constant.getLoadingShader());
 			loading.setAlpha(a);
 			loading.draw(Constant.getLoadingShader());
-			if(count >= 60) {
+			if(timeBuffer >= 1f) {
 				//終了処理
 				state = LOAD_STATE.NON;
 				GameManager.nowScreen.unFreeze();
-				count = 0;
+				timeBuffer = 0;
 				return false;
 			}
 		}
-		count++;
+		timeBuffer += Time.getDeltaTime();
 		return true;
 	}
 

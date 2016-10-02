@@ -11,7 +11,7 @@ import jp.ac.dendai.c.jtp.Physics.Physics.PhysicsObject;
 /**
  * Created by Goto on 2016/08/31.
  */
-public class GameObject implements FrameListener{
+public class GameObject{
     protected Vector pos,rot,scl;
     protected boolean debugDraw = false;
     protected OBBCollider collider;
@@ -19,6 +19,7 @@ public class GameObject implements FrameListener{
     protected RenderMediator rm;
     protected CollisionListener cl;
     protected String name;
+    protected FrameListener fl;
     public GameObject(){
         pos = new Vector3();
         rot = new Vector3();
@@ -118,8 +119,11 @@ public class GameObject implements FrameListener{
     }
     public String getName(){return name;}
     public void setName(String name){this.name = name;}
-    @Override
+    public void setFrameListener(FrameListener fl){
+        this.fl = fl;
+    }
     public void update() {
-
+        if(fl != null)
+            fl.update(this);
     }
 }

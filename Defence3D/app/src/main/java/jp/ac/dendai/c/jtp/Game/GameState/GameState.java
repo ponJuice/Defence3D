@@ -13,14 +13,14 @@ public abstract class GameState {
         SHOP
     }
     protected StateChangeListener listener;
-    private GAME_STATE state;
+    private static GAME_STATE state;
     public abstract void proc();
     public void changeState(GAME_STATE state){
         if(listener != null)
             listener.changeState(state);
         this.state = state;
     }
-    public GAME_STATE getState(){
+    public static GAME_STATE getState(){
         return state;
     }
     public GameState(GAME_STATE init){

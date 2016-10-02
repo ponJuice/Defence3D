@@ -28,6 +28,15 @@ public class Animator {
         clampIndex();
     }
 
+    public void setIndex(int n ){
+        if(n < 0){
+            n = getAnimationLength() + n % getAnimationLength();
+        }else if(n > getAnimationLength()){
+            n = n % getAnimationLength();
+        }
+        index = n;
+    }
+
     public int getIndex(){
         return index;
     }
@@ -49,6 +58,10 @@ public class Animator {
         if(num >= ab.animation.length)
             return ab.animation[ab.animation.length-1];
         return ab.animation[num];
+    }
+
+    public int getAnimationLength(){
+        return ab.animation.length;
     }
 
     public Bitmap getBitmap(){

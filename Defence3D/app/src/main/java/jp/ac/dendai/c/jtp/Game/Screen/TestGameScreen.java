@@ -1,7 +1,9 @@
 package jp.ac.dendai.c.jtp.Game.Screen;
 
+import android.opengl.GLES20;
 import android.util.Log;
 
+import jp.ac.dendai.c.jtp.Game.Enemy.EnemyBulletList;
 import jp.ac.dendai.c.jtp.Game.Enemy.Motion.FRMotion;
 import jp.ac.dendai.c.jtp.Game.Enemy.Motion.LRMotion;
 import jp.ac.dendai.c.jtp.Game.Enemy.Motion.MotionController;
@@ -28,6 +30,7 @@ import jp.ac.dendai.c.jtp.Graphics.Renderer.AlphaRenderer;
 import jp.ac.dendai.c.jtp.Graphics.Renderer.Renderer;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Graphics.UI.Image.Image;
+import jp.ac.dendai.c.jtp.Graphics.UI.UIAlign;
 import jp.ac.dendai.c.jtp.Math.Clamp;
 import jp.ac.dendai.c.jtp.ModelConverter.Wavefront.WavefrontObjConverter;
 import jp.ac.dendai.c.jtp.Physics.Collider.ACollider;
@@ -42,6 +45,7 @@ import jp.ac.dendai.c.jtp.Time;
 import jp.ac.dendai.c.jtp.TouchUtil.Input;
 import jp.ac.dendai.c.jtp.defence3d.R;
 import jp.ac.dendai.c.jtp.openglesutil.core.GLES20Util;
+import jp.ac.dendai.c.jtp.openglesutil.graphic.blending_mode.GLES20COMPOSITIONMODE;
 
 /**
  * Created by wark on 2016/09/21.
@@ -52,7 +56,8 @@ public class TestGameScreen extends Screenable {
     private AlphaRenderer alphaRenderer;
     private Shader shader;
     private Camera mainCamera;
-    private GameObject[] inveders;
+    private Inveder[] inveders;
+    private EnemyBulletList ebl;
     private GameObject floor;
     private EnemyObserver eo;
     private Player player;
@@ -61,6 +66,12 @@ public class TestGameScreen extends Screenable {
     private TimePanel t_panel;
     private Image whiteOut;
     private float playTime;
+    private int inveder_row = 5,inveder_column = 11;
+    private float offset_x = -25f,offset_y = -5f,offset_z = 50f;
+
+    private Image caution_image;
+
+    private float clear_state_time_buffer = 0;
 
     private float cby,cbx;
 
@@ -71,10 +82,9 @@ public class TestGameScreen extends Screenable {
 
 
     private PhysicsThread physicsThread;
-    private GameObject bullet;
     private Plane p;
     private float sens_x = 0.5f,sens_y = 0.5f,sens_z = 0.5f;
-    private EndlessModeState state;
+    private static EndlessModeState state;
 
     public TestGameScreen(){
         mainCamera = new Camera(Camera.CAMERA_MODE.PERSPECTIVE,0,0,-5f,0,0,0);
@@ -91,7 +101,6 @@ public class TestGameScreen extends Screenable {
         SlopeUtil.setSensitivityX(sens_x);
         SlopeUtil.setSensitivityY(sens_y);
         SlopeUtil.setSensitivityZ(sens_z);
-
 
         PhysicsInfo pi = new PhysicsInfo();
         pi.gravity.setY(-9.8f);
@@ -149,61 +158,26 @@ public class TestGameScreen extends Screenable {
         //floor.getPos().setY(-5f);
         renderer.addItem(floor);
 
-        bullet= new GameObject();
-        bullet.getRenderMediator().mesh = bullet_model;
-        bullet.getRenderMediator().isDraw = false;
-        bullet.setPhysicsObject(new PhysicsObject(bullet));
-        bullet.getPhysicsObject().mask = Constant.COLLISION_PLAYDER | Constant.COLLISION_PLAYERBULLET;
-        bullet.getPhysicsObject().tag = Constant.COLLISION_ENEMYBULLET;
-        bullet.getPhysicsObject().useGravity = true;
-        bullet.getPhysicsObject().freeze = true;
-        bullet.getPhysicsObject().useGravity = true;
-        bullet.setCollisionListener(new CollisionListener() {
-            @Override
-            public void collEnter(ACollider col, GameObject owner) {
-                owner.getRenderMediator().isDraw = false;
-                owner.getPhysicsObject().freeze = true;
-                Log.d("Enemy Bullet","Enemy Bullet Collision!! "+col.getGameObject().getClass());
-            }
-
-            @Override
-            public void collExit(ACollider col, GameObject owner) {
-
-            }
-
-            @Override
-            public void collStay(ACollider col, GameObject owner) {
-
-            }
-        });
-        bullet.setCollider(new OBBCollider(0,0,0,1,1,1));
-        bullet.setDebugDraw(false);
-        bullet.useOBB(false);
-        bullet.getScl().setX(0.2f);
-        bullet.getScl().setY(0.2f);
-        bullet.getScl().setZ(0.2f);
-        bullet.setName("Enemy Bullet");
-        physics.addObject(bullet.getPhysicsObject());
-        renderer.addItem(bullet);
-
         GameObject[] attackTarget = new GameObject[1];
         attackTarget[0] = player;
 
         Animator damageAnimator = new Animator(AnimationBitmap.createAnimation(R.mipmap.exp_alpha,256,64,8,2));
 
-        int array_length = 55;
+        ebl = new EnemyBulletList(10,physics,renderer,alphaRenderer,bullet_model);
+
+        int array_length = inveder_row * inveder_column;
         inveders = new Inveder[array_length];
         for(int n = 0;n < inveders.length;n++){
             inveders[n] = new Inveder(physics);
-            ((Inveder)inveders[n]).setAlphaRenderer(alphaRenderer);
-            ((Inveder)inveders[n]).setAnim(damageAnimator);
-            ((Inveder)inveders[n]).setBullets(bullet);
-            ((Inveder)inveders[n]).setTargetList(attackTarget);
+            inveders[n].setAlphaRenderer(alphaRenderer);
+            inveders[n].setAnim(damageAnimator);
+            inveders[n].setBullets(ebl);
+            inveders[n].setTargetList(attackTarget);
             inveders[n].getRenderMediator().mesh = inveder_model;
             inveders[n].getRenderMediator().isDraw = true;
-            inveders[n].getPos().setY(-5f);
-            inveders[n].getPos().setZ(50f + (float)(n / 11) * 15f);
-            inveders[n].getPos().setX((float)n % 11 * 3f - 11f);
+            inveders[n].getPos().setY(offset_y);
+            inveders[n].getPos().setZ(offset_z + (float)(n / inveder_column) * 10f);
+            inveders[n].getPos().setX(offset_x + (float)n % inveder_column * 5f - (float)inveder_column);
             inveders[n].setDebugDraw(false);
             inveders[n].setName("Inveder");
             renderer.addItem(inveders[n]);
@@ -211,16 +185,16 @@ public class TestGameScreen extends Screenable {
 
         motionController = new MotionController(inveders);
         LRMotion asm = new LRMotion();
-        asm.offset_z = 50f;
-        asm.offset_x = -25f;
-        asm.offset_y = -5f;
+        asm.offset_z = offset_z;
+        asm.offset_x = offset_x;
+        asm.offset_y = offset_y;
 
         motionController.addMotion(asm);
         motionController.addMotion(new FRMotion());
         motionController.setMotion(asm);
         //eo = new EnemyObserver(inveders);
 
-        state = new EndlessModeState(motionController);
+        state = new EndlessModeState(motionController,player);
         state.setChangeStateListener(new StateChangeListener() {
             @Override
             public void changeState(GameState.GAME_STATE state) {
@@ -231,6 +205,19 @@ public class TestGameScreen extends Screenable {
                     SlopeUtil.enabled(false);
                     cbx = mainCamera.getPosition(Camera.POSITION.X);
                     cby = mainCamera.getPosition(Camera.POSITION.Y);
+                }else if(state == GameState.GAME_STATE.CLEAR){
+                    clear_state_time_buffer = 0;
+                    for(int n = 0;n < inveders.length;n++){
+                        inveders[n].getRenderMediator().isDraw = false;
+                        inveders[n].getPhysicsObject().freeze = false;
+                        inveders[n].init();
+                        inveders[n].getPos().setY(offset_y);
+                        inveders[n].getPos().setZ(offset_z + (float)(n / inveder_column) * 10f);
+                        inveders[n].getPos().setX(offset_x + (float)(n % inveder_column) * 5f);
+                        inveders[n].setDebugDraw(false);
+                        inveders[n].setName("Inveder");
+                        //renderer.addItem(inveders[n]);
+                    }
                 }
             }
         });
@@ -256,6 +243,19 @@ public class TestGameScreen extends Screenable {
         whiteOut.setEnabled(false);
 
         panel.getUiRenderer().addItem(whiteOut);
+
+        caution_image = new Image();
+        caution_image.setBitmap(GLES20Util.loadBitmap(R.mipmap.caution));
+        caution_image.useAspect(true);
+        caution_image.setWidth(0.5f);
+        caution_image.setBlendMode(GLES20COMPOSITIONMODE.ADD);
+        caution_image.setHorizontal(UIAlign.Align.CENTOR);
+        caution_image.setVertical(UIAlign.Align.CENTOR);
+        caution_image.setX(GLES20Util.getWidth_gl()/2f);
+        caution_image.setY(GLES20Util.getHeight_gl()/2f);
+        caution_image.setAlpha(0f);
+        caution_image.setEnabled(false);
+        panel.getUiRenderer().addItem(caution_image);
     }
 
 
@@ -267,18 +267,16 @@ public class TestGameScreen extends Screenable {
             return;
         if(!physicsThread.isRun())
             physicsThread.start();
-        if(state.getState() != GameState.GAME_STATE.PAUSE
-                && state.getState() != GameState.GAME_STATE.GAMEOVER
-                && state.getState() != GameState.GAME_STATE.CLEAR) {
+        if(state.getState() == GameState.GAME_STATE.PLAYING) {
             panel.proc();
             motionController.procAll();
             //eo.procAll();
             player.proc();
-            bullet.getPos();
 
             state.proc();
             t_panel.setTime(playTime);
             playTime += Time.getDeltaTime();
+            //Log.d("Time",""+playTime);
         }else if(state.getState() == GameState.GAME_STATE.GAMEOVER){
             whiteOut.setEnabled(true);
             float a = Clamp.bezier2Trajectory(0,1,1f,whiteBuffer/3f);
@@ -297,6 +295,17 @@ public class TestGameScreen extends Screenable {
                 g_panel.setEnabled(true);
                 g_panel.proc();
             }
+        }else if(state.getState() == GameState.GAME_STATE.CLEAR){
+            float deltaTime = 20f;
+            if(clear_state_time_buffer > (float)inveders.length / deltaTime){
+                state.changeState(GameState.GAME_STATE.PLAYING);
+            }
+            for(int n = 0;n < inveders.length;n++){
+                if(clear_state_time_buffer > (float)n/deltaTime){
+                    inveders[n].getRenderMediator().isDraw = true;
+                }
+            }
+            clear_state_time_buffer += Time.getDeltaTime();
         }
     }
 
@@ -317,16 +326,16 @@ public class TestGameScreen extends Screenable {
     public void Touch() {
         if(freeze)
             return;
-        if(state.getState() != GameState.GAME_STATE.PAUSE
-                && state.getState() != GameState.GAME_STATE.GAMEOVER
-                && state.getState() != GameState.GAME_STATE.CLEAR) {
-            for (int n = 0; n < Input.getTouchArray().length; n++) {
-                boolean flag = panel.touch(true, Input.getTouchArray()[n]);
+        for (int n = 0; n < Input.getTouchArray().length; n++) {
+            boolean flag = true;
+            if(state.getState() == GameState.GAME_STATE.PLAYING) {
+                flag = panel.touch(true, Input.getTouchArray()[n]);
                 if (flag)
                     player.touch(Input.getTouchArray()[n]);
-                //Log.d("touch","index:"+n+" flag:"+flag);
-                Input.getTouchArray()[n].resetDelta();
+            }else if(state.getState() == GameState.GAME_STATE.GAMEOVER) {
+                g_panel.touch(true, Input.getTouchArray()[n]);
             }
+            Input.getTouchArray()[n].resetDelta();
         }
     }
 

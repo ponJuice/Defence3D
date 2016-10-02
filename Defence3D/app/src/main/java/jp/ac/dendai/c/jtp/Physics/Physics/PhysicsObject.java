@@ -1,6 +1,8 @@
 package jp.ac.dendai.c.jtp.Physics.Physics;
 
 
+import java.util.HashMap;
+
 import jp.ac.dendai.c.jtp.Game.GameObject;
 import jp.ac.dendai.c.jtp.Graphics.Shader.Shader;
 import jp.ac.dendai.c.jtp.Math.Vector;
@@ -14,13 +16,14 @@ public class PhysicsObject {
         STAY,
         NON
     }
-    COLLISION collisionMode = COLLISION.NON;
+    //COLLISION collisionMode = COLLISION.NON;
     public int mask;
     public int tag;
     public String name;
     public float mass;
     public GameObject gameObject;
     public Vector velocity;
+    protected HashMap<PhysicsObject,COLLISION> collisionList = new HashMap<>();
     Vector impulseVelocity;
     Vector bufferVelocity;
     Vector bufferPos;
@@ -42,6 +45,17 @@ public class PhysicsObject {
         bufferScl = new Vector3();
         useGravity = true;
         freeze = false;
+    }
+
+    public COLLISION getCollision(PhysicsObject po){
+        if(collisionList.containsKey(po)){
+            return collisionList.get(po);
+        }
+        return COLLISION.NON;
+    }
+
+    public void setCollision(PhysicsObject po,COLLISION col){
+        collisionList.put(po,col);
     }
 
     public void reset(){
